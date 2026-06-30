@@ -2,13 +2,33 @@
 
 ## 1. Resumen
 
-FatFingers sera una app Tauri v2 con frontend React/TypeScript y backend Rust.
+FatFingers es una app Tauri v2 con frontend React/TypeScript y backend Rust.
 
 El frontend renderiza onboarding, helper flotante y settings. El backend controla ventanas, tray, shortcuts globales, clipboard, settings, secrets y llamadas LLM.
 
 React no debe llamar proveedores LLM directamente.
 
-## 2. Estructura frontend prevista
+## 1.1 Estado implementado
+
+La arquitectura base ya esta implementada en el repo.
+
+Componentes principales actuales:
+
+- `src/App.tsx`: selecciona vista inicial, carga settings y estado de secrets.
+- `src/screens/Helper.tsx`: helper flotante y ejecucion de acciones.
+- `src/screens/Onboarding.tsx`: primer flujo de configuracion.
+- `src/screens/Settings.tsx`: dashboard de configuracion.
+- `src/components/ProviderForm.tsx`: provider, modelo, API key y headers.
+- `src-tauri/src/lib.rs`: registro de comandos Tauri y plugins.
+- `src-tauri/src/app/`: ventanas, tray, shortcuts y clipboard.
+- `src-tauri/src/settings/`: settings, history y secrets.
+- `src-tauri/src/llm/`: providers, prompt builder y tipos LLM.
+- `src-tauri/src/errors/`: errores serializables para IPC.
+
+Los comandos Tauri usan Rust como unico punto de salida hacia proveedores LLM.
+El frontend solo invoca comandos Tauri mediante `src/lib/tauri.ts`.
+
+## 2. Estructura frontend
 
 ```text
 src/
@@ -48,7 +68,7 @@ src/
     llm.ts
 ```
 
-## 3. Estructura backend prevista
+## 3. Estructura backend
 
 ```text
 src-tauri/src/
@@ -193,6 +213,15 @@ custom_headers
 
 Los secrets no deben guardarse en settings planos.
 
+Implementacion actual:
+
+- `provider_api_key` y `custom_headers` se guardan con `keyring`.
+- Nombre de servicio: `FatFingers`.
+- Linux usa `keyring` con feature `linux-native`.
+- macOS usa `apple-native`.
+- Windows usa `windows-native`.
+- `save_secret` verifica que el valor pueda leerse despues de guardarse para evitar falsos positivos.
+
 ## 6. Tauri commands
 
 ```rust
@@ -262,7 +291,9 @@ Debe usar HTTP directo desde Rust contra la Responses API.
 Requisitos:
 
 - Leer API key desde secrets.
+- Usar endpoint fijo `https://api.openai.com/v1/responses`.
 - Usar modelo configurable.
+- Ofrecer en frontend una lista sugerida de modelos OpenAI y permitir un modelo custom.
 - Usar `store: false` cuando aplique.
 - Aplicar timeout.
 - Parsear output text de forma segura.

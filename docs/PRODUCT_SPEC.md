@@ -1,5 +1,32 @@
 # Product Spec: FatFingers
 
+## 0. Estado actual
+
+Estado del producto: MVP alpha funcional.
+
+El repositorio ya contiene una implementacion Tauri v2 con React/TypeScript y
+backend Rust. El objetivo de este documento sigue siendo definir el
+comportamiento esperado del producto, pero las decisiones implementadas deben
+mantenerse sincronizadas con `docs/ARCHITECTURE.md`, `docs/MVP_PLAN.md` y
+`docs/SECURITY_PRIVACY.md`.
+
+Implementado en el MVP alpha:
+
+- Helper flotante con acciones de escritura y copia al portapapeles.
+- Onboarding y dashboard de settings.
+- Atajo global y tray/menu bar.
+- Persistencia local de settings no secretos.
+- Almacenamiento seguro de API key y custom headers mediante `keyring`.
+- Providers `openai`, `openai_compatible` y `custom_http`.
+- Test de conexion de provider.
+- Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
+
+Pendiente:
+
+- QA manual completa en macOS y Windows.
+- Packaging final firmado/notarizado por plataforma.
+- Reemplazo automatico en app origen, que sigue fuera del MVP.
+
 ## 1. Vision
 
 FatFingers es un asistente de escritura desktop que corre en segundo plano y aparece como un overlay flotante cuando el usuario presiona un atajo global.
@@ -126,6 +153,14 @@ Campos:
 - Test connection
 
 La API key no debe mostrarse despues de guardarse. La UI puede indicar que existe una key guardada.
+
+Para `openai`, la UI debe mostrar la URL efectiva de la Responses API
+`https://api.openai.com/v1/responses` como valor informativo no editable. El
+campo `baseUrl` editable aplica solo para `openai_compatible` y `custom_http`.
+
+El selector de modelo de OpenAI debe ofrecer una lista curada de modelos
+actuales y una opcion de modelo custom. La app no debe bloquear modelos nuevos
+que el usuario pueda ingresar manualmente.
 
 ### 7.4 Writing Behavior
 

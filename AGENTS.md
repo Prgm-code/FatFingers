@@ -4,7 +4,9 @@ Guia para agentes que trabajen en FatFingers.
 
 ## Estado actual
 
-El proyecto esta en fase de especificacion. No inicialices Tauri, no generes codigo fuente y no instales dependencias salvo que el usuario lo pida explicitamente.
+El proyecto ya tiene una primera implementacion Tauri/React/Rust. No reinicialices Tauri ni reemplaces la estructura existente salvo que el usuario lo pida explicitamente.
+
+Estado publico: MVP alpha. El repo esta preparado para publicarse como open source, pero todavia requiere QA macOS/Windows y packaging final antes de un release estable.
 
 Antes de implementar, lee:
 
@@ -78,3 +80,4 @@ El MVP debe copiar el resultado al portapapeles. v1.1 puede capturar texto selec
 - Mantener nombres de tipos, comandos, APIs y modulos en ingles.
 - Actualizar docs antes de implementar cambios que alteren comportamiento publico.
 - No duplicar secretos ni ejemplos con API keys reales.
+- Mantener `README.md`, `CONTRIBUTING.md`, `SECURITY.md` y `CHANGELOG.md` sincronizados con cambios publicos relevantes.

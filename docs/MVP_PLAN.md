@@ -4,7 +4,9 @@
 
 El MVP debe entregar una app desktop Tauri v2 funcional para correcciones y reescrituras cortas con LLM configurable.
 
-La primera implementacion debe priorizar:
+Estado actual: MVP alpha implementado en Linux local.
+
+La implementacion actual prioriza:
 
 - Bootstrap estable.
 - Helper flotante rapido.
@@ -13,6 +15,23 @@ La primera implementacion debe priorizar:
 - Provider OpenAI funcional.
 - Copia al portapapeles.
 - Tests basicos.
+
+Pendientes principales para cerrar el MVP como release publico:
+
+- QA manual en macOS y Windows.
+- Empaquetado final por plataforma.
+- Validacion con providers reales fuera del entorno local.
+- Icono final y revision visual de instaladores.
+
+## 1.1 Estado por fase
+
+- Fase 0 Bootstrap: implementada.
+- Fase 1 Floating Helper: implementada para flujo manual de input/copy.
+- Fase 2 Global Shortcut y Tray: implementada, pendiente QA multiplataforma.
+- Fase 3 Settings y Secrets: implementada, secrets mediante `keyring`.
+- Fase 4 LLM Integration: implementada para OpenAI, OpenAI-compatible y Custom HTTP.
+- Fase 5 Clipboard: implementada para copy/read mediante plugin Tauri.
+- Fase 6 Tests, Packaging y QA: tests y build debug Linux listos; QA macOS/Windows pendiente.
 
 ## 2. Fase 0: Bootstrap
 
@@ -79,6 +98,7 @@ Entregables:
 - Secure storage para API key y custom headers.
 - Botones Clear API key y Clear all local data.
 - Controles de provider, modelo, endpoint, timeout, temperatura.
+- Para OpenAI, mostrar endpoint Responses API no editable y permitir elegir modelo sugerido o modelo custom.
 - Controles de modo de escritura:
   - `correctionMode`
   - `formalityLevel`

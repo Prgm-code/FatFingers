@@ -10,7 +10,16 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.vite
 *.local
+.env
+.env.*
+!.env.example
+.env.local
+
+# Tauri/Rust build output
+src-tauri/target
+src-tauri/gen
 
 # Editor directories and files
 .vscode/*

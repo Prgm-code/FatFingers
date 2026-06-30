@@ -1,0 +1,91 @@
+.settings-shell,
+.onboarding-shell {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  padding: 14px;
+  overflow: auto;
+  background: var(--bg);
+}
+
+.settings-section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 12px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.settings-grid textarea {
+  min-height: 72px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  gap: 8px;
+  color: var(--text);
+}
+
+.checkbox-row input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.shortcut-recorder {
+  display: grid;
+  gap: 10px;
+}
+
+.form-actions {
+  align-content: end;
+  align-items: end;
+}
+
+.privacy-note {
+  border-inline-start: 3px solid var(--accent);
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--accent-soft);
+}
+
+.settings-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-block-start: 1px solid var(--border);
+  padding-block-start: 10px;
+  background: var(--bg);
+}
+
+@media (max-width: 620px) {
+  .settings-shell,
+  .onboarding-shell {
+    padding: 10px;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-footer {
+    justify-content: stretch;
+  }
+
+  .settings-footer button {
+    flex: 1 1 auto;
+  }
+}

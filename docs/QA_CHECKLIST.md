@@ -106,3 +106,30 @@
 8. Ver resultado.
 9. Copiar resultado.
 10. Pegar en otra app manualmente.
+
+## 9. Ejecucion local registrada
+
+Fecha: 2026-06-30.
+
+Entorno: Linux local.
+
+Comandos ejecutados:
+
+- `pnpm test`: 17 tests frontend pasan.
+- `pnpm build`: TypeScript y build Vite pasan.
+- `cargo fmt --check`: pasa.
+- `cargo check`: pasa.
+- `cargo test`: 21 tests backend pasan.
+- `pnpm tauri build --debug --bundles deb`: genera `src-tauri/target/debug/bundle/deb/FatFingers_0.1.0_amd64.deb`.
+
+Notas:
+
+- El build Linux usa `keyring` con backend `linux-native`.
+- El test con provider real requiere API key del usuario y no se ejecuta en CI local.
+- Las validaciones de secrets verifican que el valor guardado pueda leerse nuevamente.
+
+Validaciones pendientes por plataforma:
+
+- Empaquetado y smoke test manual en macOS.
+- Empaquetado y smoke test manual en Windows.
+- Prueba con provider real usando API key del usuario.

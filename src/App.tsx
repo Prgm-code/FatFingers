@@ -1,50 +1,158 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { Helper } from "./screens/Helper";
+import { Onboarding } from "./screens/Onboarding";
+import { Settings } from "./screens/Settings";
+import { About } from "./screens/About";
+import { FALLBACK_SETTINGS, SECRET_PROVIDER_API_KEY } from "./lib/settings";
+import {
+  copyToClipboard,
+  correctText,
+  getSettings,
+  hasSecret,
+  hideHelperWindow,
+  normalizeError,
+} from "./lib/tauri";
+import type { AppSettings, View } from "./types/app";
+import type { CorrectTextResponse, WritingAction } from "./types/llm";
+import "./styles/globals.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [settings, setSettings] = useState<AppSettings>(FALLBACK_SETTINGS);
+  const [view, setView] = useState<View>("helper");
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [startupError, setStartupError] = useState<string | null>(null);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    let isMounted = true;
+
+    async function load() {
+      try {
+        const [loadedSettings, storedApiKey] = await Promise.all([
+          getSettings(),
+          hasSecret(SECRET_PROVIDER_API_KEY),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setSettings(loadedSettings);
+        setHasApiKey(storedApiKey);
+        setView(storedApiKey ? "helper" : "onboarding");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+        setStartupError(normalizeError(error).message);
+        setView("helper");
+      } finally {
+        if (isMounted) {
+          setIsReady(true);
+        }
+      }
+    }
+
+    void load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = settings.theme;
+  }, [settings.theme]);
+
+  useEffect(() => {
+    const unlistenSettings = listen("fatfingers://open-settings", () => {
+      setView("settings");
+    });
+    const unlistenFocus = listen("fatfingers://focus-input", () => {
+      setView((currentView) => (currentView === "settings" ? currentView : "helper"));
+    });
+
+    return () => {
+      void unlistenSettings.then((unlisten) => unlisten());
+      void unlistenFocus.then((unlisten) => unlisten());
+    };
+  }, []);
+
+  async function runAction(
+    inputText: string,
+    action: WritingAction,
+  ): Promise<CorrectTextResponse> {
+    try {
+      return await correctText({ action, inputText, customInstruction: null });
+    } catch (error) {
+      throw new Error(normalizeError(error).message);
+    }
+  }
+
+  async function copyResult(text: string): Promise<void> {
+    try {
+      await copyToClipboard(text);
+    } catch (error) {
+      throw new Error(normalizeError(error).message);
+    }
+  }
+
+  if (!isReady) {
+    return (
+      <main className="loading-screen">
+        <span className="loading-dot" />
+        Loading
+      </main>
+    );
+  }
+
+  if (view === "onboarding") {
+    return (
+      <Onboarding
+        hasApiKey={hasApiKey}
+        onFinish={(savedSettings, nextHasApiKey) => {
+          setSettings(savedSettings);
+          setHasApiKey(nextHasApiKey);
+          setView("helper");
+        }}
+        settings={settings}
+      />
+    );
+  }
+
+  if (view === "settings") {
+    return (
+      <Settings
+        hasApiKey={hasApiKey}
+        onApiKeyChanged={setHasApiKey}
+        onBack={() => setView("helper")}
+        onDataCleared={() => {
+          setSettings(FALLBACK_SETTINGS);
+          setHasApiKey(false);
+          setView("onboarding");
+        }}
+        onSettingsSaved={setSettings}
+        settings={settings}
+      />
+    );
+  }
+
+  if (view === "about") {
+    return <About onBack={() => setView("helper")} settings={settings} />;
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <>
+      {startupError ? <div className="startup-error">{startupError}</div> : null}
+      <Helper
+        onClose={() => void hideHelperWindow()}
+        onCopy={copyResult}
+        onOpenSettings={() => setView("settings")}
+        onRun={runAction}
+        settings={settings}
+      />
+    </>
   );
 }
 

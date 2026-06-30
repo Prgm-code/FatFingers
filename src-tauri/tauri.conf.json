@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ff",
+  "productName": "FatFingers",
   "version": "0.1.0",
-  "identifier": "com.prgm.ff",
+  "identifier": "com.prgm.fatfingers",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,9 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "ff",
-        "width": 800,
-        "height": 600
+        "label": "helper",
+        "title": "FatFingers",
+        "width": 680,
+        "height": 420,
+        "minWidth": 520,
+        "minHeight": 360,
+        "center": true,
+        "resizable": true,
+        "alwaysOnTop": true,
+        "decorations": true
       }
     ],
     "security": {

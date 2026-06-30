@@ -6,6 +6,12 @@ Objetivo:
 
 - Helper flotante para escritura asistida con LLM configurable.
 
+Estado:
+
+- MVP alpha implementado.
+- Validado localmente en Linux.
+- Pendiente QA manual macOS/Windows y packaging final.
+
 Incluye:
 
 - Tauri v2 desktop app.

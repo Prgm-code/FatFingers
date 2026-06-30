@@ -31,6 +31,21 @@ Reglas:
 - `has_secret` solo devuelve boolean.
 - `delete_secret` debe borrar el valor del almacenamiento seguro.
 
+Implementacion actual:
+
+- Se usa `keyring` desde Rust.
+- Servicio: `FatFingers`.
+- `provider_api_key` y `custom_headers` son los unicos nombres aceptados.
+- `save_secret` guarda y luego intenta leer el valor desde una entrada nueva.
+- Si el valor no puede recuperarse, la operacion falla con `SecureStorageUnavailable`.
+- No se usan variables de entorno para guardar API keys.
+
+Backends configurados:
+
+- Linux: `keyring` con `linux-native` (`keyutils`).
+- macOS: `apple-native` (Keychain).
+- Windows: `windows-native` (Credential Manager).
+
 ## 3. Settings no secretas
 
 Settings permitidas en store:
@@ -54,6 +69,11 @@ Settings permitidas en store:
 - storeHistory
 
 `baseUrl` no es secreto, pero no debe incluir tokens.
+
+Archivo actual:
+
+- `settings.json` en el directorio de configuracion de la app resuelto por Tauri.
+- No debe contener `provider_api_key` ni `custom_headers`.
 
 ## 4. Texto del usuario
 

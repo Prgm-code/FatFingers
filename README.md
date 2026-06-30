@@ -1,106 +1,160 @@
 # FatFingers
 
-FatFingers es una aplicacion desktop multiplataforma para corregir, pulir, reescribir, traducir o redactar respuestas cortas usando un proveedor LLM configurable.
+FatFingers es una aplicacion desktop multiplataforma para corregir, pulir, reescribir y redactar respuestas cortas usando un proveedor LLM configurable.
 
-El producto se comporta como un overlay rapido tipo Spotlight, Raycast o Alfred: corre en segundo plano, se abre con un atajo global, permite escribir o pegar texto, ejecuta una accion de escritura y devuelve un resultado listo para copiar.
+La app funciona como un helper flotante tipo Spotlight/Raycast: corre en segundo plano, se abre con un atajo global, permite escribir o pegar texto, ejecuta una accion de escritura y deja el resultado listo para copiar.
 
-## Estado del proyecto
+## Estado actual
 
-Este repositorio esta en fase de especificacion. Todavia no contiene la aplicacion Tauri ni codigo fuente.
+Estado: MVP alpha funcional.
 
-La implementacion futura debe seguir las specs en `docs/` y las instrucciones para agentes en `AGENTS.md`.
+Implementado:
 
-## Objetivo MVP
+- App Tauri v2 con frontend React/TypeScript/Vite y backend Rust.
+- Helper flotante con input, selector de accion, contador, resultado y copia al portapapeles.
+- Onboarding y pantalla de settings.
+- Atajo global configurable.
+- Tray/menu bar con acciones basicas.
+- Persistencia local de settings no secretos.
+- Almacenamiento seguro de `provider_api_key` y `custom_headers` mediante `keyring`.
+- Provider OpenAI usando Responses API desde Rust.
+- Provider OpenAI-compatible usando Chat Completions.
+- Provider Custom HTTP.
+- Acciones `Correct`, `Professional`, `Shorten`, `Friendly`, `QuickReply`, `TranslateEnglish`, `TranslateSpanish` y `Custom`.
+- Controles de modo de escritura, formalidad, creatividad, temperatura, timeout y max output tokens.
+- Tests frontend y backend basicos.
+- Build debug Linux `.deb`.
 
-El MVP debe permitir:
+Pendiente antes de considerar un release estable:
 
-- Ejecutar la app en macOS, Windows y Linux con Tauri v2.
-- Abrir un helper flotante mediante un atajo global.
-- Escribir o pegar texto en una ventana compacta siempre visible.
-- Elegir acciones de IA: corregir, profesionalizar, acortar, hacer mas amable y respuesta rapida.
-- Configurar proveedor LLM, API key, modelo, endpoint, temperatura, timeout y accion por defecto.
-- Configurar modo de correccion/escritura: solo texto, balanceado, formalidad y creatividad.
-- Enviar solicitudes LLM desde Rust, nunca desde React.
-- Mostrar el resultado y copiarlo al portapapeles.
-- Persistir configuraciones no secretas localmente.
-- Guardar API keys y headers secretos en almacenamiento seguro.
-- Ejecutarse desde tray/menu bar.
-- Manejar errores de proveedor, red, API key, shortcut y clipboard con mensajes claros.
+- QA manual completa en macOS y Windows.
+- Firmado/notarizacion e instaladores finales por plataforma.
+- Iconografia final.
+- Validacion amplia con providers reales.
+- Mejoras de accesibilidad y navegacion keyboard-first.
+- Documentar soporte exacto de keyring por plataforma.
 
-## Stack definido
+Fuera del MVP:
 
-- Tauri v2
-- Rust backend
-- React
-- TypeScript
-- Vite
-- pnpm
-- CSS modules o CSS plano
-- Sin UI framework pesado para el MVP
-
-Plugins Tauri previstos:
-
-- Global shortcut
-- Clipboard manager
-- Store
-- Stronghold o almacenamiento seguro equivalente
-- Log/shell solo si son estrictamente necesarios
-
-## LLM providers
-
-La arquitectura debe aislar los proveedores detras de una interfaz Rust `LlmProvider`.
-
-Providers MVP:
-
-- OpenAI con Responses API
-- OpenAI-compatible endpoint
-- Custom HTTP endpoint local/remoto
-
-Providers futuros:
-
-- Anthropic
-- Gemini
-- Ollama
-- LM Studio
-- Modelos locales
+- Reemplazo automatico de texto en la app origen.
+- Historial por defecto.
+- Extension de navegador.
+- Cuentas de equipo, cloud sync, pagos y marketplace de plugins.
 
 ## Privacidad
 
-Principios obligatorios:
+FatFingers no incluye telemetria por defecto y no guarda historial salvo opt-in explicito.
 
-- Las API keys no se guardan en archivos de settings.
-- El texto del usuario no se loggea por defecto.
-- No hay telemetria por defecto.
-- El historial local esta desactivado por defecto.
-- La configuracion debe explicar que el texto se envia solo al proveedor elegido por el usuario.
+La API key no se guarda en `settings.json` ni en variables de entorno. Se guarda como secreto:
 
-## Documentacion
+- Servicio: `FatFingers`
+- Secreto API key: `provider_api_key`
+- Secreto headers: `custom_headers`
 
-- `docs/PRODUCT_SPEC.md`: especificacion funcional del producto.
-- `docs/ARCHITECTURE.md`: arquitectura frontend/backend.
-- `docs/MVP_PLAN.md`: fases de implementacion y criterios de aceptacion.
-- `docs/SECURITY_PRIVACY.md`: decisiones de seguridad y privacidad.
-- `docs/QA_CHECKLIST.md`: pruebas manuales y automatizadas esperadas.
-- `docs/ROADMAP.md`: evolucion posterior al MVP.
-- `AGENTS.md`: reglas para agentes que trabajen en el proyecto.
+El texto del usuario se envia solo al proveedor configurado por el usuario y todas las llamadas LLM salen desde Rust, nunca desde React.
 
-## Comandos futuros esperados
+## Providers
 
-Cuando la app exista:
+Providers actuales:
+
+- `openai`: usa `https://api.openai.com/v1/responses`.
+- `openai_compatible`: usa `/chat/completions` sobre el `baseUrl` configurado.
+- `custom_http`: envia un JSON simple a un endpoint definido por el usuario.
+
+La lista sugerida de modelos OpenAI vive en `src/lib/settings.ts` y permite ingresar un modelo custom.
+
+## Requisitos de desarrollo
+
+- Node.js compatible con Vite 7.
+- `pnpm`.
+- Rust stable.
+- Dependencias de Tauri v2 para la plataforma local.
+
+En Linux, el almacenamiento seguro usa `keyring` con backend `linux-native` (`keyutils`). El entorno debe permitir kernel keyrings para que las API keys sean recuperables por la app.
+
+## Uso local
+
+Instalar dependencias:
 
 ```bash
 pnpm install
-pnpm dev
-pnpm tauri dev
-pnpm test
-pnpm build
-pnpm tauri build
 ```
 
-## Roadmap resumido
+Ejecutar frontend solamente:
 
-- MVP: helper flotante, settings, shortcut global, tray, OpenAI provider, copiar resultado.
-- v1.1: capturar texto seleccionado mediante flujo de clipboard y dejar resultado copiado.
-- v1.2: reemplazar texto en la app origen con permisos explicitos por sistema operativo.
-- v1.3: modelos locales con Ollama, LM Studio y endpoints OpenAI-compatible.
-- v1.4: presets, snippets y acciones personalizadas.
+```bash
+pnpm dev
+```
+
+Ejecutar app Tauri:
+
+```bash
+pnpm tauri dev
+```
+
+Tests y builds:
+
+```bash
+pnpm test
+pnpm build
+pnpm tauri build --debug --bundles deb
+```
+
+Checks backend:
+
+```bash
+cd src-tauri
+cargo fmt --check
+cargo check
+cargo test
+```
+
+## Estructura
+
+```text
+src/
+  components/       Componentes React reutilizables
+  screens/          Helper, settings, onboarding y about
+  lib/              Wrappers Tauri, settings y validadores
+  styles/           CSS plano
+  types/            Tipos compartidos frontend
+
+src-tauri/src/
+  app/              Ventanas, tray, shortcuts y clipboard
+  settings/         Settings, history y secrets
+  llm/              Providers, prompts y tipos LLM
+  errors/           Errores serializables para IPC
+
+docs/               Specs, arquitectura, QA, roadmap y privacidad
+```
+
+## Documentacion
+
+- `docs/PRODUCT_SPEC.md`: comportamiento del producto.
+- `docs/ARCHITECTURE.md`: arquitectura actual y contratos.
+- `docs/MVP_PLAN.md`: estado del MVP y pendientes.
+- `docs/SECURITY_PRIVACY.md`: decisiones de seguridad y privacidad.
+- `docs/QA_CHECKLIST.md`: pruebas automatizadas y manuales.
+- `docs/ROADMAP.md`: evolucion planificada.
+- `docs/OPEN_SOURCE_CHECKLIST.md`: checklist para publicar y preparar releases.
+- `AGENTS.md`: reglas para agentes/coding assistants.
+
+## Contribuir
+
+Lee `CONTRIBUTING.md` antes de abrir cambios. Para cambios de comportamiento publico, actualiza primero los docs relevantes en `docs/`.
+
+Reglas principales:
+
+- No llames proveedores LLM desde React.
+- No guardes secrets en settings planos.
+- No agregues telemetria por defecto.
+- No agregues frameworks UI pesados para el MVP.
+- Mantiene la UI rapida, compacta y keyboard-first.
+
+## Seguridad
+
+Para reportar vulnerabilidades, sigue `SECURITY.md`. No abras issues publicos con API keys, textos privados, headers secretos o trazas que contengan informacion sensible.
+
+## Licencia
+
+MIT. Ver `LICENSE`.
