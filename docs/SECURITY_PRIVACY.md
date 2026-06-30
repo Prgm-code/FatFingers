@@ -120,6 +120,7 @@ Requisitos:
 - Toda llamada LLM se hace desde Rust.
 - Usar timeout configurable.
 - Usar `store: false` en OpenAI cuando aplique.
+- MiniMax usa el mismo secret `provider_api_key`; `baseUrl` y modelo se guardan como settings no secretos.
 - No incluir secrets ni texto en errores.
 - Mapear errores raw a errores de usuario.
 

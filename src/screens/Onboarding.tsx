@@ -5,6 +5,7 @@ import { ShortcutRecorder } from "../components/ShortcutRecorder";
 import {
   APP_LANGUAGES,
   FALLBACK_SETTINGS,
+  MINIMAX_BASE_URL,
   SECRET_CUSTOM_HEADERS,
   SECRET_PROVIDER_API_KEY,
 } from "../lib/settings";
@@ -63,7 +64,12 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
   async function persistDraft(): Promise<{ settings: AppSettings; hasApiKey: boolean } | null> {
     const normalized: AppSettings = {
       ...draft,
-      baseUrl: draft.provider === "openai" ? null : toNullableText(draft.baseUrl ?? ""),
+      baseUrl:
+        draft.provider === "openai"
+          ? null
+          : draft.provider === "minimax"
+            ? (toNullableText(draft.baseUrl ?? "") ?? MINIMAX_BASE_URL)
+            : toNullableText(draft.baseUrl ?? ""),
     };
     const settingsError = validateSettings(normalized, language);
 

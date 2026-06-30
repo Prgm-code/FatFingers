@@ -139,6 +139,15 @@ pub fn validate_settings(settings: &AppSettings) -> Result<(), AppError> {
 
     match settings.provider {
         ProviderType::OpenAi => {}
+        ProviderType::MiniMax => {
+            if let Some(base_url) = settings.base_url.as_deref() {
+                if !base_url.trim().is_empty() {
+                    url::Url::parse(base_url).map_err(|_| {
+                        AppError::new(AppErrorKind::InvalidSettings, "Base URL is not valid.")
+                    })?;
+                }
+            }
+        }
         ProviderType::OpenAiCompatible | ProviderType::CustomHttp => {
             let Some(base_url) = settings.base_url.as_deref() else {
                 return Err(AppError::new(
@@ -166,6 +175,7 @@ pub fn validate_settings(settings: &AppSettings) -> Result<(), AppError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::llm::minimax::DEFAULT_MINIMAX_BASE_URL;
 
     #[test]
     fn defaults_match_mvp_writing_behavior() {
@@ -237,5 +247,25 @@ mod tests {
         let error = validate_settings(&settings).unwrap_err();
 
         assert_eq!(error.code, AppErrorKind::InvalidSettings);
+    }
+
+    #[test]
+    fn minimax_provider_allows_default_base_url() {
+        let mut settings = AppSettings::default();
+        settings.provider = ProviderType::MiniMax;
+        settings.base_url = None;
+        settings.model = "MiniMax-M3".to_string();
+
+        validate_settings(&settings).unwrap();
+    }
+
+    #[test]
+    fn minimax_provider_accepts_configured_base_url() {
+        let mut settings = AppSettings::default();
+        settings.provider = ProviderType::MiniMax;
+        settings.base_url = Some(DEFAULT_MINIMAX_BASE_URL.to_string());
+        settings.model = "MiniMax-M3".to_string();
+
+        validate_settings(&settings).unwrap();
     }
 }

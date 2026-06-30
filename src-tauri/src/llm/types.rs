@@ -27,6 +27,8 @@ pub enum WritingMode {
 pub enum ProviderType {
     #[serde(rename = "openai")]
     OpenAi,
+    #[serde(rename = "minimax")]
+    MiniMax,
     #[serde(rename = "openai_compatible")]
     OpenAiCompatible,
     #[serde(rename = "custom_http")]

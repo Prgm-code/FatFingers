@@ -1,6 +1,9 @@
 import {
   CUSTOM_MODEL_VALUE,
   DEFAULT_OPENAI_MODEL,
+  DEFAULT_MINIMAX_MODEL,
+  MINIMAX_BASE_URL,
+  MINIMAX_RESPONSES_URL,
   OPENAI_MODEL_OPTIONS,
   OPENAI_RESPONSES_URL,
   PROVIDERS,
@@ -38,22 +41,38 @@ export function ProviderForm({
   onTestConnection,
 }: ProviderFormProps) {
   const isOpenAiProvider = settings.provider === "openai";
+  const isMiniMaxProvider = settings.provider === "minimax";
   const language = settings.language;
   const knownOpenAiModel = OPENAI_MODEL_OPTIONS.some(
     (option) => option.value === settings.model,
   );
   const openAiModelValue = knownOpenAiModel ? settings.model : CUSTOM_MODEL_VALUE;
-  const baseUrlValue = isOpenAiProvider ? OPENAI_RESPONSES_URL : (settings.baseUrl ?? "");
+  const baseUrlValue = isOpenAiProvider
+    ? OPENAI_RESPONSES_URL
+    : isMiniMaxProvider
+      ? (settings.baseUrl ?? MINIMAX_BASE_URL)
+      : (settings.baseUrl ?? "");
 
   function changeProvider(provider: AppSettings["provider"]) {
+    const providerChanged = provider !== settings.provider;
+
     onSettingsChange({
       ...settings,
       provider,
-      baseUrl: provider === "openai" ? null : settings.baseUrl,
+      baseUrl:
+        provider === "openai"
+          ? null
+          : provider === "minimax"
+            ? (providerChanged ? MINIMAX_BASE_URL : settings.baseUrl)
+            : settings.provider === "openai"
+              ? null
+              : settings.baseUrl,
       model:
         provider === "openai" &&
         (settings.model.trim().length === 0 || settings.model === "gpt-4.1-mini")
           ? DEFAULT_OPENAI_MODEL
+          : provider === "minimax" && (providerChanged || settings.model.trim().length === 0)
+            ? DEFAULT_MINIMAX_MODEL
           : settings.model,
     });
   }
@@ -95,6 +114,8 @@ export function ProviderForm({
           placeholder={
             settings.provider === "custom_http"
               ? "http://localhost:8080/generate"
+              : settings.provider === "minimax"
+                ? MINIMAX_RESPONSES_URL
               : "https://api.example.com/v1"
           }
           value={baseUrlValue}

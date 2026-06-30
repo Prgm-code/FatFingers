@@ -27,6 +27,17 @@ describe("validateSettings", () => {
     ).toBe("Base URL is required for this provider.");
   });
 
+  it("allows MiniMax to use its default base URL", () => {
+    expect(
+      validateSettings({
+        ...FALLBACK_SETTINGS,
+        provider: "minimax",
+        baseUrl: null,
+        model: "MiniMax-M3",
+      }),
+    ).toBeNull();
+  });
+
   it("rejects temperature outside range", () => {
     expect(validateSettings({ ...FALLBACK_SETTINGS, temperature: 2.5 })).toBe(
       "Temperature must be between 0.0 and 2.0.",

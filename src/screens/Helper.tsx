@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActionSelector } from "../components/ActionSelector";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { SettingsButton } from "../components/SettingsButton";
+import { MINIMAX_BASE_URL, OPENAI_RESPONSES_URL } from "../lib/settings";
 import { t } from "../lib/i18n";
 import { validateInput } from "../lib/validators";
 import type { AppSettings } from "../types/app";
@@ -20,6 +21,10 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
   const [action, setAction] = useState<WritingAction>(settings.defaultAction);
   const [previousInput, setPreviousInput] = useState<string | null>(null);
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
+  const [lastResponse, setLastResponse] = useState<{
+    provider: string;
+    model: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -33,6 +38,18 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
     setAction(settings.defaultAction);
   }, [settings.defaultAction]);
 
+  useEffect(() => {
+    setLastResponse(null);
+  }, [settings.provider, settings.model]);
+
+  const effectiveBaseUrl =
+    settings.provider === "openai"
+      ? OPENAI_RESPONSES_URL
+      : settings.provider === "minimax"
+        ? (settings.baseUrl ?? MINIMAX_BASE_URL)
+        : (settings.baseUrl ?? "not configured");
+  const showDevDebug = import.meta.env.DEV && import.meta.env.MODE !== "test";
+
   async function runAction() {
     const inputError = validateInput(input, language);
     if (inputError) {
@@ -44,10 +61,28 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
     setIsLoading(true);
     const originalInput = input;
     try {
+      if (showDevDebug) {
+        console.debug("[FatFingers] LLM request", {
+          action,
+          provider: settings.provider,
+          model: settings.model,
+          baseUrl: effectiveBaseUrl,
+        });
+      }
+
       const response = await onRun(input, action);
+      if (showDevDebug) {
+        console.debug("[FatFingers] LLM response", {
+          provider: response.provider,
+          model: response.model,
+          latencyMs: response.latencyMs,
+        });
+      }
+
       setPreviousInput(originalInput);
       setInput(response.outputText);
       setLatencyMs(response.latencyMs);
+      setLastResponse({ provider: response.provider, model: response.model });
 
       if (settings.autoCopy) {
         await onCopy(response.outputText);
@@ -124,6 +159,15 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
           <p className="muted">
             {settings.provider} · {settings.model}
           </p>
+          {showDevDebug ? (
+            <p className="dev-debug" data-testid="dev-debug">
+              dev request: provider={settings.provider} model={settings.model} baseUrl=
+              {effectiveBaseUrl}
+              {lastResponse
+                ? ` · last response: ${lastResponse.provider} · ${lastResponse.model}`
+                : ""}
+            </p>
+          ) : null}
         </div>
         <SettingsButton language={language} onClick={onOpenSettings} />
       </header>

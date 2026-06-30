@@ -6,6 +6,7 @@ import {
   APP_LANGUAGES,
   EXTENDED_WRITING_ACTIONS,
   FALLBACK_SETTINGS,
+  MINIMAX_BASE_URL,
   SECRET_CUSTOM_HEADERS,
   SECRET_PROVIDER_API_KEY,
   WRITING_MODES,
@@ -55,7 +56,11 @@ export function Settings({
     const normalized: AppSettings = {
       ...nextSettings,
       baseUrl:
-        nextSettings.provider === "openai" ? null : toNullableText(nextSettings.baseUrl ?? ""),
+        nextSettings.provider === "openai"
+          ? null
+          : nextSettings.provider === "minimax"
+            ? (toNullableText(nextSettings.baseUrl ?? "") ?? MINIMAX_BASE_URL)
+            : toNullableText(nextSettings.baseUrl ?? ""),
     };
     const settingsError = validateSettings(normalized, language);
 

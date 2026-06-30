@@ -16,6 +16,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - README actualizado con estado MVP alpha.
 - `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` y templates de GitHub.
 - Nota de QA Linux sobre el warning no bloqueante de `libayatana-appindicator` al inicializar el tray.
+- Soporte para provider MiniMax con modelo default `MiniMax-M3` y wire API `responses`.
+- El helper recarga settings al guardar cambios desde la ventana de configuracion y muestra datos de request LLM en modo dev.
 
 ## 0.1.0-alpha
 

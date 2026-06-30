@@ -18,7 +18,7 @@ Implementado en el MVP alpha:
 - Atajo global y tray/menu bar.
 - Persistencia local de settings no secretos.
 - Almacenamiento seguro de API key y custom headers mediante `keyring`.
-- Providers `openai`, `openai_compatible` y `custom_http`.
+- Providers `openai`, `minimax`, `openai_compatible` y `custom_http`.
 - Test de conexion de provider.
 - Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
 
@@ -154,9 +154,9 @@ Si el shortcut falla, la app debe mostrar un error claro y permitir elegir otro.
 
 Campos:
 
-- Provider type: `openai`, `openai_compatible`, `custom_http`
+- Provider type: `openai`, `minimax`, `openai_compatible`, `custom_http`
 - API key
-- Base URL para providers compatibles o custom
+- Base URL para MiniMax, providers compatibles o custom
 - Model
 - Temperature
 - Max output tokens
@@ -167,7 +167,10 @@ La API key no debe mostrarse despues de guardarse. La UI puede indicar que exist
 
 Para `openai`, la UI debe mostrar la URL efectiva de la Responses API
 `https://api.openai.com/v1/responses` como valor informativo no editable. El
-campo `baseUrl` editable aplica solo para `openai_compatible` y `custom_http`.
+campo `baseUrl` editable aplica para `minimax`, `openai_compatible` y
+`custom_http`. Para `minimax`, el default es `https://api.minimax.io/v1`,
+wire API `responses`, modelo `MiniMax-M3` y context window declarado
+`1000000`.
 
 El selector de modelo de OpenAI debe ofrecer una lista curada de modelos
 actuales y una opcion de modelo custom. La app no debe bloquear modelos nuevos

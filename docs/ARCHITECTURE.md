@@ -92,6 +92,7 @@ src-tauri/src/
     types.rs
     prompts.rs
     openai.rs
+    minimax.rs
     openai_compatible.rs
     custom_http.rs
 
@@ -195,7 +196,7 @@ type AppSettings = {
   appName: string;
   language: AppLanguage;
   hotkey: string;
-  provider: "openai" | "openai_compatible" | "custom_http";
+  provider: "openai" | "minimax" | "openai_compatible" | "custom_http";
   baseUrl?: string;
   model: string;
   defaultAction: WritingAction;
@@ -326,7 +327,21 @@ Requisitos:
 - Parsear output text de forma segura.
 - Mapear errores a mensajes amigables.
 
-### 8.2 OpenAI-compatible
+### 8.2 MiniMax
+
+Debe usar HTTP directo desde Rust contra la Responses API compatible de MiniMax.
+
+Defaults:
+
+- `provider`: `minimax`
+- `baseUrl`: `https://api.minimax.io/v1`
+- endpoint efectivo: `https://api.minimax.io/v1/responses`
+- `model`: `MiniMax-M3`
+- `model_context_window`: `1000000`
+
+La API key se guarda en el mismo secret `provider_api_key`.
+
+### 8.3 OpenAI-compatible
 
 Debe permitir:
 
@@ -335,7 +350,7 @@ Debe permitir:
 - Modelo
 - Headers opcionales guardados como secret
 
-### 8.3 Custom HTTP
+### 8.4 Custom HTTP
 
 Request:
 

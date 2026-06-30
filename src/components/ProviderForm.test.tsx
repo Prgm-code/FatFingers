@@ -1,8 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import {
   CUSTOM_MODEL_VALUE,
   FALLBACK_SETTINGS,
+  MINIMAX_BASE_URL,
   OPENAI_RESPONSES_URL,
 } from "../lib/settings";
 import { ProviderForm } from "./ProviderForm";
@@ -74,4 +76,54 @@ describe("ProviderForm", () => {
       model: "",
     });
   });
+
+  it("sets MiniMax defaults when selecting the MiniMax provider", () => {
+    const onSettingsChange = vi.fn();
+    renderProviderForm({ onSettingsChange });
+
+    fireEvent.change(screen.getByLabelText("Provider type"), {
+      target: { value: "minimax" },
+    });
+
+    expect(onSettingsChange).toHaveBeenCalledWith({
+      ...FALLBACK_SETTINGS,
+      provider: "minimax",
+      baseUrl: MINIMAX_BASE_URL,
+      model: "MiniMax-M3",
+    });
+  });
+
+  it("shows the selected MiniMax model after changing provider", () => {
+    render(<ControlledProviderForm />);
+
+    fireEvent.change(screen.getByLabelText("Provider type"), {
+      target: { value: "minimax" },
+    });
+
+    expect((screen.getByLabelText("Model") as HTMLInputElement).value).toBe("MiniMax-M3");
+    expect((screen.getByLabelText("Base URL") as HTMLInputElement).value).toBe(
+      MINIMAX_BASE_URL,
+    );
+  });
 });
+
+function ControlledProviderForm() {
+  const [settings, setSettings] = useState(FALLBACK_SETTINGS);
+
+  return (
+    <ProviderForm
+      apiKeyDraft=""
+      customHeadersDraft=""
+      hasApiKey={false}
+      isTesting={false}
+      onApiKeyDraftChange={vi.fn()}
+      onClearApiKey={vi.fn()}
+      onCustomHeadersDraftChange={vi.fn()}
+      onSaveApiKey={vi.fn()}
+      onSaveCustomHeaders={vi.fn()}
+      onSettingsChange={setSettings}
+      onTestConnection={vi.fn()}
+      settings={settings}
+    />
+  );
+}

@@ -1,7 +1,5 @@
 use crate::errors::{AppError, AppErrorKind};
-use tauri::{
-    AppHandle, Emitter, LogicalSize, Manager, Size, WebviewUrl, WebviewWindowBuilder,
-};
+use tauri::{AppHandle, Emitter, LogicalSize, Manager, Size, WebviewUrl, WebviewWindowBuilder};
 
 pub const HELPER_LABEL: &str = "helper";
 pub const SETTINGS_LABEL: &str = "settings";

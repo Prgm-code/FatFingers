@@ -12,7 +12,7 @@ use settings::history;
 use settings::secrets::{self, CUSTOM_HEADERS, PROVIDER_API_KEY};
 use settings::store;
 use settings::{validate_settings, AppSettings};
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 
 #[tauri::command]
 fn get_settings(app: AppHandle) -> Result<AppSettings, AppError> {
@@ -32,7 +32,9 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), AppError> 
         sync_launch_at_login(&app, settings.launch_at_login)?;
     }
 
-    store::save_settings(&app, &settings)
+    store::save_settings(&app, &settings)?;
+    let _ = app.emit("fatfingers://settings-updated", &settings);
+    Ok(())
 }
 
 #[tauri::command]

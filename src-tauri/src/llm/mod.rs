@@ -1,4 +1,5 @@
 pub mod custom_http;
+pub mod minimax;
 pub mod openai;
 pub mod openai_compatible;
 pub mod prompts;
@@ -40,6 +41,7 @@ pub fn provider_from_settings(
 
     match settings.provider {
         ProviderType::OpenAi => Ok(Box::new(openai::OpenAiProvider::new(config)?)),
+        ProviderType::MiniMax => Ok(Box::new(minimax::MiniMaxProvider::new(config)?)),
         ProviderType::OpenAiCompatible => Ok(Box::new(
             openai_compatible::OpenAiCompatibleProvider::new(config)?,
         )),

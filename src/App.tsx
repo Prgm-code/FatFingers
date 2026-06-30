@@ -20,6 +20,18 @@ import type { AppSettings, View } from "./types/app";
 import type { CorrectTextResponse, WritingAction } from "./types/llm";
 import "./styles/globals.css";
 
+async function loadSettingsSnapshot(): Promise<{
+  settings: AppSettings;
+  hasApiKey: boolean;
+}> {
+  const [settings, hasApiKey] = await Promise.all([
+    getSettings(),
+    hasSecret(SECRET_PROVIDER_API_KEY),
+  ]);
+
+  return { settings, hasApiKey };
+}
+
 function App() {
   const [settings, setSettings] = useState<AppSettings>(FALLBACK_SETTINGS);
   const requestedView = new URLSearchParams(window.location.search).get("view");
@@ -34,18 +46,15 @@ function App() {
 
     async function load() {
       try {
-        const [loadedSettings, storedApiKey] = await Promise.all([
-          getSettings(),
-          hasSecret(SECRET_PROVIDER_API_KEY),
-        ]);
+        const snapshot = await loadSettingsSnapshot();
 
         if (!isMounted) {
           return;
         }
 
-        setSettings(loadedSettings);
-        setHasApiKey(storedApiKey);
-        setView(isSettingsWindow ? "settings" : storedApiKey ? "helper" : "onboarding");
+        setSettings(snapshot.settings);
+        setHasApiKey(snapshot.hasApiKey);
+        setView(isSettingsWindow ? "settings" : snapshot.hasApiKey ? "helper" : "onboarding");
       } catch (error) {
         if (!isMounted) {
           return;
@@ -74,12 +83,31 @@ function App() {
     const unlistenSettings = listen("fatfingers://open-settings", () => {
       setView("settings");
     });
-    const unlistenFocus = listen("fatfingers://focus-input", () => {
+    const unlistenUpdatedSettings = listen<AppSettings>(
+      "fatfingers://settings-updated",
+      async (event) => {
+        setSettings(event.payload);
+        try {
+          setHasApiKey(await hasSecret(SECRET_PROVIDER_API_KEY));
+        } catch {
+          // Keep the current secret state if the secure store is temporarily unavailable.
+        }
+      },
+    );
+    const unlistenFocus = listen("fatfingers://focus-input", async () => {
       setView((currentView) => (currentView === "settings" ? currentView : "helper"));
+      try {
+        const snapshot = await loadSettingsSnapshot();
+        setSettings(snapshot.settings);
+        setHasApiKey(snapshot.hasApiKey);
+      } catch {
+        // The helper can still open with the last loaded settings.
+      }
     });
 
     return () => {
       void unlistenSettings.then((unlisten) => unlisten());
+      void unlistenUpdatedSettings.then((unlisten) => unlisten());
       void unlistenFocus.then((unlisten) => unlisten());
     };
   }, []);

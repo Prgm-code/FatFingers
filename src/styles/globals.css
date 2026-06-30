@@ -202,6 +202,16 @@ h2 {
   font-size: 12px;
 }
 
+.dev-debug {
+  max-width: min(560px, 78vw);
+  margin-top: 3px;
+  color: color-mix(in srgb, var(--accent-strong), var(--muted) 35%);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .topbar {
   display: flex;
   align-items: center;
