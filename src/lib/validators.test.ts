@@ -7,6 +7,10 @@ describe("validateInput", () => {
     expect(validateInput("   ")).toBe("Enter text before running an action.");
   });
 
+  it("returns Spanish validation errors", () => {
+    expect(validateInput("   ", "es")).toBe("Ingresa texto antes de ejecutar una acción.");
+  });
+
   it("accepts text", () => {
     expect(validateInput("hello")).toBeNull();
   });

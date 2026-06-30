@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ActionSelector } from "../components/ActionSelector";
 import { ErrorBanner } from "../components/ErrorBanner";
-import { ResultPanel } from "../components/ResultPanel";
 import { SettingsButton } from "../components/SettingsButton";
+import { t } from "../lib/i18n";
 import { validateInput } from "../lib/validators";
 import type { AppSettings } from "../types/app";
 import type { CorrectTextResponse, WritingAction } from "../types/llm";
@@ -18,11 +18,12 @@ type HelperProps = {
 export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: HelperProps) {
   const [input, setInput] = useState("");
   const [action, setAction] = useState<WritingAction>(settings.defaultAction);
-  const [result, setResult] = useState("");
+  const [previousInput, setPreviousInput] = useState<string | null>(null);
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const language = settings.language;
 
   useEffect(() => {
     textareaRef.current?.focus();
@@ -33,7 +34,7 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
   }, [settings.defaultAction]);
 
   async function runAction() {
-    const inputError = validateInput(input);
+    const inputError = validateInput(input, language);
     if (inputError) {
       setError(inputError);
       return;
@@ -41,9 +42,11 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
 
     setError(null);
     setIsLoading(true);
+    const originalInput = input;
     try {
       const response = await onRun(input, action);
-      setResult(response.outputText);
+      setPreviousInput(originalInput);
+      setInput(response.outputText);
       setLatencyMs(response.latencyMs);
 
       if (settings.autoCopy) {
@@ -53,24 +56,26 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
         }
       }
     } catch (runError) {
-      setError(runError instanceof Error ? runError.message : "The action failed.");
+      setError(runError instanceof Error ? runError.message : t(language, "actionFailed"));
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function copyResult() {
-    if (!result) {
+  async function copyInput() {
+    if (!input) {
       return;
     }
 
     try {
-      await onCopy(result);
+      await onCopy(input);
       if (settings.autoCloseAfterCopy) {
         onClose();
       }
     } catch (copyError) {
-      setError(copyError instanceof Error ? copyError.message : "Clipboard is unavailable.");
+      setError(
+        copyError instanceof Error ? copyError.message : t(language, "clipboardUnavailable"),
+      );
     }
   }
 
@@ -83,7 +88,7 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
       return;
     }
 
-    if (command && event.key === "Enter") {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       void runAction();
       return;
@@ -91,14 +96,14 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
 
     if (command && event.shiftKey && event.key.toLowerCase() === "c") {
       event.preventDefault();
-      void copyResult();
+      void copyInput();
       return;
     }
 
     if (command && event.key.toLowerCase() === "n") {
       event.preventDefault();
       setInput("");
-      setResult("");
+      setPreviousInput(null);
       setLatencyMs(null);
       setError(null);
       textareaRef.current?.focus();
@@ -120,51 +125,57 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
             {settings.provider} · {settings.model}
           </p>
         </div>
-        <SettingsButton onClick={onOpenSettings} />
+        <SettingsButton language={language} onClick={onOpenSettings} />
       </header>
 
       <ErrorBanner message={error} />
 
-      <section className="editor-section" aria-label="Floating editor">
+      <section className="editor-section" aria-label={t(language, "floatingEditor")}>
         <div className="panel-header">
-          <h2>Input</h2>
-          <span className="muted">{input.length} chars</span>
+          <h2>{t(language, "input")}</h2>
+          <span className="muted">
+            {latencyMs ? `${latencyMs} ms · ` : null}
+            {input.length} {t(language, "chars")}
+          </span>
         </div>
         <textarea
-          aria-label="Text to rewrite"
+          aria-label={t(language, "writeOrPasteText")}
           className="input-editor"
           onChange={(event) => setInput(event.currentTarget.value)}
-          placeholder="Write or paste text"
+          placeholder={t(language, "writeOrPasteText")}
           ref={textareaRef}
           value={input}
         />
         <div className="helper-controls">
-          <ActionSelector disabled={isLoading} onChange={setAction} value={action} />
+          <ActionSelector
+            disabled={isLoading}
+            language={language}
+            onChange={setAction}
+            value={action}
+          />
+          {previousInput ? (
+            <button
+              disabled={isLoading}
+              onClick={() => {
+                setInput(previousInput);
+                setPreviousInput(null);
+                setLatencyMs(null);
+                setError(null);
+                textareaRef.current?.focus();
+              }}
+              type="button"
+            >
+              {t(language, "undo")}
+            </button>
+          ) : null}
+          <button disabled={!input || isLoading} onClick={() => void copyInput()} type="button">
+            {t(language, "copy")}
+          </button>
           <button disabled={isLoading} onClick={() => void runAction()} type="button">
-            {isLoading ? "Working" : "Run"}
+            {isLoading ? t(language, "working") : t(language, "run")}
           </button>
         </div>
       </section>
-
-      <ResultPanel
-        isLoading={isLoading}
-        latencyMs={latencyMs}
-        onClose={onClose}
-        onCopy={() => void copyResult()}
-        onNew={() => {
-          setInput("");
-          setResult("");
-          setLatencyMs(null);
-          setError(null);
-          textareaRef.current?.focus();
-        }}
-        onReplaceInput={() => {
-          setInput(result);
-          textareaRef.current?.focus();
-        }}
-        onTryAgain={() => void runAction()}
-        result={result}
-      />
     </main>
   );
 }

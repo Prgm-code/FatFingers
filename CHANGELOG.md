@@ -8,6 +8,10 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Selector de idioma de interfaz ingles/español persistido en settings.
+- Helper reducido a ventana compacta, con selector de accion compacto y panel de resultado oculto hasta generar.
+- El helper ahora ejecuta con Enter, reemplaza el input con el resultado y permite Undo.
+- Settings abre en ventana separada de mayor tamaño.
 - Preparacion open source del repositorio.
 - README actualizado con estado MVP alpha.
 - `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` y templates de GitHub.

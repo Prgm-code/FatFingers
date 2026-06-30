@@ -5,6 +5,7 @@ import {
   OPENAI_RESPONSES_URL,
   PROVIDERS,
 } from "../lib/settings";
+import { t } from "../lib/i18n";
 import type { AppSettings } from "../types/app";
 
 type ProviderFormProps = {
@@ -37,6 +38,7 @@ export function ProviderForm({
   onTestConnection,
 }: ProviderFormProps) {
   const isOpenAiProvider = settings.provider === "openai";
+  const language = settings.language;
   const knownOpenAiModel = OPENAI_MODEL_OPTIONS.some(
     (option) => option.value === settings.model,
   );
@@ -66,7 +68,7 @@ export function ProviderForm({
   return (
     <div className="settings-grid">
       <label>
-        Provider type
+        {t(language, "providerType")}
         <select
           onChange={(event) =>
             changeProvider(event.currentTarget.value as AppSettings["provider"])
@@ -82,7 +84,7 @@ export function ProviderForm({
       </label>
 
       <label>
-        Base URL
+        {t(language, "baseUrl")}
         <input
           aria-readonly={isOpenAiProvider}
           onChange={(event) =>
@@ -102,7 +104,7 @@ export function ProviderForm({
       {isOpenAiProvider ? (
         <>
           <label>
-            Model
+            {t(language, "model")}
             <select
               onChange={(event) => changeOpenAiModel(event.currentTarget.value)}
               value={openAiModelValue}
@@ -112,13 +114,13 @@ export function ProviderForm({
                   {model.label}
                 </option>
               ))}
-              <option value={CUSTOM_MODEL_VALUE}>Custom model...</option>
+              <option value={CUSTOM_MODEL_VALUE}>{t(language, "customModel")}</option>
             </select>
           </label>
 
           {openAiModelValue === CUSTOM_MODEL_VALUE ? (
             <label>
-              Custom model ID
+              {t(language, "customModelId")}
               <input
                 onChange={(event) =>
                   onSettingsChange({ ...settings, model: event.currentTarget.value })
@@ -131,7 +133,7 @@ export function ProviderForm({
         </>
       ) : (
         <label>
-          Model
+          {t(language, "model")}
           <input
             onChange={(event) =>
               onSettingsChange({ ...settings, model: event.currentTarget.value })
@@ -142,18 +144,18 @@ export function ProviderForm({
       )}
 
       <label>
-        API key
+        {t(language, "apiKey")}
         <input
           autoComplete="off"
           onChange={(event) => onApiKeyDraftChange(event.currentTarget.value)}
-          placeholder={hasApiKey ? "Saved key exists" : "Paste key"}
+          placeholder={hasApiKey ? t(language, "savedKeyExists") : t(language, "pasteKey")}
           type="password"
           value={apiKeyDraft}
         />
       </label>
 
       <label>
-        Custom headers JSON
+        {t(language, "customHeadersJson")}
         <textarea
           onChange={(event) => onCustomHeadersDraftChange(event.currentTarget.value)}
           placeholder='{"X-Provider":"value"}'
@@ -164,20 +166,20 @@ export function ProviderForm({
 
       <div className="button-row form-actions">
         <button disabled={apiKeyDraft.trim().length === 0} onClick={onSaveApiKey} type="button">
-          Save API key
+          {t(language, "saveApiKey")}
         </button>
         <button disabled={!hasApiKey} onClick={onClearApiKey} type="button">
-          Clear API key
+          {t(language, "clearApiKey")}
         </button>
         <button
           disabled={customHeadersDraft.trim().length === 0}
           onClick={onSaveCustomHeaders}
           type="button"
         >
-          Save headers
+          {t(language, "saveHeaders")}
         </button>
         <button disabled={isTesting} onClick={onTestConnection} type="button">
-          {isTesting ? "Testing" : "Test connection"}
+          {isTesting ? t(language, "testing") : t(language, "testConnection")}
         </button>
       </div>
     </div>

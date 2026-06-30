@@ -1,28 +1,37 @@
 import { WRITING_ACTIONS } from "../lib/settings";
+import { t, writingActionLabel } from "../lib/i18n";
+import type { AppLanguage } from "../types/app";
 import type { WritingAction } from "../types/llm";
 
 type ActionSelectorProps = {
   value: WritingAction;
   onChange: (value: WritingAction) => void;
   disabled?: boolean;
+  language?: AppLanguage;
 };
 
-export function ActionSelector({ value, onChange, disabled = false }: ActionSelectorProps) {
+export function ActionSelector({
+  value,
+  onChange,
+  disabled = false,
+  language = "en",
+}: ActionSelectorProps) {
   return (
-    <div className="segmented-control" role="radiogroup" aria-label="Writing action">
+    <label className="action-select-label">
+      <span className="visually-hidden">{t(language, "writingAction")}</span>
+      <select
+        aria-label={t(language, "writingAction")}
+        className="action-select"
+        disabled={disabled}
+        onChange={(event) => onChange(event.currentTarget.value as WritingAction)}
+        value={value}
+      >
       {WRITING_ACTIONS.map((action) => (
-        <button
-          aria-checked={value === action.value}
-          className="segment-button"
-          disabled={disabled}
-          key={action.value}
-          onClick={() => onChange(action.value)}
-          role="radio"
-          type="button"
-        >
-          {action.label}
-        </button>
+        <option key={action.value} value={action.value}>
+          {writingActionLabel(language, action.value)}
+        </option>
       ))}
-    </div>
+      </select>
+    </label>
   );
 }

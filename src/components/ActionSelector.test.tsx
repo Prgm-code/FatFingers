@@ -7,7 +7,9 @@ describe("ActionSelector", () => {
     const onChange = vi.fn();
 
     render(<ActionSelector onChange={onChange} value="correct" />);
-    fireEvent.click(screen.getByRole("radio", { name: "Shorten" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Writing action" }), {
+      target: { value: "shorten" },
+    });
 
     expect(onChange).toHaveBeenCalledWith("shorten");
   });

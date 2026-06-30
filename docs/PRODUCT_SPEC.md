@@ -14,6 +14,7 @@ Implementado en el MVP alpha:
 
 - Helper flotante con acciones de escritura y copia al portapapeles.
 - Onboarding y dashboard de settings.
+- Helper compacto con ventana separada para settings.
 - Atajo global y tray/menu bar.
 - Persistencia local de settings no secretos.
 - Almacenamiento seguro de API key y custom headers mediante `keyring`.
@@ -112,16 +113,26 @@ Secciones:
 - Writing Behavior
 - Privacy
 
+Settings debe abrir en una ventana propia, no dentro de la ventana compacta del
+helper. La ventana de settings debe ser resizable y suficientemente amplia para
+mostrar las secciones completas con scroll interno cuando sea necesario.
+
 ### 7.1 General
 
 Campos:
 
 - Launch at login
+- Interface language: `en`, `es`
 - Default action
 - Default language behavior
 - Auto-copy result after generation
 - Close window after copy
 - Theme: `system`, `light`, `dark`
+
+`Interface language` controla solo el idioma visible de la aplicacion
+FatFingers. No fuerza el idioma de salida del proveedor LLM; la salida sigue
+determinada por la accion, el texto de entrada y el comportamiento de escritura
+configurado.
 
 ### 7.2 Shortcut
 
@@ -233,7 +244,8 @@ Cuando se presiona el shortcut global:
 - Usar ventana frameless o minima.
 - Enfocar textarea inmediatamente.
 - Cerrar con `Esc`.
-- Enviar con `Command/Ctrl + Enter`.
+- Enviar con `Enter`.
+- Insertar saltos de linea con `Shift + Enter`.
 
 Dimensiones sugeridas:
 
@@ -244,20 +256,25 @@ Dimensiones sugeridas:
 
 Estado inicial:
 
-- Textarea grande.
-- Selector de accion.
+- Textarea grande y controles minimos.
+- Accion por defecto configurada en settings, con selector compacto si el
+  usuario necesita cambiarla puntualmente.
 - Boton submit.
 - Icono de settings.
 - Contador de caracteres.
 - Indicador provider/model.
+- No mostrar un panel de resultado vacio.
 
 Despues de enviar:
 
 - Mostrar loading state.
 - Deshabilitar submit.
 - Permitir cancelar si es practico.
-- Mostrar resultado en segundo panel o panel de resultado.
-- Botones: Copy, Replace input, Try again, New, Close.
+- Reemplazar el texto del textarea con el resultado generado.
+- Mantener el tamaño del textarea estable antes y despues de generar.
+- Mostrar un boton Undo/Deshacer para restaurar el texto original de la ultima
+  generacion.
+- Botones minimos: accion, Copy, Undo cuando aplique, Run.
 
 ## 10. Shortcuts internos
 

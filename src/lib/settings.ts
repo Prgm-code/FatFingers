@@ -1,4 +1,5 @@
 import type { AppSettings } from "../types/app";
+import type { AppLanguage } from "../types/app";
 import type { ProviderType, WritingAction, WritingMode } from "../types/llm";
 
 export const SECRET_PROVIDER_API_KEY = "provider_api_key";
@@ -42,8 +43,14 @@ export const PROVIDERS: Array<{ value: ProviderType; label: string }> = [
   { value: "custom_http", label: "Custom HTTP" },
 ];
 
+export const APP_LANGUAGES: Array<{ value: AppLanguage; label: string }> = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+];
+
 export const FALLBACK_SETTINGS: AppSettings = {
   appName: "FatFingers",
+  language: "en",
   hotkey: navigator.platform.toLowerCase().includes("mac")
     ? "Command+Shift+Space"
     : "Ctrl+Shift+Space",

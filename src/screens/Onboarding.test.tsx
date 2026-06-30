@@ -49,9 +49,27 @@ describe("Onboarding", () => {
       />,
     );
 
+    expect(screen.getByLabelText("Interface language")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Provider" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Shortcut" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Finish" })).toBeTruthy();
+  });
+
+  it("updates visible labels when switching onboarding to Spanish", () => {
+    render(
+      <Onboarding
+        hasApiKey={false}
+        onFinish={vi.fn()}
+        settings={FALLBACK_SETTINGS}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Interface language"), {
+      target: { value: "es" },
+    });
+
+    expect(screen.getByRole("heading", { name: "Proveedor" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Finalizar" })).toBeTruthy();
   });
 
   it("marks the API key as saved after saving it", async () => {

@@ -1,9 +1,11 @@
 import type { ProviderType, WritingAction, WritingMode } from "./llm";
 
 export type Theme = "system" | "light" | "dark";
+export type AppLanguage = "en" | "es";
 
 export type AppSettings = {
   appName: string;
+  language: AppLanguage;
   hotkey: string;
   provider: ProviderType;
   baseUrl?: string | null;

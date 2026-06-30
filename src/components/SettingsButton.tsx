@@ -1,17 +1,23 @@
+import { t } from "../lib/i18n";
+import type { AppLanguage } from "../types/app";
+
 type SettingsButtonProps = {
   onClick: () => void;
+  language?: AppLanguage;
 };
 
-export function SettingsButton({ onClick }: SettingsButtonProps) {
+export function SettingsButton({ onClick, language = "en" }: SettingsButtonProps) {
+  const label = t(language, "openSettings");
+
   return (
     <button
-      aria-label="Open settings"
+      aria-label={label}
       className="icon-button"
       onClick={onClick}
-      title="Open settings"
+      title={label}
       type="button"
     >
-      Settings
+      {t(language, "settings")}
     </button>
   );
 }

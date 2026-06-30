@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { isLikelyHotkey, normalizeHotkey } from "../lib/hotkeys";
+import { t } from "../lib/i18n";
+import type { AppLanguage } from "../types/app";
 
 type ShortcutRecorderProps = {
   value: string;
+  language?: AppLanguage;
   onChange: (value: string) => void;
   onTest: () => void;
   onReset: () => void;
@@ -10,6 +13,7 @@ type ShortcutRecorderProps = {
 
 export function ShortcutRecorder({
   value,
+  language = "en",
   onChange,
   onTest,
   onReset,
@@ -24,7 +28,7 @@ export function ShortcutRecorder({
   return (
     <div className="shortcut-recorder">
       <label>
-        Current shortcut
+        {t(language, "currentShortcut")}
         <input
           onBlur={() => {
             const normalized = normalizeHotkey(draft);
@@ -41,13 +45,13 @@ export function ShortcutRecorder({
           onClick={() => onChange(normalizeHotkey(draft))}
           type="button"
         >
-          Change shortcut
+          {t(language, "changeShortcut")}
         </button>
         <button disabled={!isValid} onClick={onTest} type="button">
-          Test shortcut
+          {t(language, "testShortcut")}
         </button>
         <button onClick={onReset} type="button">
-          Reset shortcut
+          {t(language, "resetShortcut")}
         </button>
       </div>
     </div>

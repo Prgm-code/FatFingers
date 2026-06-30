@@ -51,6 +51,7 @@ Backends configurados:
 Settings permitidas en store:
 
 - appName
+- language
 - hotkey
 - provider
 - baseUrl

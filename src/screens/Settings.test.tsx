@@ -60,6 +60,33 @@ describe("Settings", () => {
     expect(
       screen.getByText("Your text is sent only to the AI provider you configure."),
     ).toBeTruthy();
+    expect(screen.getByLabelText("Interface language")).toBeTruthy();
+  });
+
+  it("updates visible labels when switching to Spanish and saves language", async () => {
+    render(
+      <Settings
+        hasApiKey={false}
+        onApiKeyChanged={vi.fn()}
+        onBack={vi.fn()}
+        onDataCleared={vi.fn()}
+        onSettingsSaved={vi.fn()}
+        settings={FALLBACK_SETTINGS}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText("Interface language"), {
+      target: { value: "es" },
+    });
+
+    expect(screen.getByRole("heading", { name: "Privacidad" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Guardar configuración" }));
+
+    expect(await screen.findByText("Configuración guardada.")).toBeTruthy();
+    expect(mocks.saveSettings).toHaveBeenCalledWith({
+      ...FALLBACK_SETTINGS,
+      language: "es",
+    });
   });
 
   it("shows shortcut registration errors", async () => {

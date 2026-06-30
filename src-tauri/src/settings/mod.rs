@@ -13,6 +13,8 @@ pub const DEFAULT_OPENAI_MODEL: &str = "gpt-5.4-mini";
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
     pub app_name: String,
+    #[serde(default)]
+    pub language: AppLanguage,
     pub hotkey: String,
     pub provider: ProviderType,
     pub base_url: Option<String>,
@@ -39,10 +41,24 @@ pub enum Theme {
     Dark,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AppLanguage {
+    En,
+    Es,
+}
+
+impl Default for AppLanguage {
+    fn default() -> Self {
+        Self::En
+    }
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
             app_name: APP_NAME.to_string(),
+            language: AppLanguage::En,
             hotkey: default_hotkey().to_string(),
             provider: ProviderType::OpenAi,
             base_url: None,
@@ -156,6 +172,7 @@ mod tests {
         let settings = AppSettings::default();
 
         assert_eq!(settings.app_name, APP_NAME);
+        assert_eq!(settings.language, AppLanguage::En);
         assert_eq!(settings.model, DEFAULT_OPENAI_MODEL);
         assert_eq!(settings.correction_mode, WritingMode::PlainText);
         assert_eq!(settings.formality_level, 50);
@@ -172,6 +189,43 @@ mod tests {
         let error = validate_settings(&settings).unwrap_err();
 
         assert_eq!(error.code, AppErrorKind::InvalidSettings);
+    }
+
+    #[test]
+    fn defaults_language_when_loading_legacy_settings() {
+        let json = serde_json::json!({
+            "appName": APP_NAME,
+            "hotkey": default_hotkey(),
+            "provider": "openai",
+            "baseUrl": null,
+            "model": DEFAULT_OPENAI_MODEL,
+            "defaultAction": "correct",
+            "correctionMode": "plain_text",
+            "formalityLevel": 50,
+            "creativityLevel": 20,
+            "temperature": 0.2,
+            "maxOutputTokens": 800,
+            "timeoutSeconds": 30,
+            "autoCopy": false,
+            "autoCloseAfterCopy": false,
+            "launchAtLogin": false,
+            "theme": "system",
+            "storeHistory": false
+        });
+
+        let settings: AppSettings = serde_json::from_value(json).unwrap();
+
+        assert_eq!(settings.language, AppLanguage::En);
+    }
+
+    #[test]
+    fn serializes_spanish_language_setting() {
+        let mut settings = AppSettings::default();
+        settings.language = AppLanguage::Es;
+
+        let json = serde_json::to_value(settings).unwrap();
+
+        assert_eq!(json["language"], "es");
     }
 
     #[test]

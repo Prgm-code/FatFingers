@@ -1,11 +1,12 @@
 .helper-shell {
   display: grid;
-  grid-template-rows: auto auto minmax(150px, 1fr) minmax(120px, 0.8fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 10px;
   width: 100%;
   min-width: 0;
-  min-height: 100%;
-  padding: 14px;
+  height: 100%;
+  overflow: hidden;
+  padding: 16px;
   background: var(--bg);
 }
 
@@ -14,12 +15,16 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 10px;
+  padding: 12px;
   background: var(--surface);
   box-shadow: var(--shadow);
+}
+
+.editor-section {
+  grid-template-rows: auto minmax(112px, 1fr) auto;
 }
 
 .panel-header {
@@ -31,49 +36,44 @@
 }
 
 .input-editor {
-  min-height: 112px;
+  min-height: 0;
   height: 100%;
   line-height: 1.45;
+  resize: none;
 }
 
 .helper-controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  justify-content: end;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.segmented-control {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(70px, 1fr));
-  gap: 4px;
+.action-select-label {
+  width: 180px;
   min-width: 0;
-  padding: 3px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface-muted);
+  color: var(--muted);
 }
 
-.segment-button {
-  min-width: 0;
-  min-height: 30px;
+.action-select {
+  min-height: 34px;
+  padding-block: 6px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
-  border-color: transparent;
-  padding: 4px 7px;
-  text-overflow: ellipsis;
+  clip: rect(0 0 0 0);
   white-space: nowrap;
-  background: transparent;
-}
-
-.segment-button[aria-checked="true"] {
-  border-color: color-mix(in srgb, var(--accent), transparent 55%);
-  color: var(--accent-strong);
-  background: var(--accent-soft);
+  clip-path: inset(50%);
 }
 
 .result-output {
-  min-height: 68px;
-  max-height: 28vh;
+  min-height: 64px;
+  max-height: 34vh;
   overflow: auto;
   white-space: pre-wrap;
   line-height: 1.45;
@@ -96,15 +96,15 @@
 
 @media (max-width: 620px) {
   .helper-shell {
-    grid-template-rows: auto auto minmax(180px, 1fr) minmax(150px, 0.9fr);
-    padding: 10px;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    padding: 14px;
   }
 
   .helper-controls {
-    grid-template-columns: 1fr;
+    justify-content: stretch;
   }
 
-  .segmented-control {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .action-select-label {
+    flex: 1 1 160px;
   }
 }

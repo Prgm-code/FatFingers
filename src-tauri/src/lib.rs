@@ -130,6 +130,11 @@ fn show_settings_window(app: AppHandle) -> Result<(), AppError> {
 }
 
 #[tauri::command]
+fn hide_settings_window(app: AppHandle) -> Result<(), AppError> {
+    windows::hide_settings(&app)
+}
+
+#[tauri::command]
 fn clear_local_history(app: AppHandle) -> Result<(), AppError> {
     history::clear_history(&app)
 }
@@ -233,6 +238,7 @@ pub fn run() {
             show_helper_window,
             hide_helper_window,
             show_settings_window,
+            hide_settings_window,
             clear_local_history,
             clear_all_local_data,
             set_launch_at_login

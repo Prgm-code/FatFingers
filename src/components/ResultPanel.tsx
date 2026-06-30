@@ -1,9 +1,12 @@
 import { LoadingState } from "./LoadingState";
+import { t } from "../lib/i18n";
+import type { AppLanguage } from "../types/app";
 
 type ResultPanelProps = {
   result: string;
   isLoading: boolean;
   latencyMs?: number | null;
+  language?: AppLanguage;
   onCopy: () => void;
   onReplaceInput: () => void;
   onTryAgain: () => void;
@@ -15,38 +18,47 @@ export function ResultPanel({
   result,
   isLoading,
   latencyMs,
+  language = "en",
   onCopy,
   onReplaceInput,
   onTryAgain,
   onNew,
   onClose,
 }: ResultPanelProps) {
+  if (!result && !isLoading) {
+    return null;
+  }
+
   return (
-    <section className="result-panel" aria-label="Result">
+    <section className="result-panel" aria-label={t(language, "result")}>
       <div className="panel-header">
-        <h2>Result</h2>
+        <h2>{t(language, "result")}</h2>
         {latencyMs ? <span className="muted">{latencyMs} ms</span> : null}
       </div>
 
       <div className="result-output">
-        {isLoading ? <LoadingState /> : result || <span className="placeholder">No result yet</span>}
+        {isLoading ? (
+          <LoadingState language={language} />
+        ) : (
+          result || <span className="placeholder">{t(language, "noResultYet")}</span>
+        )}
       </div>
 
       <div className="button-row">
         <button disabled={!result || isLoading} onClick={onCopy} type="button">
-          Copy
+          {t(language, "copy")}
         </button>
         <button disabled={!result || isLoading} onClick={onReplaceInput} type="button">
-          Replace input
+          {t(language, "replaceInput")}
         </button>
         <button disabled={isLoading} onClick={onTryAgain} type="button">
-          Try again
+          {t(language, "tryAgain")}
         </button>
         <button disabled={isLoading} onClick={onNew} type="button">
-          New
+          {t(language, "new")}
         </button>
         <button onClick={onClose} type="button">
-          Close
+          {t(language, "close")}
         </button>
       </div>
     </section>

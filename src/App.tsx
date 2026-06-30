@@ -5,13 +5,16 @@ import { Onboarding } from "./screens/Onboarding";
 import { Settings } from "./screens/Settings";
 import { About } from "./screens/About";
 import { FALLBACK_SETTINGS, SECRET_PROVIDER_API_KEY } from "./lib/settings";
+import { t } from "./lib/i18n";
 import {
   copyToClipboard,
   correctText,
   getSettings,
   hasSecret,
   hideHelperWindow,
+  hideSettingsWindow,
   normalizeError,
+  showSettingsWindow,
 } from "./lib/tauri";
 import type { AppSettings, View } from "./types/app";
 import type { CorrectTextResponse, WritingAction } from "./types/llm";
@@ -19,7 +22,9 @@ import "./styles/globals.css";
 
 function App() {
   const [settings, setSettings] = useState<AppSettings>(FALLBACK_SETTINGS);
-  const [view, setView] = useState<View>("helper");
+  const requestedView = new URLSearchParams(window.location.search).get("view");
+  const isSettingsWindow = requestedView === "settings";
+  const [view, setView] = useState<View>(isSettingsWindow ? "settings" : "helper");
   const [hasApiKey, setHasApiKey] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
@@ -40,13 +45,13 @@ function App() {
 
         setSettings(loadedSettings);
         setHasApiKey(storedApiKey);
-        setView(storedApiKey ? "helper" : "onboarding");
+        setView(isSettingsWindow ? "settings" : storedApiKey ? "helper" : "onboarding");
       } catch (error) {
         if (!isMounted) {
           return;
         }
         setStartupError(normalizeError(error).message);
-        setView("helper");
+        setView(isSettingsWindow ? "settings" : "helper");
       } finally {
         if (isMounted) {
           setIsReady(true);
@@ -98,11 +103,19 @@ function App() {
     }
   }
 
+  async function openSettings(): Promise<void> {
+    try {
+      await showSettingsWindow();
+    } catch {
+      setView("settings");
+    }
+  }
+
   if (!isReady) {
     return (
       <main className="loading-screen">
         <span className="loading-dot" />
-        Loading
+        {t(settings.language, "loading")}
       </main>
     );
   }
@@ -126,7 +139,14 @@ function App() {
       <Settings
         hasApiKey={hasApiKey}
         onApiKeyChanged={setHasApiKey}
-        onBack={() => setView("helper")}
+        onBack={() => {
+          if (isSettingsWindow) {
+            void hideSettingsWindow();
+            return;
+          }
+
+          setView("helper");
+        }}
         onDataCleared={() => {
           setSettings(FALLBACK_SETTINGS);
           setHasApiKey(false);
@@ -148,7 +168,7 @@ function App() {
       <Helper
         onClose={() => void hideHelperWindow()}
         onCopy={copyResult}
-        onOpenSettings={() => setView("settings")}
+        onOpenSettings={() => void openSettings()}
         onRun={runAction}
         settings={settings}
       />

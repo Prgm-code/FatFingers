@@ -56,20 +56,22 @@ Entregables:
 
 - Ventana helper compacta.
 - Textarea con foco inmediato.
-- Action selector.
+- Selector de accion compacto, usando `defaultAction` como valor inicial.
 - Character count.
 - Provider/model indicator.
-- Submit con `Cmd/Ctrl + Enter`.
+- Submit con `Enter`; `Shift + Enter` inserta salto de linea.
 - Cierre con `Esc`.
-- Result panel.
-- Botones Copy, Replace input, Try again, New, Close.
+- El resultado reemplaza el texto del textarea.
+- Boton Undo para restaurar el texto original tras una generacion.
+- Botones minimos Copy, Undo cuando aplique y Run.
 
 Validacion:
 
 - El helper abre rapido.
+- El helper abre en tamaño compacto con padding suficiente y no conserva un tamaño gigante previo.
 - El textarea recibe foco.
 - Empty input muestra error local.
-- Result panel no rompe layout.
+- El textarea mantiene tamaño estable al reemplazar input por resultado.
 
 ## 4. Fase 2: Global Shortcut y Tray
 
@@ -94,10 +96,12 @@ Validacion:
 Entregables:
 
 - Dashboard de configuracion.
+- Ventana de settings separada del helper, con tamaño amplio y resizable.
 - Store local para settings no secretas.
 - Secure storage para API key y custom headers.
 - Botones Clear API key y Clear all local data.
 - Controles de provider, modelo, endpoint, timeout, temperatura.
+- Selector de idioma de interfaz `en`/`es`.
 - Para OpenAI, mostrar endpoint Responses API no editable y permitir elegir modelo sugerido o modelo custom.
 - Controles de modo de escritura:
   - `correctionMode`
@@ -112,6 +116,7 @@ Validacion:
 - API key no aparece en archivos planos.
 - UI indica si existe API key guardada sin mostrarla.
 - Modo de escritura persiste y se envia al backend.
+- Idioma de interfaz persiste tras reinicio y no cambia el idioma de salida del LLM.
 
 ## 6. Fase 4: LLM Integration
 
@@ -155,6 +160,7 @@ Entregables:
 
 - Tests backend de prompts, settings, secrets y provider body generation.
 - Tests frontend de onboarding, settings, empty input, action selector, result copy, error banner y keyboard submit.
+- Tests frontend de selector de idioma y labels basicos en ingles/español.
 - Icono placeholder.
 - Configuracion de empaquetado.
 - QA checklist ejecutada al menos en Linux local y documentada para macOS/Windows.

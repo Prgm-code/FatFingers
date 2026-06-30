@@ -3,12 +3,14 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { ProviderForm } from "../components/ProviderForm";
 import { ShortcutRecorder } from "../components/ShortcutRecorder";
 import {
+  APP_LANGUAGES,
   EXTENDED_WRITING_ACTIONS,
   FALLBACK_SETTINGS,
   SECRET_CUSTOM_HEADERS,
   SECRET_PROVIDER_API_KEY,
   WRITING_MODES,
 } from "../lib/settings";
+import { t, writingActionLabel, writingModeLabel } from "../lib/i18n";
 import {
   clearAllLocalData,
   clearLocalHistory,
@@ -47,6 +49,7 @@ export function Settings({
   const [status, setStatus] = useState<string | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const language = draft.language;
 
   async function persistSettings(nextSettings = draft): Promise<AppSettings | null> {
     const normalized: AppSettings = {
@@ -54,7 +57,7 @@ export function Settings({
       baseUrl:
         nextSettings.provider === "openai" ? null : toNullableText(nextSettings.baseUrl ?? ""),
     };
-    const settingsError = validateSettings(normalized);
+    const settingsError = validateSettings(normalized, language);
 
     if (settingsError) {
       setError(settingsError);
@@ -67,7 +70,7 @@ export function Settings({
       await saveSettings(normalized);
       setDraft(normalized);
       onSettingsSaved(normalized);
-      setStatus("Settings saved.");
+      setStatus(t(language, "settingsSaved"));
       return normalized;
     } catch (saveError) {
       setError(normalizeError(saveError).message);
@@ -88,7 +91,7 @@ export function Settings({
     const stored = await hasSecret(SECRET_PROVIDER_API_KEY);
 
     if (!stored) {
-      throw new Error("API key could not be read from secure storage after saving.");
+      throw new Error(t(language, "apiKeySecureStorageReadFailed"));
     }
 
     setApiKeyDraft("");
@@ -100,7 +103,7 @@ export function Settings({
     setError(null);
     try {
       await persistApiKeyDraft();
-      setStatus("API key saved.");
+      setStatus(t(language, "apiKeySaved"));
     } catch (secretError) {
       setError(normalizeError(secretError).message);
     }
@@ -112,7 +115,7 @@ export function Settings({
       await deleteSecret(SECRET_PROVIDER_API_KEY);
       setApiKeyDraft("");
       onApiKeyChanged(false);
-      setStatus("API key cleared.");
+      setStatus(t(language, "apiKeyCleared"));
     } catch (secretError) {
       setError(normalizeError(secretError).message);
     }
@@ -126,11 +129,11 @@ export function Settings({
       }
       await saveSecret(SECRET_CUSTOM_HEADERS, customHeadersDraft);
       setCustomHeadersDraft("");
-      setStatus("Custom headers saved.");
+      setStatus(t(language, "customHeadersSaved"));
     } catch (headersError) {
       setError(
         headersError instanceof SyntaxError
-          ? "Custom headers must be valid JSON."
+          ? t(language, "customHeadersValidJson")
           : normalizeError(headersError).message,
       );
     }
@@ -158,7 +161,7 @@ export function Settings({
     setError(null);
     try {
       await registerUserHotkey(draft.hotkey);
-      setStatus("Shortcut registered.");
+      setStatus(t(language, "shortcutRegistered"));
     } catch (shortcutError) {
       setError(normalizeError(shortcutError).message);
     }
@@ -168,11 +171,11 @@ export function Settings({
     <main className="settings-shell">
       <header className="topbar">
         <div>
-          <h1>Settings</h1>
+          <h1>{t(language, "settings")}</h1>
           <p className="muted">{draft.appName}</p>
         </div>
         <button onClick={onBack} type="button">
-          Back
+          {t(language, "back")}
         </button>
       </header>
 
@@ -180,7 +183,7 @@ export function Settings({
       {status ? <div className="status-banner">{status}</div> : null}
 
       <section className="settings-section">
-        <h2>General</h2>
+        <h2>{t(language, "general")}</h2>
         <div className="settings-grid">
           <label className="checkbox-row">
             <input
@@ -190,10 +193,10 @@ export function Settings({
               }
               type="checkbox"
             />
-            Launch at login
+            {t(language, "launchAtLogin")}
           </label>
           <label>
-            Default action
+            {t(language, "defaultAction")}
             <select
               onChange={(event) =>
                 setDraft({
@@ -205,15 +208,33 @@ export function Settings({
             >
               {EXTENDED_WRITING_ACTIONS.map((action) => (
                 <option key={action.value} value={action.value}>
-                  {action.label}
+                  {writingActionLabel(language, action.value)}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            Default language behavior
+            {t(language, "defaultLanguageBehavior")}
             <select disabled value="preserve">
-              <option value="preserve">Preserve input language</option>
+              <option value="preserve">{t(language, "preserveInputLanguage")}</option>
+            </select>
+          </label>
+          <label>
+            {t(language, "interfaceLanguage")}
+            <select
+              onChange={(event) =>
+                setDraft({
+                  ...draft,
+                  language: event.currentTarget.value as AppSettings["language"],
+                })
+              }
+              value={draft.language}
+            >
+              {APP_LANGUAGES.map((appLanguage) => (
+                <option key={appLanguage.value} value={appLanguage.value}>
+                  {appLanguage.label}
+                </option>
+              ))}
             </select>
           </label>
           <label className="checkbox-row">
@@ -222,7 +243,7 @@ export function Settings({
               onChange={(event) => setDraft({ ...draft, autoCopy: event.currentTarget.checked })}
               type="checkbox"
             />
-            Auto-copy result after generation
+            {t(language, "autoCopy")}
           </label>
           <label className="checkbox-row">
             <input
@@ -232,27 +253,28 @@ export function Settings({
               }
               type="checkbox"
             />
-            Close window after copy
+            {t(language, "closeWindowAfterCopy")}
           </label>
           <label>
-            Theme
+            {t(language, "theme")}
             <select
               onChange={(event) =>
                 setDraft({ ...draft, theme: event.currentTarget.value as AppSettings["theme"] })
               }
               value={draft.theme}
             >
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
+              <option value="system">{t(language, "themeSystem")}</option>
+              <option value="light">{t(language, "themeLight")}</option>
+              <option value="dark">{t(language, "themeDark")}</option>
             </select>
           </label>
         </div>
       </section>
 
       <section className="settings-section">
-        <h2>Shortcut</h2>
+        <h2>{t(language, "shortcut")}</h2>
         <ShortcutRecorder
+          language={language}
           onChange={(hotkey) => setDraft({ ...draft, hotkey })}
           onReset={() => setDraft({ ...draft, hotkey: FALLBACK_SETTINGS.hotkey })}
           onTest={() => void testShortcut()}
@@ -261,7 +283,7 @@ export function Settings({
       </section>
 
       <section className="settings-section">
-        <h2>AI Provider</h2>
+        <h2>{t(language, "aiProvider")}</h2>
         <ProviderForm
           apiKeyDraft={apiKeyDraft}
           customHeadersDraft={customHeadersDraft}
@@ -279,10 +301,10 @@ export function Settings({
       </section>
 
       <section className="settings-section">
-        <h2>Writing Behavior</h2>
+        <h2>{t(language, "writingBehavior")}</h2>
         <div className="settings-grid">
           <label>
-            Correction mode
+            {t(language, "correctionMode")}
             <select
               onChange={(event) =>
                 setDraft({
@@ -294,13 +316,13 @@ export function Settings({
             >
               {WRITING_MODES.map((mode) => (
                 <option key={mode.value} value={mode.value}>
-                  {mode.label}
+                  {writingModeLabel(language, mode.value)}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            Formality level
+            {t(language, "formalityLevel")}
             <input
               max={100}
               min={0}
@@ -313,7 +335,7 @@ export function Settings({
             <span className="muted">{draft.formalityLevel}</span>
           </label>
           <label>
-            Creativity level
+            {t(language, "creativityLevel")}
             <input
               max={100}
               min={0}
@@ -326,7 +348,7 @@ export function Settings({
             <span className="muted">{draft.creativityLevel}</span>
           </label>
           <label>
-            Temperature
+            {t(language, "temperature")}
             <input
               max={2}
               min={0}
@@ -339,7 +361,7 @@ export function Settings({
             />
           </label>
           <label>
-            Max output tokens
+            {t(language, "maxOutputTokens")}
             <input
               min={1}
               onChange={(event) =>
@@ -350,7 +372,7 @@ export function Settings({
             />
           </label>
           <label>
-            Timeout seconds
+            {t(language, "timeoutSeconds")}
             <input
               min={1}
               onChange={(event) =>
@@ -364,8 +386,8 @@ export function Settings({
       </section>
 
       <section className="settings-section">
-        <h2>Privacy</h2>
-        <p className="privacy-note">Your text is sent only to the AI provider you configure.</p>
+        <h2>{t(language, "privacy")}</h2>
+        <p className="privacy-note">{t(language, "privacyNotice")}</p>
         <div className="settings-grid">
           <label className="checkbox-row">
             <input
@@ -375,28 +397,28 @@ export function Settings({
               }
               type="checkbox"
             />
-            Store history locally
+            {t(language, "storeHistoryLocally")}
           </label>
           <label className="checkbox-row">
             <input checked={false} disabled type="checkbox" />
-            Optional telemetry
+            {t(language, "optionalTelemetry")}
           </label>
           <div className="button-row">
             <button
               onClick={async () => {
                 try {
                   await clearLocalHistory();
-                  setStatus("Local history cleared.");
+                  setStatus(t(language, "localHistoryCleared"));
                 } catch (historyError) {
                   setError(normalizeError(historyError).message);
                 }
               }}
               type="button"
             >
-              Clear local history
+              {t(language, "clearLocalHistory")}
             </button>
             <button onClick={() => void clearApiKey()} type="button">
-              Clear API key
+              {t(language, "clearApiKey")}
             </button>
             <button
               onClick={async () => {
@@ -409,7 +431,7 @@ export function Settings({
               }}
               type="button"
             >
-              Clear all local data
+              {t(language, "clearAllLocalData")}
             </button>
           </div>
         </div>
@@ -417,7 +439,7 @@ export function Settings({
 
       <footer className="settings-footer">
         <button disabled={isSaving} onClick={() => void persistSettings()} type="button">
-          {isSaving ? "Saving" : "Save settings"}
+          {isSaving ? t(language, "saving") : t(language, "saveSettings")}
         </button>
       </footer>
     </main>

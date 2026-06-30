@@ -20,7 +20,7 @@ Componentes principales actuales:
 - `src/screens/Settings.tsx`: dashboard de configuracion.
 - `src/components/ProviderForm.tsx`: provider, modelo, API key y headers.
 - `src-tauri/src/lib.rs`: registro de comandos Tauri y plugins.
-- `src-tauri/src/app/`: ventanas, tray, shortcuts y clipboard.
+- `src-tauri/src/app/`: ventanas separadas de helper/settings, tray, shortcuts y clipboard.
 - `src-tauri/src/settings/`: settings, history y secrets.
 - `src-tauri/src/llm/`: providers, prompt builder y tipos LLM.
 - `src-tauri/src/errors/`: errores serializables para IPC.
@@ -103,6 +103,13 @@ src-tauri/src/
     settings_tests.rs
 ```
 
+Ventanas Tauri actuales:
+
+- `helper`: overlay compacto always-on-top para escribir, ejecutar y copiar.
+  Tamaño por defecto `620x380`, minimo `520x340`.
+- `settings`: dashboard de configuracion en ventana separada. Tamaño por
+  defecto `920x720`, minimo `760x560`.
+
 ## 4. Tipos principales
 
 ### 4.1 WritingAction
@@ -182,9 +189,11 @@ type WritingAction =
   | "custom";
 
 type WritingMode = "plain_text" | "balanced" | "formal" | "creative";
+type AppLanguage = "en" | "es";
 
 type AppSettings = {
   appName: string;
+  language: AppLanguage;
   hotkey: string;
   provider: "openai" | "openai_compatible" | "custom_http";
   baseUrl?: string;
@@ -203,6 +212,18 @@ type AppSettings = {
   storeHistory: boolean;
 };
 ```
+
+Rust:
+
+```rust
+pub enum AppLanguage {
+    En,
+    Es,
+}
+```
+
+`language` se serializa como `en` o `es` y controla solo la interfaz React. Los
+settings antiguos sin `language` deben cargar con default `en`.
 
 Secrets:
 
@@ -260,6 +281,12 @@ async fn show_helper_window() -> Result<(), AppError>;
 
 #[tauri::command]
 async fn hide_helper_window() -> Result<(), AppError>;
+
+#[tauri::command]
+async fn show_settings_window() -> Result<(), AppError>;
+
+#[tauri::command]
+async fn hide_settings_window() -> Result<(), AppError>;
 ```
 
 ## 7. Prompt builder

@@ -3,10 +3,12 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { ProviderForm } from "../components/ProviderForm";
 import { ShortcutRecorder } from "../components/ShortcutRecorder";
 import {
+  APP_LANGUAGES,
   FALLBACK_SETTINGS,
   SECRET_CUSTOM_HEADERS,
   SECRET_PROVIDER_API_KEY,
 } from "../lib/settings";
+import { t } from "../lib/i18n";
 import {
   deleteSecret,
   hasSecret,
@@ -33,6 +35,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [isTesting, setIsTesting] = useState(false);
+  const language = draft.language;
 
   useEffect(() => {
     setHasSavedApiKey(hasApiKey);
@@ -49,7 +52,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
     const stored = await hasSecret(SECRET_PROVIDER_API_KEY);
 
     if (!stored) {
-      throw new Error("API key could not be read from secure storage after saving.");
+      throw new Error(t(language, "apiKeySecureStorageReadFailed"));
     }
 
     setApiKeyDraft("");
@@ -62,7 +65,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       ...draft,
       baseUrl: draft.provider === "openai" ? null : toNullableText(draft.baseUrl ?? ""),
     };
-    const settingsError = validateSettings(normalized);
+    const settingsError = validateSettings(normalized, language);
 
     if (settingsError) {
       setError(settingsError);
@@ -81,7 +84,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
     } catch (saveError) {
       setError(
         saveError instanceof SyntaxError
-          ? "Custom headers must be valid JSON."
+          ? t(language, "customHeadersValidJson")
           : normalizeError(saveError).message,
       );
       return null;
@@ -103,7 +106,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       setStatus(response.message);
     } catch (testError) {
       setError(normalizeError(testError).message);
-      setStatus("You can continue and fix the provider later.");
+      setStatus(t(language, "providerConnectionLater"));
     } finally {
       setIsTesting(false);
     }
@@ -117,11 +120,11 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       }
       await saveSecret(SECRET_CUSTOM_HEADERS, customHeadersDraft);
       setCustomHeadersDraft("");
-      setStatus("Custom headers saved.");
+      setStatus(t(language, "customHeadersSaved"));
     } catch (headersError) {
       setError(
         headersError instanceof SyntaxError
-          ? "Custom headers must be valid JSON."
+          ? t(language, "customHeadersValidJson")
           : normalizeError(headersError).message,
       );
     }
@@ -131,7 +134,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
     setError(null);
     try {
       await persistApiKeyDraft();
-      setStatus("API key saved.");
+      setStatus(t(language, "apiKeySaved"));
     } catch (secretError) {
       setError(normalizeError(secretError).message);
     }
@@ -143,7 +146,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       await deleteSecret(SECRET_PROVIDER_API_KEY);
       setApiKeyDraft("");
       setHasSavedApiKey(false);
-      setStatus("API key cleared.");
+      setStatus(t(language, "apiKeyCleared"));
     } catch (secretError) {
       setError(normalizeError(secretError).message);
     }
@@ -153,7 +156,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
     setError(null);
     try {
       await registerUserHotkey(draft.hotkey);
-      setStatus("Shortcut registered.");
+      setStatus(t(language, "shortcutRegistered"));
     } catch (shortcutError) {
       setError(normalizeError(shortcutError).message);
     }
@@ -171,7 +174,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       <header className="topbar">
         <div>
           <h1>{draft.appName}</h1>
-          <p className="muted">Quick writing helper</p>
+          <p className="muted">{t(language, "quickWritingHelper")}</p>
         </div>
       </header>
 
@@ -179,7 +182,31 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       {status ? <div className="status-banner">{status}</div> : null}
 
       <section className="settings-section">
-        <h2>Provider</h2>
+        <h2>{t(language, "general")}</h2>
+        <div className="settings-grid">
+          <label>
+            {t(language, "interfaceLanguage")}
+            <select
+              onChange={(event) =>
+                setDraft({
+                  ...draft,
+                  language: event.currentTarget.value as AppSettings["language"],
+                })
+              }
+              value={draft.language}
+            >
+              {APP_LANGUAGES.map((appLanguage) => (
+                <option key={appLanguage.value} value={appLanguage.value}>
+                  {appLanguage.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <h2>{t(language, "provider")}</h2>
         <ProviderForm
           apiKeyDraft={apiKeyDraft}
           customHeadersDraft={customHeadersDraft}
@@ -197,8 +224,9 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       </section>
 
       <section className="settings-section">
-        <h2>Shortcut</h2>
+        <h2>{t(language, "shortcut")}</h2>
         <ShortcutRecorder
+          language={language}
           onChange={(hotkey) => setDraft({ ...draft, hotkey })}
           onReset={() => setDraft({ ...draft, hotkey: FALLBACK_SETTINGS.hotkey })}
           onTest={() => void testShortcut()}
@@ -208,10 +236,10 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
 
       <footer className="settings-footer">
         <button disabled={isTesting} onClick={() => void testConnection()} type="button">
-          {isTesting ? "Testing" : "Test connection"}
+          {isTesting ? t(language, "testing") : t(language, "testConnection")}
         </button>
         <button onClick={() => void finish()} type="button">
-          Finish
+          {t(language, "finish")}
         </button>
       </footer>
     </main>

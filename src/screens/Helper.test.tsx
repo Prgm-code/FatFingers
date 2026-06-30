@@ -13,7 +13,7 @@ describe("Helper", () => {
     expect(screen.getByRole("alert").textContent).toContain("Enter text");
   });
 
-  it("submits with Ctrl+Enter", async () => {
+  it("submits with Enter", async () => {
     const onRun = vi.fn(async () => ({
       outputText: "Fixed text",
       provider: "openai",
@@ -22,16 +22,16 @@ describe("Helper", () => {
     }));
     renderHelper({ onRun });
 
-    const input = screen.getByLabelText("Text to rewrite");
+    const input = screen.getByLabelText("Write or paste text");
     fireEvent.change(input, { target: { value: "helo" } });
-    fireEvent.keyDown(input, { key: "Enter", ctrlKey: true });
+    fireEvent.keyDown(input, { key: "Enter" });
 
     await waitFor(() => {
       expect(onRun).toHaveBeenCalledWith("helo", "correct");
     });
   });
 
-  it("copies generated result", async () => {
+  it("replaces input with generated result, copies it, and can undo", async () => {
     const onCopy = vi.fn(async () => undefined);
     renderHelper({
       onCopy,
@@ -43,23 +43,48 @@ describe("Helper", () => {
       }),
     });
 
-    fireEvent.change(screen.getByLabelText("Text to rewrite"), {
+    fireEvent.change(screen.getByLabelText("Write or paste text"), {
       target: { value: "helo" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Run" }));
 
-    await screen.findByText("Fixed text");
+    expect(await screen.findByDisplayValue("Fixed text")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Copy" }));
 
     await waitFor(() => {
       expect(onCopy).toHaveBeenCalledWith("Fixed text");
     });
+
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+
+    expect(screen.getByDisplayValue("helo")).toBeTruthy();
+  });
+
+  it("renders helper labels and validation in Spanish", async () => {
+    renderHelper({ settings: { ...FALLBACK_SETTINGS, language: "es" } });
+
+    expect(screen.getByRole("heading", { name: "Entrada" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Ejecutar" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ejecutar" }));
+
+    expect(screen.getByRole("alert").textContent).toContain("Ingresa texto");
+
+    fireEvent.change(screen.getByLabelText("Escribe o pega texto"), {
+      target: { value: "hola" },
+    });
+    fireEvent.keyDown(screen.getByLabelText("Escribe o pega texto"), { key: "Enter" });
+
+    expect(await screen.findByDisplayValue("Fixed text")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Copiar" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Deshacer" })).toBeTruthy();
   });
 });
 
 type RenderOverrides = {
   onRun?: ComponentProps<typeof Helper>["onRun"];
   onCopy?: ComponentProps<typeof Helper>["onCopy"];
+  settings?: ComponentProps<typeof Helper>["settings"];
 };
 
 function renderHelper(overrides: RenderOverrides = {}) {
@@ -77,7 +102,7 @@ function renderHelper(overrides: RenderOverrides = {}) {
           latencyMs: 10,
         }))
       }
-      settings={FALLBACK_SETTINGS}
+      settings={overrides.settings ?? FALLBACK_SETTINGS}
     />,
   );
 }

@@ -60,6 +60,10 @@ export async function showSettingsWindow(): Promise<void> {
   return invoke("show_settings_window");
 }
 
+export async function hideSettingsWindow(): Promise<void> {
+  return invoke("hide_settings_window");
+}
+
 export async function clearLocalHistory(): Promise<void> {
   return invoke("clear_local_history");
 }
