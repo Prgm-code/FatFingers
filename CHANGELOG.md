@@ -15,6 +15,7 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Preparacion open source del repositorio.
 - README actualizado con estado MVP alpha.
 - `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` y templates de GitHub.
+- Nota de QA Linux sobre el warning no bloqueante de `libayatana-appindicator` al inicializar el tray.
 
 ## 0.1.0-alpha
 

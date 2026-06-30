@@ -79,6 +79,7 @@
 
 - Default shortcut `Ctrl+Shift+Space`.
 - Tray funciona en entorno soportado.
+- Warning `libayatana-appindicator is deprecated` no se considera bloqueante si el tray funciona.
 - Helper always-on-top funciona donde el WM lo permita.
 - Clipboard copy funciona.
 - Errores de portal/clipboard son claros.
@@ -125,6 +126,7 @@ Comandos ejecutados:
 Notas:
 
 - El build Linux usa `keyring` con backend `linux-native`.
+- En el entorno local puede aparecer un warning de deprecacion de `libayatana-appindicator` al inicializar el tray. El warning viene de la dependencia Linux usada por Tauri/tray-icon y no se considera fallo si el tray aparece y responde.
 - El test con provider real requiere API key del usuario y no se ejecuta en CI local.
 - Las validaciones de secrets verifican que el valor guardado pueda leerse nuevamente.
 

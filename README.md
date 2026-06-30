@@ -72,6 +72,13 @@ La lista sugerida de modelos OpenAI vive en `src/lib/settings.ts` y permite ingr
 
 En Linux, el almacenamiento seguro usa `keyring` con backend `linux-native` (`keyutils`). El entorno debe permitir kernel keyrings para que las API keys sean recuperables por la app.
 
+El tray de Linux depende del soporte AppIndicator/Ayatana disponible en el
+desktop environment. Algunas versiones de `libayatana-appindicator` imprimen
+un warning de deprecacion al iniciar el tray:
+`Please use libayatana-appindicator-glib in newly written code`. En FatFingers
+esto viene de la dependencia nativa usada por Tauri para el tray y no bloquea el
+funcionamiento de la app.
+
 ## Uso local
 
 Instalar dependencias:
