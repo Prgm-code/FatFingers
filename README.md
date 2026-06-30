@@ -106,8 +106,13 @@ Tests y builds:
 ```bash
 pnpm test
 pnpm build
+pnpm tauri build
 pnpm tauri build --debug --bundles deb
 ```
+
+En Linux, `pnpm tauri build` genera paquetes `.deb`, `.rpm` y `.AppImage`. En
+distros rolling como Arch, el wrapper de Tauri define `NO_STRIP=true` para evitar
+fallos de `linuxdeploy` al procesar librerias del sistema recientes.
 
 Checks backend:
 

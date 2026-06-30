@@ -60,6 +60,47 @@ describe("Helper", () => {
     expect(screen.getByDisplayValue("helo")).toBeTruthy();
   });
 
+  it("clears previous result when a new helper session starts", async () => {
+    const { rerender } = renderHelper({
+      onRun: async () => ({
+        outputText: "Fixed text",
+        provider: "openai",
+        model: "model",
+        latencyMs: 10,
+      }),
+      sessionId: 0,
+    });
+
+    fireEvent.change(screen.getByLabelText("Write or paste text"), {
+      target: { value: "helo" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Run" }));
+
+    expect(await screen.findByDisplayValue("Fixed text")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy();
+
+    rerender(
+      <Helper
+        onClose={vi.fn()}
+        onCopy={vi.fn(async () => undefined)}
+        onOpenSettings={vi.fn()}
+        onRun={vi.fn(async () => ({
+          outputText: "Fixed text",
+          provider: "openai",
+          model: "model",
+          latencyMs: 10,
+        }))}
+        sessionId={1}
+        settings={FALLBACK_SETTINGS}
+      />,
+    );
+
+    await waitFor(() => {
+      expect((screen.getByLabelText("Write or paste text") as HTMLTextAreaElement).value).toBe("");
+      expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
+    });
+  });
+
   it("renders helper labels and validation in Spanish", async () => {
     renderHelper({ settings: { ...FALLBACK_SETTINGS, language: "es" } });
 
@@ -85,6 +126,7 @@ type RenderOverrides = {
   onRun?: ComponentProps<typeof Helper>["onRun"];
   onCopy?: ComponentProps<typeof Helper>["onCopy"];
   settings?: ComponentProps<typeof Helper>["settings"];
+  sessionId?: ComponentProps<typeof Helper>["sessionId"];
 };
 
 function renderHelper(overrides: RenderOverrides = {}) {
@@ -102,6 +144,7 @@ function renderHelper(overrides: RenderOverrides = {}) {
           latencyMs: 10,
         }))
       }
+      sessionId={overrides.sessionId ?? 0}
       settings={overrides.settings ?? FALLBACK_SETTINGS}
     />,
   );

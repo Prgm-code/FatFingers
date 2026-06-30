@@ -44,6 +44,7 @@
 - Shortcut global abre helper.
 - Helper se abre centrado.
 - Textarea recibe foco inmediatamente.
+- Helper abre con textarea limpio y sin resultado anterior.
 - `Esc` oculta helper.
 - `Cmd/Ctrl + Enter` ejecuta accion.
 - Correccion funciona con provider real.
@@ -122,10 +123,14 @@ Comandos ejecutados:
 - `cargo check`: pasa.
 - `cargo test`: 21 tests backend pasan.
 - `pnpm tauri build --debug --bundles deb`: genera `src-tauri/target/debug/bundle/deb/FatFingers_0.1.0_amd64.deb`.
+- `pnpm tauri build`: genera paquetes release Linux `.deb`, `.rpm` y `.AppImage`.
 
 Notas:
 
 - El build Linux usa `keyring` con backend `linux-native`.
+- En Linux, `scripts/run-tauri.mjs` define `NO_STRIP=true` para builds Tauri.
+  Esto evita que `linuxdeploy` falle en distros rolling al ejecutar su `strip`
+  embebido sobre librerias con seccion ELF `.relr.dyn`.
 - En el entorno local puede aparecer un warning de deprecacion de `libayatana-appindicator` al inicializar el tray. El warning viene de la dependencia Linux usada por Tauri/tray-icon y no se considera fallo si el tray aparece y responde.
 - El test con provider real requiere API key del usuario y no se ejecuta en CI local.
 - Las validaciones de secrets verifican que el valor guardado pueda leerse nuevamente.

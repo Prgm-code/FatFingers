@@ -40,6 +40,7 @@ function App() {
   const [hasApiKey, setHasApiKey] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
+  const [helperSessionId, setHelperSessionId] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -96,6 +97,7 @@ function App() {
     );
     const unlistenFocus = listen("fatfingers://focus-input", async () => {
       setView((currentView) => (currentView === "settings" ? currentView : "helper"));
+      setHelperSessionId((sessionId) => sessionId + 1);
       try {
         const snapshot = await loadSettingsSnapshot();
         setSettings(snapshot.settings);
@@ -198,6 +200,7 @@ function App() {
         onCopy={copyResult}
         onOpenSettings={() => void openSettings()}
         onRun={runAction}
+        sessionId={helperSessionId}
         settings={settings}
       />
     </>

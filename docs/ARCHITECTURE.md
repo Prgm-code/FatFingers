@@ -374,17 +374,18 @@ Response:
 
 ## 9. Flujo de datos
 
-1. Usuario abre helper con shortcut global.
+1. Usuario abre helper con shortcut global, tray o segundo lanzamiento de app.
 2. Frontend solicita settings al backend.
-3. Usuario escribe texto y elige accion.
-4. Frontend llama `correct_text`.
-5. Backend valida input y settings.
-6. Backend lee secretos si son necesarios.
-7. Backend construye prompt.
-8. Backend llama al provider seleccionado.
-9. Backend devuelve `CorrectTextResponse`.
-10. Frontend muestra resultado.
-11. Usuario copia resultado con `copy_to_clipboard`.
+3. Frontend limpia el estado local del helper para iniciar una nueva sesion.
+4. Usuario escribe texto y elige accion.
+5. Frontend llama `correct_text`.
+6. Backend valida input y settings.
+7. Backend lee secretos si son necesarios.
+8. Backend construye prompt.
+9. Backend llama al provider seleccionado.
+10. Backend devuelve `CorrectTextResponse`.
+11. Frontend muestra resultado.
+12. Usuario copia resultado con `copy_to_clipboard`.
 
 ## 10. Ventanas
 

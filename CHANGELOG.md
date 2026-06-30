@@ -19,6 +19,12 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Soporte para provider MiniMax con modelo default `MiniMax-M3` y wire API `responses`.
 - El helper recarga settings al guardar cambios desde la ventana de configuracion y muestra datos de request LLM en modo dev.
 
+### Changed
+
+- El build release Linux define `NO_STRIP=true` para que AppImage pueda
+  empaquetarse en distros rolling donde `linuxdeploy` falla con librerias
+  recientes.
+
 ## 0.1.0-alpha
 
 ### Added

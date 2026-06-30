@@ -1,4 +1,4 @@
-use crate::app::{hotkeys, windows};
+use crate::app::{hotkeys, lifecycle, windows};
 use crate::settings::store::{load_settings, save_settings};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -73,7 +73,10 @@ pub fn build_tray(app: &mut App) -> tauri::Result<()> {
                     }
                 }
             }
-            "quit" => app.exit(0),
+            "quit" => {
+                lifecycle::request_quit();
+                app.exit(0);
+            }
             _ => {}
         })
         .on_tray_icon_event(|tray, event| {

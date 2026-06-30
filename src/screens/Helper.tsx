@@ -10,13 +10,21 @@ import type { CorrectTextResponse, WritingAction } from "../types/llm";
 
 type HelperProps = {
   settings: AppSettings;
+  sessionId: number;
   onRun: (input: string, action: WritingAction) => Promise<CorrectTextResponse>;
   onCopy: (text: string) => Promise<void>;
   onClose: () => void;
   onOpenSettings: () => void;
 };
 
-export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: HelperProps) {
+export function Helper({
+  settings,
+  sessionId,
+  onRun,
+  onCopy,
+  onClose,
+  onOpenSettings,
+}: HelperProps) {
   const [input, setInput] = useState("");
   const [action, setAction] = useState<WritingAction>(settings.defaultAction);
   const [previousInput, setPreviousInput] = useState<string | null>(null);
@@ -33,6 +41,16 @@ export function Helper({ settings, onRun, onCopy, onClose, onOpenSettings }: Hel
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    setInput("");
+    setPreviousInput(null);
+    setLatencyMs(null);
+    setLastResponse(null);
+    setError(null);
+    setIsLoading(false);
+    textareaRef.current?.focus();
+  }, [sessionId]);
 
   useEffect(() => {
     setAction(settings.defaultAction);

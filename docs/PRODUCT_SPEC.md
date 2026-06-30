@@ -246,6 +246,8 @@ Cuando se presiona el shortcut global:
 - Mantener always-on-top.
 - Usar ventana frameless o minima.
 - Enfocar textarea inmediatamente.
+- Limpiar textarea, resultado anterior, errores y estado de undo en cada
+  apertura del helper.
 - Cerrar con `Esc`.
 - Enviar con `Enter`.
 - Insertar saltos de linea con `Shift + Enter`.

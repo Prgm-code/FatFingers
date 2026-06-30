@@ -7,6 +7,7 @@ const env = { ...process.env };
 const pathKey = Object.keys(env).find((key) => key.toLowerCase() === "path") ?? "PATH";
 const currentPath = env[pathKey] ?? "";
 const cargoBin = join(homedir(), ".cargo", "bin");
+const tauriArgs = process.argv.slice(2);
 
 if (existsSync(cargoBin)) {
   const pathEntries = currentPath.split(delimiter).filter(Boolean);
@@ -17,8 +18,14 @@ if (existsSync(cargoBin)) {
 }
 
 const isWindows = process.platform === "win32";
+const isLinux = process.platform === "linux";
+
+if (isLinux && tauriArgs[0] === "build" && env.NO_STRIP === undefined) {
+  env.NO_STRIP = "true";
+}
+
 const command = isWindows ? "tauri.cmd" : "tauri";
-const child = spawn(command, process.argv.slice(2), {
+const child = spawn(command, tauriArgs, {
   env,
   shell: isWindows,
   stdio: "inherit",

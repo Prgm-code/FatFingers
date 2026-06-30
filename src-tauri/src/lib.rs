@@ -3,7 +3,7 @@ mod errors;
 mod llm;
 mod settings;
 
-use app::{clipboard, hotkeys, tray, windows};
+use app::{clipboard, hotkeys, lifecycle, tray, windows};
 use errors::{AppError, AppErrorKind};
 use llm::types::{
     CorrectTextRequest, CorrectTextResponse, LlmRequest, TestProviderResponse, WritingAction,
@@ -202,6 +202,9 @@ fn sync_launch_at_login(app: &AppHandle, enabled: bool) -> Result<(), AppError> 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            let _ = windows::show_helper(app);
+        }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
@@ -215,6 +218,15 @@ pub fn run() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                let label = window.label();
+                if label == windows::HELPER_LABEL || label == windows::SETTINGS_LABEL {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .setup(|app| {
             tray::build_tray(app)?;
 
@@ -245,6 +257,13 @@ pub fn run() {
             clear_all_local_data,
             set_launch_at_login
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running FatFingers");
+        .build(tauri::generate_context!())
+        .expect("error while building FatFingers")
+        .run(|_app, event| {
+            if let tauri::RunEvent::ExitRequested { api, .. } = event {
+                if !lifecycle::is_quit_requested() {
+                    api.prevent_exit();
+                }
+            }
+        });
 }

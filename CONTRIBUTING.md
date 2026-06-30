@@ -53,6 +53,17 @@ Packaging debug Linux:
 pnpm tauri build --debug --bundles deb
 ```
 
+Packaging release Linux:
+
+```bash
+pnpm tauri build
+```
+
+El build release Linux por defecto genera `.deb` y `.rpm`. AppImage debe
+probarse con `pnpm tauri build` o de forma explicita con
+`pnpm tauri build --bundles appimage`. En Linux el wrapper define
+`NO_STRIP=true` para evitar fallos de `linuxdeploy` en distros rolling.
+
 ## Secrets
 
 No incluyas API keys reales, headers privados, texto sensible de usuario o logs con secretos en issues, tests, fixtures o docs.
