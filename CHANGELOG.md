@@ -8,6 +8,7 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Soporte para provider OpenRouter con modelo default `openrouter/auto`.
 - Selector de idioma de interfaz ingles/español persistido en settings.
 - Helper reducido a ventana compacta, con selector de accion compacto y panel de resultado oculto hasta generar.
 - El helper ahora ejecuta con Enter, reemplaza el input con el resultado y permite Undo.

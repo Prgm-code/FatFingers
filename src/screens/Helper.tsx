@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { ActionSelector } from "../components/ActionSelector";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { SettingsButton } from "../components/SettingsButton";
-import { MINIMAX_BASE_URL, OPENAI_RESPONSES_URL } from "../lib/settings";
+import {
+  MINIMAX_BASE_URL,
+  OPENAI_RESPONSES_URL,
+  OPENROUTER_CHAT_COMPLETIONS_URL,
+} from "../lib/settings";
 import { t } from "../lib/i18n";
 import { validateInput } from "../lib/validators";
 import type { AppSettings } from "../types/app";
@@ -63,6 +67,8 @@ export function Helper({
   const effectiveBaseUrl =
     settings.provider === "openai"
       ? OPENAI_RESPONSES_URL
+      : settings.provider === "openrouter"
+        ? OPENROUTER_CHAT_COMPLETIONS_URL
       : settings.provider === "minimax"
         ? (settings.baseUrl ?? MINIMAX_BASE_URL)
         : (settings.baseUrl ?? "not configured");

@@ -2,6 +2,7 @@ pub mod custom_http;
 pub mod minimax;
 pub mod openai;
 pub mod openai_compatible;
+pub mod openrouter;
 pub mod prompts;
 pub mod types;
 
@@ -20,6 +21,7 @@ pub trait LlmProvider {
 
 #[derive(Debug, Clone)]
 pub struct ProviderConfig {
+    pub app_name: String,
     pub base_url: Option<String>,
     pub api_key: Option<String>,
     pub custom_headers: HashMap<String, String>,
@@ -33,6 +35,7 @@ pub fn provider_from_settings(
 ) -> Result<Box<dyn LlmProvider + Send + Sync>, AppError> {
     let headers = parse_custom_headers(custom_headers)?;
     let config = ProviderConfig {
+        app_name: settings.app_name.clone(),
         base_url: settings.base_url.clone(),
         api_key,
         custom_headers: headers,
@@ -42,6 +45,7 @@ pub fn provider_from_settings(
     match settings.provider {
         ProviderType::OpenAi => Ok(Box::new(openai::OpenAiProvider::new(config)?)),
         ProviderType::MiniMax => Ok(Box::new(minimax::MiniMaxProvider::new(config)?)),
+        ProviderType::OpenRouter => Ok(Box::new(openrouter::OpenRouterProvider::new(config)?)),
         ProviderType::OpenAiCompatible => Ok(Box::new(
             openai_compatible::OpenAiCompatibleProvider::new(config)?,
         )),

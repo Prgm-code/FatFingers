@@ -29,7 +29,7 @@ Pendientes principales para cerrar el MVP como release publico:
 - Fase 1 Floating Helper: implementada para flujo manual de input/copy.
 - Fase 2 Global Shortcut y Tray: implementada, pendiente QA multiplataforma.
 - Fase 3 Settings y Secrets: implementada, secrets mediante `keyring`.
-- Fase 4 LLM Integration: implementada para OpenAI, MiniMax, OpenAI-compatible y Custom HTTP.
+- Fase 4 LLM Integration: implementada para OpenAI, MiniMax, OpenRouter, OpenAI-compatible y Custom HTTP.
 - Fase 5 Clipboard: implementada para copy/read mediante plugin Tauri.
 - Fase 6 Tests, Packaging y QA: tests y build debug Linux listos; QA macOS/Windows pendiente.
 
@@ -127,6 +127,7 @@ Entregables:
 - `prompts.rs` con templates por accion.
 - Provider OpenAI con Responses API.
 - Provider MiniMax con Responses API, modelo default `MiniMax-M3` y base URL default `https://api.minimax.io/v1`.
+- Provider OpenRouter con Chat Completions, endpoint fijo `https://openrouter.ai/api/v1/chat/completions` y modelo default `openrouter/auto`.
 - Provider OpenAI-compatible.
 - Provider Custom HTTP.
 - Timeout y error mapping.

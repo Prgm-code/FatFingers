@@ -29,6 +29,8 @@ pub enum ProviderType {
     OpenAi,
     #[serde(rename = "minimax")]
     MiniMax,
+    #[serde(rename = "openrouter")]
+    OpenRouter,
     #[serde(rename = "openai_compatible")]
     OpenAiCompatible,
     #[serde(rename = "custom_http")]

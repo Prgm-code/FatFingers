@@ -38,6 +38,17 @@ describe("validateSettings", () => {
     ).toBeNull();
   });
 
+  it("allows OpenRouter to use its fixed default endpoint", () => {
+    expect(
+      validateSettings({
+        ...FALLBACK_SETTINGS,
+        provider: "openrouter",
+        baseUrl: null,
+        model: "openrouter/auto",
+      }),
+    ).toBeNull();
+  });
+
   it("rejects temperature outside range", () => {
     expect(validateSettings({ ...FALLBACK_SETTINGS, temperature: 2.5 })).toBe(
       "Temperature must be between 0.0 and 2.0.",

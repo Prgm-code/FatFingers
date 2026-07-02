@@ -19,6 +19,7 @@ Implementado:
 - Almacenamiento seguro de `provider_api_key` y `custom_headers` mediante `keyring`.
 - Provider OpenAI usando Responses API desde Rust.
 - Provider MiniMax usando Responses API desde Rust.
+- Provider OpenRouter usando Chat Completions desde Rust.
 - Provider OpenAI-compatible usando Chat Completions.
 - Provider Custom HTTP.
 - Acciones `Correct`, `Professional`, `Shorten`, `Friendly`, `QuickReply`, `TranslateEnglish`, `TranslateSpanish` y `Custom`.
@@ -60,6 +61,7 @@ Providers actuales:
 
 - `openai`: usa `https://api.openai.com/v1/responses`.
 - `minimax`: usa `https://api.minimax.io/v1/responses` por defecto, modelo `MiniMax-M3`.
+- `openrouter`: usa `https://openrouter.ai/api/v1/chat/completions` con modelo default `openrouter/auto`.
 - `openai_compatible`: usa `/chat/completions` sobre el `baseUrl` configurado.
 - `custom_http`: envia un JSON simple a un endpoint definido por el usuario.
 

@@ -121,6 +121,7 @@ Requisitos:
 - Usar timeout configurable.
 - Usar `store: false` en OpenAI cuando aplique.
 - MiniMax usa el mismo secret `provider_api_key`; `baseUrl` y modelo se guardan como settings no secretos.
+- OpenRouter usa el mismo secret `provider_api_key`; el modelo se guarda como setting no secreto y los headers opcionales se guardan en `custom_headers`.
 - No incluir secrets ni texto en errores.
 - Mapear errores raw a errores de usuario.
 

@@ -18,7 +18,7 @@ Implementado en el MVP alpha:
 - Atajo global y tray/menu bar.
 - Persistencia local de settings no secretos.
 - Almacenamiento seguro de API key y custom headers mediante `keyring`.
-- Providers `openai`, `minimax`, `openai_compatible` y `custom_http`.
+- Providers `openai`, `minimax`, `openrouter`, `openai_compatible` y `custom_http`.
 - Test de conexion de provider.
 - Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
 
@@ -154,7 +154,7 @@ Si el shortcut falla, la app debe mostrar un error claro y permitir elegir otro.
 
 Campos:
 
-- Provider type: `openai`, `minimax`, `openai_compatible`, `custom_http`
+- Provider type: `openai`, `minimax`, `openrouter`, `openai_compatible`, `custom_http`
 - API key
 - Base URL para MiniMax, providers compatibles o custom
 - Model
@@ -170,7 +170,9 @@ Para `openai`, la UI debe mostrar la URL efectiva de la Responses API
 campo `baseUrl` editable aplica para `minimax`, `openai_compatible` y
 `custom_http`. Para `minimax`, el default es `https://api.minimax.io/v1`,
 wire API `responses`, modelo `MiniMax-M3` y context window declarado
-`1000000`.
+`1000000`. Para `openrouter`, la UI debe mostrar el endpoint efectivo
+`https://openrouter.ai/api/v1/chat/completions` como valor informativo no
+editable y el modelo default debe ser `openrouter/auto`.
 
 El selector de modelo de OpenAI debe ofrecer una lista curada de modelos
 actuales y una opcion de modelo custom. La app no debe bloquear modelos nuevos
@@ -229,7 +231,7 @@ Texto obligatorio:
 Onboarding:
 
 - Welcome screen.
-- Elegir provider: OpenAI, OpenAI-compatible endpoint o local/custom endpoint.
+- Elegir provider: OpenAI, MiniMax, OpenRouter, OpenAI-compatible endpoint o local/custom endpoint.
 - Ingresar API key.
 - Ingresar modelo default.
 - Elegir shortcut default.

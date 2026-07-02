@@ -10,6 +10,9 @@ export const MINIMAX_BASE_URL = "https://api.minimax.io/v1";
 export const MINIMAX_RESPONSES_URL = `${MINIMAX_BASE_URL}/responses`;
 export const DEFAULT_MINIMAX_MODEL = "MiniMax-M3";
 export const MINIMAX_CONTEXT_WINDOW = 1_000_000;
+export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+export const OPENROUTER_CHAT_COMPLETIONS_URL = `${OPENROUTER_BASE_URL}/chat/completions`;
+export const DEFAULT_OPENROUTER_MODEL = "openrouter/auto";
 export const CUSTOM_MODEL_VALUE = "__custom_model__";
 
 export const OPENAI_MODEL_OPTIONS: Array<{ value: string; label: string }> = [
@@ -44,6 +47,7 @@ export const WRITING_MODES: Array<{ value: WritingMode; label: string }> = [
 export const PROVIDERS: Array<{ value: ProviderType; label: string }> = [
   { value: "openai", label: "OpenAI" },
   { value: "minimax", label: "MiniMax" },
+  { value: "openrouter", label: "OpenRouter" },
   { value: "openai_compatible", label: "OpenAI-compatible" },
   { value: "custom_http", label: "Custom HTTP" },
 ];

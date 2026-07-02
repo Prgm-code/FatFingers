@@ -6,6 +6,7 @@ import {
   FALLBACK_SETTINGS,
   MINIMAX_BASE_URL,
   OPENAI_RESPONSES_URL,
+  OPENROUTER_CHAT_COMPLETIONS_URL,
 } from "../lib/settings";
 import { ProviderForm } from "./ProviderForm";
 
@@ -91,6 +92,41 @@ describe("ProviderForm", () => {
       baseUrl: MINIMAX_BASE_URL,
       model: "MiniMax-M3",
     });
+  });
+
+  it("sets OpenRouter defaults when selecting the OpenRouter provider", () => {
+    const onSettingsChange = vi.fn();
+    renderProviderForm({ onSettingsChange });
+
+    fireEvent.change(screen.getByLabelText("Provider type"), {
+      target: { value: "openrouter" },
+    });
+
+    expect(onSettingsChange).toHaveBeenCalledWith({
+      ...FALLBACK_SETTINGS,
+      provider: "openrouter",
+      baseUrl: null,
+      model: "openrouter/auto",
+    });
+  });
+
+  it("shows the fixed OpenRouter Chat Completions URL", () => {
+    renderProviderForm({
+      settings: {
+        ...FALLBACK_SETTINGS,
+        provider: "openrouter",
+        baseUrl: null,
+        model: "openrouter/auto",
+      },
+    });
+
+    const baseUrlInput = screen.getByLabelText("Base URL") as HTMLInputElement;
+
+    expect(baseUrlInput.value).toBe(OPENROUTER_CHAT_COMPLETIONS_URL);
+    expect(baseUrlInput.hasAttribute("readonly")).toBe(true);
+    expect((screen.getByLabelText("Model") as HTMLInputElement).value).toBe(
+      "openrouter/auto",
+    );
   });
 
   it("shows the selected MiniMax model after changing provider", () => {

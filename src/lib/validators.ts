@@ -46,12 +46,13 @@ export function validateSettings(settings: AppSettings, language: AppLanguage = 
   if (
     settings.provider !== "openai" &&
     settings.provider !== "minimax" &&
+    settings.provider !== "openrouter" &&
     (!settings.baseUrl || settings.baseUrl.trim().length === 0)
   ) {
     return t(language, "validationBaseUrlRequired");
   }
 
-  if (settings.provider !== "openai" && settings.baseUrl) {
+  if (settings.provider !== "openai" && settings.provider !== "openrouter" && settings.baseUrl) {
     try {
       new URL(settings.baseUrl);
     } catch {

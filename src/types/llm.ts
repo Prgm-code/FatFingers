@@ -10,7 +10,12 @@ export type WritingAction =
 
 export type WritingMode = "plain_text" | "balanced" | "formal" | "creative";
 
-export type ProviderType = "openai" | "minimax" | "openai_compatible" | "custom_http";
+export type ProviderType =
+  | "openai"
+  | "minimax"
+  | "openrouter"
+  | "openai_compatible"
+  | "custom_http";
 
 export type CorrectTextRequest = {
   action: WritingAction;

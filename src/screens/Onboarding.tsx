@@ -67,6 +67,8 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       baseUrl:
         draft.provider === "openai"
           ? null
+          : draft.provider === "openrouter"
+            ? null
           : draft.provider === "minimax"
             ? (toNullableText(draft.baseUrl ?? "") ?? MINIMAX_BASE_URL)
             : toNullableText(draft.baseUrl ?? ""),

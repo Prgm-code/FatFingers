@@ -58,6 +58,8 @@ export function Settings({
       baseUrl:
         nextSettings.provider === "openai"
           ? null
+          : nextSettings.provider === "openrouter"
+            ? null
           : nextSettings.provider === "minimax"
             ? (toNullableText(nextSettings.baseUrl ?? "") ?? MINIMAX_BASE_URL)
             : toNullableText(nextSettings.baseUrl ?? ""),

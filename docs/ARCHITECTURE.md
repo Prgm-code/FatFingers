@@ -93,6 +93,7 @@ src-tauri/src/
     prompts.rs
     openai.rs
     minimax.rs
+    openrouter.rs
     openai_compatible.rs
     custom_http.rs
 
@@ -196,7 +197,7 @@ type AppSettings = {
   appName: string;
   language: AppLanguage;
   hotkey: string;
-  provider: "openai" | "minimax" | "openai_compatible" | "custom_http";
+  provider: "openai" | "minimax" | "openrouter" | "openai_compatible" | "custom_http";
   baseUrl?: string;
   model: string;
   defaultAction: WritingAction;
@@ -341,7 +342,25 @@ Defaults:
 
 La API key se guarda en el mismo secret `provider_api_key`.
 
-### 8.3 OpenAI-compatible
+### 8.3 OpenRouter
+
+Debe usar HTTP directo desde Rust contra la API compatible con OpenAI de
+OpenRouter.
+
+Defaults:
+
+- `provider`: `openrouter`
+- endpoint efectivo: `https://openrouter.ai/api/v1/chat/completions`
+- `model`: `openrouter/auto`
+
+La API key se guarda en el mismo secret `provider_api_key`. El backend debe
+enviar `X-Title` con el nombre configurado de la app y permitir headers
+opcionales guardados como secret, por ejemplo `HTTP-Referer`.
+
+Cuando OpenRouter devuelve el campo `model`, la respuesta de FatFingers debe
+reportar ese valor para mostrar el modelo realmente usado por el router.
+
+### 8.4 OpenAI-compatible
 
 Debe permitir:
 
@@ -350,7 +369,7 @@ Debe permitir:
 - Modelo
 - Headers opcionales guardados como secret
 
-### 8.4 Custom HTTP
+### 8.5 Custom HTTP
 
 Request:
 

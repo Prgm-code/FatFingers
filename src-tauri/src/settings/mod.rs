@@ -138,7 +138,7 @@ pub fn validate_settings(settings: &AppSettings) -> Result<(), AppError> {
     }
 
     match settings.provider {
-        ProviderType::OpenAi => {}
+        ProviderType::OpenAi | ProviderType::OpenRouter => {}
         ProviderType::MiniMax => {
             if let Some(base_url) = settings.base_url.as_deref() {
                 if !base_url.trim().is_empty() {
@@ -176,6 +176,7 @@ pub fn validate_settings(settings: &AppSettings) -> Result<(), AppError> {
 mod tests {
     use super::*;
     use crate::llm::minimax::DEFAULT_MINIMAX_BASE_URL;
+    use crate::llm::openrouter::DEFAULT_OPENROUTER_MODEL;
 
     #[test]
     fn defaults_match_mvp_writing_behavior() {
@@ -265,6 +266,16 @@ mod tests {
         settings.provider = ProviderType::MiniMax;
         settings.base_url = Some(DEFAULT_MINIMAX_BASE_URL.to_string());
         settings.model = "MiniMax-M3".to_string();
+
+        validate_settings(&settings).unwrap();
+    }
+
+    #[test]
+    fn openrouter_provider_allows_fixed_default_endpoint() {
+        let mut settings = AppSettings::default();
+        settings.provider = ProviderType::OpenRouter;
+        settings.base_url = None;
+        settings.model = DEFAULT_OPENROUTER_MODEL.to_string();
 
         validate_settings(&settings).unwrap();
     }

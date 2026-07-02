@@ -2,10 +2,12 @@ import {
   CUSTOM_MODEL_VALUE,
   DEFAULT_OPENAI_MODEL,
   DEFAULT_MINIMAX_MODEL,
+  DEFAULT_OPENROUTER_MODEL,
   MINIMAX_BASE_URL,
   MINIMAX_RESPONSES_URL,
   OPENAI_MODEL_OPTIONS,
   OPENAI_RESPONSES_URL,
+  OPENROUTER_CHAT_COMPLETIONS_URL,
   PROVIDERS,
 } from "../lib/settings";
 import { t } from "../lib/i18n";
@@ -42,6 +44,8 @@ export function ProviderForm({
 }: ProviderFormProps) {
   const isOpenAiProvider = settings.provider === "openai";
   const isMiniMaxProvider = settings.provider === "minimax";
+  const isOpenRouterProvider = settings.provider === "openrouter";
+  const hasReadOnlyEndpoint = isOpenAiProvider || isOpenRouterProvider;
   const language = settings.language;
   const knownOpenAiModel = OPENAI_MODEL_OPTIONS.some(
     (option) => option.value === settings.model,
@@ -49,6 +53,8 @@ export function ProviderForm({
   const openAiModelValue = knownOpenAiModel ? settings.model : CUSTOM_MODEL_VALUE;
   const baseUrlValue = isOpenAiProvider
     ? OPENAI_RESPONSES_URL
+    : isOpenRouterProvider
+      ? OPENROUTER_CHAT_COMPLETIONS_URL
     : isMiniMaxProvider
       ? (settings.baseUrl ?? MINIMAX_BASE_URL)
       : (settings.baseUrl ?? "");
@@ -60,7 +66,7 @@ export function ProviderForm({
       ...settings,
       provider,
       baseUrl:
-        provider === "openai"
+        provider === "openai" || provider === "openrouter"
           ? null
           : provider === "minimax"
             ? (providerChanged ? MINIMAX_BASE_URL : settings.baseUrl)
@@ -71,6 +77,8 @@ export function ProviderForm({
         provider === "openai" &&
         (settings.model.trim().length === 0 || settings.model === "gpt-4.1-mini")
           ? DEFAULT_OPENAI_MODEL
+          : provider === "openrouter" && (providerChanged || settings.model.trim().length === 0)
+            ? DEFAULT_OPENROUTER_MODEL
           : provider === "minimax" && (providerChanged || settings.model.trim().length === 0)
             ? DEFAULT_MINIMAX_MODEL
           : settings.model,
@@ -105,15 +113,17 @@ export function ProviderForm({
       <label>
         {t(language, "baseUrl")}
         <input
-          aria-readonly={isOpenAiProvider}
+          aria-readonly={hasReadOnlyEndpoint}
           onChange={(event) =>
-            !isOpenAiProvider &&
+            !hasReadOnlyEndpoint &&
             onSettingsChange({ ...settings, baseUrl: event.currentTarget.value })
           }
-          readOnly={isOpenAiProvider}
+          readOnly={hasReadOnlyEndpoint}
           placeholder={
             settings.provider === "custom_http"
               ? "http://localhost:8080/generate"
+              : settings.provider === "openrouter"
+                ? OPENROUTER_CHAT_COMPLETIONS_URL
               : settings.provider === "minimax"
                 ? MINIMAX_RESPONSES_URL
               : "https://api.example.com/v1"
@@ -179,7 +189,11 @@ export function ProviderForm({
         {t(language, "customHeadersJson")}
         <textarea
           onChange={(event) => onCustomHeadersDraftChange(event.currentTarget.value)}
-          placeholder='{"X-Provider":"value"}'
+          placeholder={
+            settings.provider === "openrouter"
+              ? '{"HTTP-Referer":"https://your-site.example"}'
+              : '{"X-Provider":"value"}'
+          }
           rows={3}
           value={customHeadersDraft}
         />
