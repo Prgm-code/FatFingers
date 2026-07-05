@@ -64,15 +64,19 @@ El MVP no incluye:
 - Cloud sync.
 - Pagos.
 - Marketplace de plugins.
-- Reemplazo automatico de texto en la app origen.
+- Lectura de texto de otras apps (captura por accessibility APIs).
 
 ## Reemplazo en app origen
 
-La funcion de volver a presionar Enter para escribir o reemplazar el texto en la aplicacion desde la cual se lanzo el helper queda en roadmap v1.2.
+La funcion de volver a presionar Enter para pegar el texto en la aplicacion desde la cual se lanzo el helper (roadmap v1.2) esta adelantada e implementada como pegado automatico opt-in.
 
-Motivo: requiere automatizacion OS-specific, permisos de accesibilidad y fallback manual por plataforma.
+Reglas:
 
-El MVP debe copiar el resultado al portapapeles. v1.1 puede capturar texto seleccionado mediante clipboard y dejar el texto corregido copiado para que el usuario pegue manualmente.
+- El pegado automatico se controla con el ajuste `pasteBehavior` (`clipboard` default | `auto_paste`). Nunca simular teclado sin opt-in.
+- La implementacion vive en `src-tauri/src/app/paste.rs`: copiar al clipboard, ocultar el helper, delay corto y sintetizar `Ctrl/Cmd+V` con `enigo`.
+- Fallback obligatorio a copia manual cuando la simulacion no esta disponible (Wayland, macOS sin Accessibility) o falla en runtime.
+- FatFingers nunca lee el contenido de la app origen.
+- Ver `docs/SECURITY_PRIVACY.md` seccion 9 y `docs/ROADMAP.md` v1.2.
 
 ## Convenciones de documentacion
 

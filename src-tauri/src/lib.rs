@@ -3,7 +3,8 @@ mod errors;
 mod llm;
 mod settings;
 
-use app::{clipboard, hotkeys, lifecycle, tray, windows};
+use app::paste::{PasteBackOutcome, PasteCapability};
+use app::{clipboard, hotkeys, lifecycle, paste, tray, windows};
 use errors::{AppError, AppErrorKind};
 use llm::types::{
     CorrectTextRequest, CorrectTextResponse, LlmRequest, TestProviderResponse, WritingAction,
@@ -123,6 +124,16 @@ fn read_clipboard_text(app: AppHandle) -> Result<String, AppError> {
 }
 
 #[tauri::command]
+async fn paste_back(app: AppHandle, text: String) -> Result<PasteBackOutcome, AppError> {
+    paste::paste_back(app, text).await
+}
+
+#[tauri::command]
+async fn get_paste_capability() -> Result<PasteCapability, AppError> {
+    Ok(paste::detect_paste_capability().await)
+}
+
+#[tauri::command]
 fn register_user_hotkey(app: AppHandle, hotkey: String) -> Result<(), AppError> {
     let mut settings = store::load_settings(&app)?;
     hotkeys::replace_user_hotkey(&app, &hotkey, Some(&settings.hotkey))?;
@@ -134,6 +145,16 @@ fn register_user_hotkey(app: AppHandle, hotkey: String) -> Result<(), AppError> 
 fn test_user_hotkey(app: AppHandle, hotkey: String) -> Result<(), AppError> {
     let settings = store::load_settings(&app).unwrap_or_default();
     hotkeys::test_user_hotkey(&app, &hotkey, Some(&settings.hotkey))
+}
+
+#[tauri::command]
+fn show_onboarding_window(app: AppHandle) -> Result<(), AppError> {
+    windows::show_onboarding(&app)
+}
+
+#[tauri::command]
+fn close_onboarding_window(app: AppHandle) -> Result<(), AppError> {
+    windows::close_onboarding(&app)
 }
 
 #[tauri::command]
@@ -269,8 +290,12 @@ pub fn run() {
             test_provider_connection,
             copy_to_clipboard,
             read_clipboard_text,
+            paste_back,
+            get_paste_capability,
             register_user_hotkey,
             test_user_hotkey,
+            show_onboarding_window,
+            close_onboarding_window,
             show_helper_window,
             hide_helper_window,
             show_settings_window,

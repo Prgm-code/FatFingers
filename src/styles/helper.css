@@ -1,64 +1,167 @@
+/* Frameless helper: the window is transparent, the card draws its own
+   rounded surface and shadow. */
+
+body[data-view="helper"] {
+  background: transparent;
+}
+
 .helper-shell {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 10px;
   width: 100%;
   min-width: 0;
   height: 100%;
   overflow: hidden;
-  padding: 16px;
-  background: var(--bg);
+  padding: 10px;
+  background: transparent;
 }
 
-.editor-section,
-.result-panel {
-  display: grid;
+.helper-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
   min-height: 0;
-  gap: 10px;
+  height: 100%;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
-  background: var(--surface);
+  border-radius: 14px;
+  padding: 4px 14px 12px;
+  background: var(--bg);
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-.editor-section {
-  grid-template-rows: auto minmax(112px, 1fr) auto;
-}
-
-.panel-header {
-  display: flex;
+.helper-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 1;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 22px;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.helper-close:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+/* Subtle brand-teal edge while reviewing a generated result. */
+.helper-card[data-phase="review"]::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.helper-drag {
+  flex: 0 0 auto;
+  height: 12px;
+  margin: 0 -14px;
+  cursor: grab;
+}
+
+.helper-card .error-banner {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.helper-notice {
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-size: 12px;
 }
 
 .input-editor {
+  flex: 1 1 auto;
   min-height: 0;
-  height: 100%;
-  line-height: 1.45;
+  border: none;
+  padding: 2px 0;
+  background: transparent;
+  font-size: 15px;
+  line-height: 1.5;
   resize: none;
 }
 
-.helper-controls {
+.input-editor:focus {
+  outline: none;
+}
+
+.status-line {
   display: flex;
-  justify-content: end;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  min-height: 26px;
+}
+
+.status-hints {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 .action-select-label {
-  width: 180px;
-  min-width: 0;
+  flex: 0 1 150px;
+  min-width: 96px;
   color: var(--muted);
 }
 
 .action-select {
-  min-height: 34px;
-  padding-block: 6px;
+  min-height: 26px;
+  border: none;
+  padding: 2px 24px 2px 6px;
+  background-color: transparent;
+  background-position:
+    calc(100% - 12px) 50%,
+    calc(100% - 7px) 50%;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.action-select:hover:not(:disabled),
+.action-select:focus {
+  color: var(--text);
 }
 
 .visually-hidden {
@@ -71,18 +174,6 @@
   clip-path: inset(50%);
 }
 
-.result-output {
-  min-height: 64px;
-  max-height: 34vh;
-  overflow: auto;
-  white-space: pre-wrap;
-  line-height: 1.45;
-}
-
-.placeholder {
-  color: var(--muted);
-}
-
 .loading-state {
   display: inline-flex;
   align-items: center;
@@ -92,19 +183,15 @@
 
 .icon-button {
   flex: 0 0 auto;
+  min-height: 24px;
+  border: none;
+  padding: 2px 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1;
 }
 
-@media (max-width: 620px) {
-  .helper-shell {
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
-    padding: 14px;
-  }
-
-  .helper-controls {
-    justify-content: stretch;
-  }
-
-  .action-select-label {
-    flex: 1 1 160px;
-  }
+.icon-button:hover:not(:disabled) {
+  color: var(--accent-strong);
 }

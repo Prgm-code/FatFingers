@@ -48,18 +48,38 @@ No incluye:
 - Reemplazo automatico.
 - Permisos avanzados de accessibility.
 
-## v1.2: Replace Selected Text
+## v1.2: Replace Selected Text (en progreso, adelantado)
 
 Objetivo:
 
 - Escribir o reemplazar automaticamente el texto en la aplicacion desde donde se lanzo el helper.
 
-Comportamiento deseado:
+Estado:
 
-- Usuario selecciona texto o posiciona cursor en una app origen.
-- Usuario abre FatFingers.
-- Usuario escribe/corrige con Enter o shortcut configurado.
-- Al confirmar otra vez, FatFingers escribe o reemplaza el texto en la app origen.
+- En progreso. Se adelanta esta feature al presente ciclo.
+
+Comportamiento (flujo de dos fases):
+
+- Usuario posiciona cursor en una app origen.
+- Usuario abre FatFingers con el shortcut.
+- Usuario escribe y presiona Enter: el texto se mejora con el LLM (fase `review`).
+- Usuario presiona Enter otra vez: FatFingers pega el texto en la app origen y oculta el helper.
+- Ctrl/Cmd+Enter en fase `review` vuelve a mejorar el texto.
+
+Diseno elegido:
+
+- Ajuste `pasteBehavior` con valores `clipboard` (default) y `auto_paste`. El pegado automatico es opt-in.
+- Estrategia "hide-first": copiar el resultado al clipboard, ocultar la ventana always-on-top (el sistema devuelve el foco a la app anterior), esperar un delay corto y sintetizar Ctrl+V (Cmd+V en macOS) con `enigo`.
+- Restauracion best-effort del contenido previo del clipboard (solo texto).
+- Deteccion de capacidad por plataforma expuesta al frontend (`get_paste_capability`).
+- Fallback: si la simulacion no esta disponible o falla, se copia al clipboard, se muestra el aviso "Copiado - pulsa Ctrl+V" y se oculta el helper.
+
+Matriz por plataforma:
+
+- Windows: pegado simulado soportado.
+- macOS: pegado simulado si el usuario concede Accessibility permissions; si no, fallback a clipboard.
+- Linux X11: pegado simulado via libxdo.
+- Linux Wayland: la simulacion de teclado esta restringida por el compositor; en la practica el flujo es el fallback a clipboard. No prometer pegado automatico en Wayland.
 
 Requisitos:
 
@@ -67,12 +87,6 @@ Requisitos:
 - Explicacion clara de permisos en onboarding/settings.
 - Fallback a copia manual.
 - Diferencias por plataforma documentadas.
-
-Notas por plataforma:
-
-- macOS puede requerir Accessibility permissions.
-- Windows puede requerir APIs de automatizacion/input simulation.
-- Linux puede variar segun Wayland/X11 y desktop environment.
 
 Esta feature no debe bloquear el MVP.
 

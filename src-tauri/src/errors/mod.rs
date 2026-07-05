@@ -12,6 +12,7 @@ pub enum AppErrorKind {
     EmptyInput,
     ShortcutUnavailable,
     ClipboardUnavailable,
+    PasteUnavailable,
     SecureStorageUnavailable,
     InvalidSettings,
     ProviderError,

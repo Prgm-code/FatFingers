@@ -3,10 +3,18 @@ use tauri::{AppHandle, Emitter, LogicalSize, Manager, Size, WebviewUrl, WebviewW
 
 pub const HELPER_LABEL: &str = "helper";
 pub const SETTINGS_LABEL: &str = "settings";
-const HELPER_WIDTH: f64 = 620.0;
-const HELPER_HEIGHT: f64 = 380.0;
-const HELPER_MIN_WIDTH: f64 = 520.0;
-const HELPER_MIN_HEIGHT: f64 = 340.0;
+pub const ONBOARDING_LABEL: &str = "onboarding";
+// Keep in sync with the static `helper` window in tauri.conf.json.
+const HELPER_WIDTH: f64 = 600.0;
+const HELPER_HEIGHT: f64 = 220.0;
+const HELPER_MIN_WIDTH: f64 = 460.0;
+const HELPER_MIN_HEIGHT: f64 = 160.0;
+// The first-launch onboarding gets its own framed, opaque window; toggling
+// decorations on the transparent helper window breaks its titlebar hit-testing.
+const ONBOARDING_WIDTH: f64 = 860.0;
+const ONBOARDING_HEIGHT: f64 = 820.0;
+const ONBOARDING_MIN_WIDTH: f64 = 680.0;
+const ONBOARDING_MIN_HEIGHT: f64 = 680.0;
 const SETTINGS_WIDTH: f64 = 920.0;
 const SETTINGS_HEIGHT: f64 = 720.0;
 const SETTINGS_MIN_WIDTH: f64 = 760.0;
@@ -21,6 +29,10 @@ pub fn show_helper(app: &AppHandle) -> Result<(), AppError> {
             .min_inner_size(HELPER_MIN_WIDTH, HELPER_MIN_HEIGHT)
             .resizable(true)
             .always_on_top(true)
+            .decorations(false)
+            .transparent(true)
+            .skip_taskbar(true)
+            .shadow(false)
             .center()
             .build()
             .map_err(|_| {
@@ -53,6 +65,50 @@ pub fn show_helper(app: &AppHandle) -> Result<(), AppError> {
         )
     })?;
     let _ = window.emit("fatfingers://focus-input", ());
+
+    Ok(())
+}
+
+pub fn show_onboarding(app: &AppHandle) -> Result<(), AppError> {
+    let window = match app.get_webview_window(ONBOARDING_LABEL) {
+        Some(window) => window,
+        None => WebviewWindowBuilder::new(
+            app,
+            ONBOARDING_LABEL,
+            WebviewUrl::App("index.html?view=onboarding".into()),
+        )
+        .title("FatFingers")
+        .inner_size(ONBOARDING_WIDTH, ONBOARDING_HEIGHT)
+        .min_inner_size(ONBOARDING_MIN_WIDTH, ONBOARDING_MIN_HEIGHT)
+        .resizable(true)
+        .center()
+        .build()
+        .map_err(|_| {
+            AppError::new(
+                AppErrorKind::ProviderError,
+                "Onboarding window could not be created.",
+            )
+        })?,
+    };
+
+    window.show().map_err(|_| {
+        AppError::new(
+            AppErrorKind::ProviderError,
+            "Onboarding window could not be shown.",
+        )
+    })?;
+    window.set_focus().map_err(|_| {
+        AppError::new(
+            AppErrorKind::ProviderError,
+            "Onboarding window could not receive focus.",
+        )
+    })
+}
+
+pub fn close_onboarding(app: &AppHandle) -> Result<(), AppError> {
+    if let Some(window) = app.get_webview_window(ONBOARDING_LABEL) {
+        let _ = window.close();
+    }
 
     Ok(())
 }

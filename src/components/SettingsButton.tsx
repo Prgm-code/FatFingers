@@ -17,7 +17,7 @@ export function SettingsButton({ onClick, language = "en" }: SettingsButtonProps
       title={label}
       type="button"
     >
-      {t(language, "settings")}
+      <span aria-hidden="true">⚙</span>
     </button>
   );
 }

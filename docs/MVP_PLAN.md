@@ -193,10 +193,18 @@ MVP completo cuando:
 
 ## 10. Fuera de MVP
 
-- Reemplazo automatico en app origen.
-- Captura avanzada por accessibility APIs.
+- Captura avanzada por accessibility APIs (leer texto de otras apps).
 - Chat history completo.
 - Cloud sync.
 - Team accounts.
 - Payments.
 - Plugin marketplace.
+
+## 11. Post-MVP en progreso
+
+- Roadmap v1.2 adelantado: pegado automatico en la app origen mediante flujo
+  de dos fases con Enter, ajuste opt-in `pasteBehavior` (default `clipboard`)
+  y fallback a copia manual. Ver `docs/ROADMAP.md` y
+  `docs/SECURITY_PRIVACY.md` seccion 9.
+- Rediseño minimalista del helper (ventana frameless) y navegacion lateral en
+  settings. Ver `docs/PRODUCT_SPEC.md` secciones 7 y 9.

@@ -67,6 +67,7 @@ Settings permitidas en store:
 - timeoutSeconds
 - autoCopy
 - autoCloseAfterCopy
+- pasteBehavior
 - launchAtLogin
 - theme
 - storeHistory
@@ -157,15 +158,17 @@ Reglas:
 
 ## 9. Reemplazo en app origen
 
-No es MVP.
+Implementado como pegado automatico opt-in (roadmap v1.2 adelantado).
 
-Para v1.2:
+Reglas de diseno:
 
-- Pedir permisos explicitos por plataforma.
-- Explicar por que se necesitan permisos de accessibility/automation.
-- Ofrecer fallback manual.
-- No auto-pegar sin accion clara del usuario.
-- No capturar texto sin intencion explicita.
+- El pegado automatico se controla con el ajuste `pasteBehavior` (`clipboard` | `auto_paste`). Default: `clipboard`. La simulacion de teclado nunca ocurre sin opt-in.
+- La accion clara del usuario es el segundo Enter en fase `review`: el usuario ya vio el texto mejorado y confirma su insercion.
+- macOS requiere Accessibility permissions; el sistema muestra el prompt en el primer intento y Settings explica por que se necesita.
+- Fallback manual garantizado: si la simulacion no esta disponible (Wayland, permiso denegado) o falla en runtime, FatFingers copia el texto al clipboard y avisa al usuario ("Copiado - pulsa Ctrl+V").
+- No se captura texto de la app origen: FatFingers solo escribe, nunca lee el contenido del campo destino.
+- Restauracion del clipboard previo: best-effort y solo texto; contenido no textual (imagenes, archivos) se pierde al pegar. Documentado como limitacion.
+- Los errores de pegado son genericos ("Automatic paste is not available on this system.") y nunca incluyen texto del usuario ni secrets.
 
 ## 10. Clear all local data
 

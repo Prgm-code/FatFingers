@@ -22,9 +22,7 @@ type ProviderFormProps = {
   onApiKeyDraftChange: (value: string) => void;
   onCustomHeadersDraftChange: (value: string) => void;
   onSettingsChange: (settings: AppSettings) => void;
-  onSaveApiKey: () => void;
   onClearApiKey: () => void;
-  onSaveCustomHeaders: () => void;
   onClearCustomHeaders: () => void;
   onTestConnection: () => void;
 };
@@ -38,9 +36,7 @@ export function ProviderForm({
   onApiKeyDraftChange,
   onCustomHeadersDraftChange,
   onSettingsChange,
-  onSaveApiKey,
   onClearApiKey,
-  onSaveCustomHeaders,
   onClearCustomHeaders,
   onTestConnection,
 }: ProviderFormProps) {
@@ -202,18 +198,8 @@ export function ProviderForm({
       </label>
 
       <div className="button-row form-actions">
-        <button disabled={apiKeyDraft.trim().length === 0} onClick={onSaveApiKey} type="button">
-          {t(language, "saveApiKey")}
-        </button>
         <button disabled={!hasApiKey} onClick={onClearApiKey} type="button">
           {t(language, "clearApiKey")}
-        </button>
-        <button
-          disabled={customHeadersDraft.trim().length === 0}
-          onClick={onSaveCustomHeaders}
-          type="button"
-        >
-          {t(language, "saveHeaders")}
         </button>
         <button onClick={onClearCustomHeaders} type="button">
           {t(language, "clearHeaders")}

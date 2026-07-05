@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { FALLBACK_SETTINGS, SECRET_PROVIDER_API_KEY } from "../lib/settings";
 import { Onboarding } from "./Onboarding";
@@ -72,11 +72,12 @@ describe("Onboarding", () => {
     expect(screen.getByRole("button", { name: "Finalizar" })).toBeTruthy();
   });
 
-  it("marks the API key as saved after saving it", async () => {
+  it("saves a typed API key when finishing onboarding", async () => {
+    const onFinish = vi.fn();
     render(
       <Onboarding
         hasApiKey={false}
-        onFinish={vi.fn()}
+        onFinish={onFinish}
         settings={FALLBACK_SETTINGS}
       />,
     );
@@ -84,15 +85,12 @@ describe("Onboarding", () => {
     fireEvent.change(screen.getByLabelText("API key"), {
       target: { value: "test-api-key" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save API key" }));
+    fireEvent.click(screen.getByRole("button", { name: "Finish" }));
 
-    expect(await screen.findByText("API key saved.")).toBeTruthy();
+    await waitFor(() => {
+      expect(onFinish).toHaveBeenCalledWith(expect.anything(), true);
+    });
     expect(mocks.saveSecret).toHaveBeenCalledWith(SECRET_PROVIDER_API_KEY, "test-api-key");
-    expect((screen.getByLabelText("API key") as HTMLInputElement).value).toBe("");
-    expect(screen.getByPlaceholderText("Saved key exists")).toBeTruthy();
-    expect((screen.getByRole("button", { name: "Clear API key" }) as HTMLButtonElement).disabled).toBe(
-      false,
-    );
   });
 
   it("saves a typed API key before testing the provider", async () => {

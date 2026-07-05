@@ -26,7 +26,12 @@ Pendiente:
 
 - QA manual completa en macOS y Windows.
 - Packaging final firmado/notarizado por plataforma.
-- Reemplazo automatico en app origen, que sigue fuera del MVP.
+
+En progreso (roadmap v1.2 adelantado):
+
+- Pegado automatico en la app origen mediante flujo de dos fases con Enter,
+  opt-in via `pasteBehavior` y fallback a clipboard. Ver seccion 9 y
+  `docs/ROADMAP.md`.
 
 ## 1. Vision
 
@@ -114,8 +119,12 @@ Secciones:
 - Privacy
 
 Settings debe abrir en una ventana propia, no dentro de la ventana compacta del
-helper. La ventana de settings debe ser resizable y suficientemente amplia para
-mostrar las secciones completas con scroll interno cuando sea necesario.
+helper. La ventana de settings debe ser resizable y usar una navegacion lateral
+con una seccion visible a la vez, en lugar de un formulario unico con scroll
+largo. El boton Save del footer persiste los settings y tambien los borradores
+no vacios de API key y custom headers. Las acciones destructivas (limpiar
+historial, borrar API key, borrar datos locales) requieren confirmacion en dos
+pasos dentro del propio boton.
 
 ### 7.1 General
 
@@ -124,7 +133,10 @@ Campos:
 - Launch at login
 - Interface language: `en`, `es`
 - Default action
-- Default language behavior
+- After improving, Enter will: `clipboard` (copiar al portapapeles, default) o
+  `auto_paste` (pegar en la app origen). Si la plataforma no soporta pegado
+  simulado (por ejemplo Wayland o macOS sin permiso de Accessibility), la UI
+  muestra una nota y el comportamiento efectivo es copiar al portapapeles.
 - Auto-copy result after generation
 - Close window after copy
 - Theme: `system`, `light`, `dark`
@@ -217,10 +229,12 @@ Campos y acciones:
 
 - Store history locally: off por defecto.
 - Clear local history.
-- Never send telemetry: default.
-- Optional telemetry toggle: off por defecto.
+- Never send telemetry: default. No se muestra toggle de telemetria mientras la
+  telemetria no exista; si se implementa despues sera opt-in.
 - Clear all local data.
 - Clear API key.
+
+Las tres acciones de limpieza requieren un segundo click de confirmacion.
 
 Texto obligatorio:
 
@@ -240,57 +254,76 @@ Onboarding:
 
 Si el test de provider falla, el usuario debe poder continuar y arreglarlo despues desde settings.
 
+El onboarding abre en su propia ventana dedicada, con marco nativo, opaca y
+amplia (~860x820, minimo 680x680). Al finalizar, la ventana de onboarding se
+cierra y se muestra el helper compacto. Cerrar la ventana de onboarding con el
+boton nativo no bloquea la app: sigue disponible desde el tray y el usuario
+puede completar la configuracion despues desde settings.
+
 ## 9. Helper flotante
 
 Cuando se presiona el shortcut global:
 
-- Abrir ventana pequeña centrada.
-- Mantener always-on-top.
-- Usar ventana frameless o minima.
+- Abrir ventana pequeña centrada, sin marco (frameless) y con esquinas
+  redondeadas dibujadas por la app.
+- Mantener always-on-top y fuera de la taskbar.
+- Fondo crema u oscuro segun el tema (`system` sigue al sistema operativo),
+  manteniendo el acento teal de la marca.
 - Enfocar textarea inmediatamente.
-- Limpiar textarea, resultado anterior, errores y estado de undo en cada
+- Limpiar textarea, resultado anterior, errores, fase y estado de undo en cada
   apertura del helper.
 - Cerrar con `Esc`.
-- Enviar con `Enter`.
 - Insertar saltos de linea con `Shift + Enter`.
 
 Dimensiones sugeridas:
 
-- Width: 680px
-- Height: 420px
+- Width: 600px
+- Height: 220px
 - Resizable: si
 - Compacta por defecto
 
-Estado inicial:
+El helper opera en un flujo de dos fases:
 
-- Textarea grande y controles minimos.
-- Accion por defecto configurada en settings, con selector compacto si el
-  usuario necesita cambiarla puntualmente.
-- Boton submit.
-- Icono de settings.
-- Contador de caracteres.
-- Indicador provider/model.
-- No mostrar un panel de resultado vacio.
+Fase `compose` (estado inicial):
 
-Despues de enviar:
+- Una sola superficie de texto sin bordes, con placeholder como unico chrome.
+- Linea de estado inferior discreta: selector compacto de accion a la
+  izquierda; hints de teclado y contador a la derecha.
+- Sin botones grandes: no hay boton Run ni Copy visibles; Enter ejecuta y los
+  atajos cubren el resto.
+- Icono minimo de settings en la linea de estado.
+- `Enter` envia el texto al proveedor (pasa a `improving`).
 
-- Mostrar loading state.
-- Deshabilitar submit.
-- Permitir cancelar si es practico.
-- Reemplazar el texto del textarea con el resultado generado.
-- Mantener el tamaño del textarea estable antes y despues de generar.
-- Mostrar un boton Undo/Deshacer para restaurar el texto original de la ultima
-  generacion.
-- Botones minimos: accion, Copy, Undo cuando aplique, Run.
+Fase `improving`:
+
+- Mostrar loading state discreto en la linea de estado.
+- Bloquear reenvios mientras carga.
+
+Fase `review` (resultado generado):
+
+- El texto mejorado reemplaza el contenido del textarea y puede editarse.
+- Indicador visual sutil de fase: barra de acento teal en el borde del
+  contenedor.
+- `Enter` confirma: segun `pasteBehavior`, pega el texto en la app origen y
+  oculta el helper, o lo copia al portapapeles, avisa y oculta. El texto
+  confirmado es el contenido actual del textarea, incluidas ediciones.
+- `Cmd/Ctrl + Enter` vuelve a mejorar el texto actual.
+- `Cmd/Ctrl + Z` sobre el estado de la app (boton/atajo Undo) restaura el
+  texto original y vuelve a `compose`.
+- Mostrar latencia de la ultima generacion en la linea de estado.
 
 ## 10. Shortcuts internos
 
 - `Esc`: cerrar helper.
-- `Cmd/Ctrl + Enter`: ejecutar accion.
+- `Enter`: en `compose`, mejorar; en `review`, confirmar (pegar o copiar).
+- `Shift + Enter`: salto de linea.
+- `Cmd/Ctrl + Enter`: en `review`, volver a mejorar.
 - `Cmd/Ctrl + C`: copiar seleccion normalmente.
 - `Cmd/Ctrl + Shift + C`: copiar resultado.
-- `Cmd/Ctrl + N`: nuevo input.
+- `Cmd/Ctrl + N`: nuevo input (vuelve a `compose`).
 - `Cmd/Ctrl + ,`: abrir settings.
+- `Tab`: ciclar la accion de escritura.
+- `Cmd/Ctrl + 1..5`: seleccionar accion directamente.
 
 ## 11. Tray/menu bar
 
@@ -359,9 +392,12 @@ No implementar en MVP:
 - Cloud sync.
 - Payments.
 - Plugin marketplace.
-- Auto-replacing selected text in other apps.
+- Reemplazo de texto seleccionado leyendo el contenido de otras apps.
 
-La escritura o reemplazo automatico en la aplicacion origen queda para v1.2.
+La escritura automatica en la aplicacion origen (roadmap v1.2) se adelanto y
+esta implementada como pegado automatico opt-in con fallback a clipboard; ver
+seccion 9 y `docs/SECURITY_PRIVACY.md` seccion 9. FatFingers nunca lee el
+contenido de la app origen.
 
 ## 14. Criterios de aceptacion MVP
 

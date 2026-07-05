@@ -36,15 +36,11 @@ src/
   App.tsx
 
   components/
-    FloatingEditor.tsx
     ActionSelector.tsx
-    ResultPanel.tsx
-    LoadingState.tsx
     ErrorBanner.tsx
     SettingsButton.tsx
     ShortcutRecorder.tsx
     ProviderForm.tsx
-    TrayHint.tsx
 
   screens/
     Onboarding.tsx
@@ -81,6 +77,7 @@ src-tauri/src/
     tray.rs
     hotkeys.rs
     clipboard.rs
+    paste.rs
 
   settings/
     mod.rs
@@ -107,10 +104,28 @@ src-tauri/src/
 
 Ventanas Tauri actuales:
 
-- `helper`: overlay compacto always-on-top para escribir, ejecutar y copiar.
-  Tamaño por defecto `620x380`, minimo `520x340`.
-- `settings`: dashboard de configuracion en ventana separada. Tamaño por
-  defecto `920x720`, minimo `760x560`.
+- `helper`: overlay compacto always-on-top para escribir, mejorar y confirmar.
+  Sin decoraciones nativas (`decorations: false`), fondo transparente con
+  contenedor redondeado dibujado por CSS y fuera de la taskbar
+  (`skipTaskbar: true`). Tamaño por defecto `600x220`, minimo `460x160`.
+  La configuracion de esta ventana vive en `tauri.conf.json` y tambien en el
+  `WebviewWindowBuilder` de `src-tauri/src/app/windows.rs`; ambos deben
+  mantenerse sincronizados.
+- `settings`: dashboard de configuracion en ventana separada con navegacion
+  lateral. Tamaño por defecto `920x720`, minimo `760x560`.
+- `onboarding`: primer flujo de configuracion en ventana propia, con marco
+  nativo y opaca (`index.html?view=onboarding`). Tamaño por defecto `860x820`,
+  minimo `680x680`. Se crea bajo demanda y se cierra al finalizar el
+  onboarding. No se reutiliza la ventana del helper: alternar decoraciones
+  nativas sobre una ventana transparente rompe el hit-testing de la barra de
+  titulo en algunos entornos.
+
+`app/paste.rs` implementa el pegado automatico en la app origen: escribe el
+resultado al clipboard, oculta el helper (el sistema devuelve el foco a la app
+anterior), espera un delay corto y sintetiza `Ctrl+V`/`Cmd+V` con `enigo`.
+Expone la deteccion de capacidad por plataforma (`simulated` |
+`clipboard_only`) y hace fallback a copia manual cuando la simulacion no esta
+disponible (Wayland, macOS sin Accessibility) o falla en runtime.
 
 ## 4. Tipos principales
 
@@ -209,11 +224,17 @@ type AppSettings = {
   timeoutSeconds: number;
   autoCopy: boolean;
   autoCloseAfterCopy: boolean;
+  pasteBehavior: "clipboard" | "auto_paste";
   launchAtLogin: boolean;
   theme: "system" | "light" | "dark";
   storeHistory: boolean;
 };
 ```
+
+`pasteBehavior` controla que hace Enter en fase `review`: `clipboard` (default)
+copia al portapapeles; `auto_paste` pega en la app origen. En Rust el campo usa
+`#[serde(default)]` para que settings antiguos sin el campo carguen con
+`clipboard`.
 
 Rust:
 
@@ -276,6 +297,12 @@ async fn copy_to_clipboard(text: String) -> Result<(), AppError>;
 
 #[tauri::command]
 async fn read_clipboard_text() -> Result<String, AppError>;
+
+#[tauri::command]
+async fn paste_back(text: String) -> Result<PasteBackOutcome, AppError>;
+
+#[tauri::command]
+async fn get_paste_capability() -> Result<PasteCapability, AppError>;
 
 #[tauri::command]
 async fn register_user_hotkey(hotkey: String) -> Result<(), AppError>;
@@ -405,16 +432,20 @@ Response:
 8. Backend construye prompt.
 9. Backend llama al provider seleccionado.
 10. Backend devuelve `CorrectTextResponse`.
-11. Frontend muestra resultado.
-12. Usuario copia resultado con `copy_to_clipboard`.
+11. Frontend muestra el resultado en el textarea y pasa a fase `review`.
+12. Usuario confirma con Enter: segun `pasteBehavior`, el frontend llama
+    `paste_back` (el backend copia al clipboard, oculta el helper y sintetiza
+    el atajo de pegado, con fallback a `clipboard_only`) o `copy_to_clipboard`
+    y cierra el helper.
 
 ## 10. Ventanas
 
-Ventanas previstas:
+Ventanas actuales:
 
 - `helper`: flotante, compacta, always-on-top, ocultable.
 - `settings`: dashboard de configuracion.
-- `onboarding`: primer lanzamiento.
+- `onboarding`: primer lanzamiento, ventana dedicada que se cierra al
+  finalizar.
 
 El helper debe ocultarse en vez de destruirse al presionar `Esc`.
 
@@ -430,6 +461,7 @@ Crear `AppError` tipado con categorias:
 - EmptyInput
 - ShortcutUnavailable
 - ClipboardUnavailable
+- PasteUnavailable
 - SecureStorageUnavailable
 - InvalidSettings
 - ProviderError

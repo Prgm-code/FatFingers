@@ -10,18 +10,22 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "helper",
         "title": "FatFingers",
-        "width": 620,
-        "height": 380,
-        "minWidth": 520,
-        "minHeight": 340,
+        "width": 600,
+        "height": 220,
+        "minWidth": 460,
+        "minHeight": 160,
         "center": true,
         "resizable": true,
         "alwaysOnTop": true,
-        "decorations": true
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "shadow": false
       }
     ],
     "security": {

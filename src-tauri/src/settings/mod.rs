@@ -28,6 +28,8 @@ pub struct AppSettings {
     pub timeout_seconds: u64,
     pub auto_copy: bool,
     pub auto_close_after_copy: bool,
+    #[serde(default)]
+    pub paste_behavior: PasteBehavior,
     pub launch_at_login: bool,
     pub theme: Theme,
     pub store_history: bool,
@@ -39,6 +41,14 @@ pub enum Theme {
     System,
     Light,
     Dark,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PasteBehavior {
+    #[default]
+    Clipboard,
+    AutoPaste,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -72,6 +82,7 @@ impl Default for AppSettings {
             timeout_seconds: 30,
             auto_copy: false,
             auto_close_after_copy: false,
+            paste_behavior: PasteBehavior::Clipboard,
             launch_at_login: false,
             theme: Theme::System,
             store_history: false,
@@ -227,6 +238,30 @@ mod tests {
         let settings: AppSettings = serde_json::from_value(json).unwrap();
 
         assert_eq!(settings.language, AppLanguage::En);
+        assert_eq!(settings.paste_behavior, PasteBehavior::Clipboard);
+    }
+
+    #[test]
+    fn serializes_paste_behavior_snake_case() {
+        let mut settings = AppSettings::default();
+
+        let json = serde_json::to_value(settings.clone()).unwrap();
+        assert_eq!(json["pasteBehavior"], "clipboard");
+
+        settings.paste_behavior = PasteBehavior::AutoPaste;
+        let json = serde_json::to_value(settings).unwrap();
+        assert_eq!(json["pasteBehavior"], "auto_paste");
+    }
+
+    #[test]
+    fn roundtrips_paste_behavior() {
+        let mut settings = AppSettings::default();
+        settings.paste_behavior = PasteBehavior::AutoPaste;
+
+        let json = serde_json::to_value(settings.clone()).unwrap();
+        let loaded: AppSettings = serde_json::from_value(json).unwrap();
+
+        assert_eq!(loaded, settings);
     }
 
     #[test]

@@ -35,9 +35,16 @@ Pendiente antes de considerar un release estable:
 - Validacion amplia con providers reales.
 - Mejoras de accesibilidad y navegacion keyboard-first.
 
+En progreso (roadmap v1.2 adelantado):
+
+- Flujo de dos fases: Enter mejora el texto y un segundo Enter lo pega en la
+  app origen (ajuste opt-in `pasteBehavior`, default copiar al portapapeles).
+  En Linux Wayland la simulacion de teclado esta restringida y el flujo usa el
+  fallback a portapapeles; en macOS requiere permiso de Accessibility.
+
 Fuera del MVP:
 
-- Reemplazo automatico de texto en la app origen.
+- Lectura de texto de otras apps (captura por accessibility APIs).
 - Historial por defecto.
 - Extension de navegador.
 - Cuentas de equipo, cloud sync, pagos y marketplace de plugins.
@@ -72,6 +79,9 @@ La lista sugerida de modelos OpenAI vive en `src/lib/settings.ts` y permite ingr
 - `pnpm`.
 - Rust stable.
 - Dependencias de Tauri v2 para la plataforma local.
+- La simulacion de pegado (`auto_paste`) usa `enigo` con backends puros de
+  Rust (X11 via `x11rb` y el protocolo virtual-keyboard de Wayland); no
+  requiere paquetes extra del sistema.
 
 En Linux, el almacenamiento seguro usa `keyring` con backend
 `linux-native-sync-persistent`: Secret Service via D-Bus para persistir

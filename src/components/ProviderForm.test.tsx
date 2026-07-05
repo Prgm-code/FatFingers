@@ -22,8 +22,6 @@ function renderProviderForm(
     onClearApiKey: vi.fn(),
     onClearCustomHeaders: vi.fn(),
     onCustomHeadersDraftChange: vi.fn(),
-    onSaveApiKey: vi.fn(),
-    onSaveCustomHeaders: vi.fn(),
     onSettingsChange: vi.fn(),
     onTestConnection: vi.fn(),
     settings: FALLBACK_SETTINGS,
@@ -166,8 +164,6 @@ function ControlledProviderForm() {
       onClearApiKey={vi.fn()}
       onClearCustomHeaders={vi.fn()}
       onCustomHeadersDraftChange={vi.fn()}
-      onSaveApiKey={vi.fn()}
-      onSaveCustomHeaders={vi.fn()}
       onSettingsChange={setSettings}
       onTestConnection={vi.fn()}
       settings={settings}

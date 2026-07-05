@@ -69,7 +69,7 @@
 - Helper always-on-top funciona.
 - Clipboard copy funciona.
 - App empaqueta para macOS.
-- Permisos futuros de Accessibility quedan fuera del MVP.
+- Accessibility permissions solo se solicitan al usar `auto_paste` (ver 6.1).
 
 ## 5. Windows
 
@@ -93,6 +93,34 @@
 - Clipboard copy funciona.
 - Errores de portal/clipboard son claros.
 - App corre en desarrollo local.
+
+## 6.1 Pegado automatico (dos fases)
+
+Comun:
+
+- Con `pasteBehavior: clipboard` (default): Enter mejora, segundo Enter copia
+  al portapapeles, muestra aviso y oculta el helper.
+- Con `pasteBehavior: auto_paste` en plataforma soportada: enfocar un campo de
+  texto en otra app, abrir helper con shortcut, escribir, Enter, Enter; el
+  texto aparece en el campo origen y el helper se oculta.
+- Editar el resultado antes del segundo Enter pega el texto editado.
+- `Cmd/Ctrl + Enter` en fase review vuelve a mejorar en lugar de pegar.
+- Reabrir el helper con el shortcut resetea a fase compose.
+- Settings muestra nota de capacidad cuando el pegado simulado no esta
+  disponible.
+- Si la simulacion falla en runtime, el flujo cae a copia + aviso sin error
+  destructivo.
+- El contenido de texto previo del clipboard se restaura tras el pegado
+  simulado (best-effort).
+
+Por plataforma:
+
+- Linux X11: pegado simulado funciona via libxdo.
+- Linux Wayland: capacidad reportada `clipboard_only`; el flujo usa el
+  fallback y el aviso "Copiado - pulsa Ctrl+V".
+- Windows: pegado simulado funciona.
+- macOS: el primer intento dispara el prompt de Accessibility; con permiso
+  denegado el fallback funciona, con permiso concedido el pegado funciona.
 
 ## 7. Privacy QA
 

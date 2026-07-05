@@ -121,22 +121,6 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
     }
   }
 
-  async function saveCustomHeaders() {
-    setError(null);
-    try {
-      const headersError = validateCustomHeadersJson(customHeadersDraft, language);
-      if (headersError) {
-        setError(headersError);
-        return;
-      }
-      await saveSecret(SECRET_CUSTOM_HEADERS, customHeadersDraft);
-      setCustomHeadersDraft("");
-      setStatus(t(language, "customHeadersSaved"));
-    } catch (headersError) {
-      setError(normalizeError(headersError).message);
-    }
-  }
-
   async function clearCustomHeaders() {
     setError(null);
     try {
@@ -145,16 +129,6 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       setStatus(t(language, "customHeadersCleared"));
     } catch (headersError) {
       setError(normalizeError(headersError).message);
-    }
-  }
-
-  async function saveApiKey() {
-    setError(null);
-    try {
-      await persistApiKeyDraft();
-      setStatus(t(language, "apiKeySaved"));
-    } catch (secretError) {
-      setError(normalizeError(secretError).message);
     }
   }
 
@@ -234,8 +208,6 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
           onClearApiKey={() => void clearApiKey()}
           onClearCustomHeaders={() => void clearCustomHeaders()}
           onCustomHeadersDraftChange={setCustomHeadersDraft}
-          onSaveApiKey={() => void saveApiKey()}
-          onSaveCustomHeaders={() => void saveCustomHeaders()}
           onSettingsChange={setDraft}
           onTestConnection={() => void testConnection()}
           settings={draft}

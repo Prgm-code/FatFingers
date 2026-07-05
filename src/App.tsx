@@ -14,10 +14,14 @@ import {
   hasSecret,
   hideHelperWindow,
   hideSettingsWindow,
+  closeOnboardingWindow,
   normalizeError,
+  pasteBack,
+  showHelperWindow,
+  showOnboardingWindow,
   showSettingsWindow,
 } from "./lib/tauri";
-import type { AppSettings, View } from "./types/app";
+import type { AppSettings, PasteBackOutcome, View } from "./types/app";
 import type { CorrectTextResponse, WritingAction } from "./types/llm";
 import "./styles/globals.css";
 
@@ -39,7 +43,10 @@ function App() {
   const [settings, setSettings] = useState<AppSettings>(FALLBACK_SETTINGS);
   const requestedView = new URLSearchParams(window.location.search).get("view");
   const isSettingsWindow = requestedView === "settings";
-  const [view, setView] = useState<View>(isSettingsWindow ? "settings" : "helper");
+  const isOnboardingWindow = requestedView === "onboarding";
+  const [view, setView] = useState<View>(
+    isSettingsWindow ? "settings" : isOnboardingWindow ? "onboarding" : "helper",
+  );
   const [hasApiKey, setHasApiKey] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
@@ -63,13 +70,17 @@ function App() {
             ? null
             : t(snapshot.settings.language, "shortcutUnavailable"),
         );
-        setView(isSettingsWindow ? "settings" : snapshot.hasApiKey ? "helper" : "onboarding");
+        if (!isSettingsWindow && !isOnboardingWindow && !snapshot.hasApiKey) {
+          // First launch: onboarding lives in its own framed window instead of
+          // the compact frameless helper.
+          void showOnboardingWindow();
+          void hideHelperWindow();
+        }
       } catch (error) {
         if (!isMounted) {
           return;
         }
         setStartupError(normalizeError(error).message);
-        setView(isSettingsWindow ? "settings" : "helper");
       } finally {
         if (isMounted) {
           setIsReady(true);
@@ -89,8 +100,16 @@ function App() {
   }, [settings.theme]);
 
   useEffect(() => {
+    // The frameless helper window is transparent; only the helper view draws
+    // its own rounded card, every other view needs the opaque background.
+    document.body.dataset.view = view;
+  }, [view]);
+
+  useEffect(() => {
     const unlistenSettings = listen("fatfingers://open-settings", () => {
-      setView("settings");
+      if (!isOnboardingWindow) {
+        setView("settings");
+      }
     });
     const unlistenUpdatedSettings = listen<AppSettings>(
       "fatfingers://settings-updated",
@@ -104,7 +123,11 @@ function App() {
       },
     );
     const unlistenFocus = listen("fatfingers://focus-input", async () => {
-      setView((currentView) => (currentView === "settings" ? currentView : "helper"));
+      // Events broadcast to every window; only the helper window reacts.
+      if (isSettingsWindow || isOnboardingWindow) {
+        return;
+      }
+      setView("helper");
       setHelperSessionId((sessionId) => sessionId + 1);
       try {
         const snapshot = await loadSettingsSnapshot();
@@ -141,6 +164,14 @@ function App() {
     }
   }
 
+  async function pasteResult(text: string): Promise<PasteBackOutcome> {
+    try {
+      return await pasteBack(text);
+    } catch (error) {
+      throw new Error(normalizeError(error).message);
+    }
+  }
+
   async function openSettings(): Promise<void> {
     try {
       await showSettingsWindow();
@@ -167,6 +198,12 @@ function App() {
           onFinish={(savedSettings, nextHasApiKey) => {
             setSettings(savedSettings);
             setHasApiKey(nextHasApiKey);
+            if (isOnboardingWindow) {
+              // show_helper reloads the helper window's settings snapshot.
+              void showHelperWindow();
+              void closeOnboardingWindow();
+              return;
+            }
             setView("helper");
           }}
           settings={settings}
@@ -193,7 +230,10 @@ function App() {
           onDataCleared={() => {
             setSettings(FALLBACK_SETTINGS);
             setHasApiKey(false);
-            setView("onboarding");
+            void showOnboardingWindow();
+            if (isSettingsWindow) {
+              void hideSettingsWindow();
+            }
           }}
           onSettingsSaved={setSettings}
           settings={settings}
@@ -218,6 +258,7 @@ function App() {
         onClose={() => void hideHelperWindow()}
         onCopy={copyResult}
         onOpenSettings={() => void openSettings()}
+        onPaste={pasteResult}
         onRun={runAction}
         sessionId={helperSessionId}
         settings={settings}

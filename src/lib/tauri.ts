@@ -1,5 +1,11 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { AppError, AppSettings, RuntimeStatus } from "../types/app";
+import type {
+  AppError,
+  AppSettings,
+  PasteBackOutcome,
+  PasteCapability,
+  RuntimeStatus,
+} from "../types/app";
 import type {
   CorrectTextRequest,
   CorrectTextResponse,
@@ -48,12 +54,28 @@ export async function readClipboardText(): Promise<string> {
   return invoke<string>("read_clipboard_text");
 }
 
+export async function pasteBack(text: string): Promise<PasteBackOutcome> {
+  return invoke<PasteBackOutcome>("paste_back", { text });
+}
+
+export async function getPasteCapability(): Promise<PasteCapability> {
+  return invoke<PasteCapability>("get_paste_capability");
+}
+
 export async function registerUserHotkey(hotkey: string): Promise<void> {
   return invoke("register_user_hotkey", { hotkey });
 }
 
 export async function testUserHotkey(hotkey: string): Promise<void> {
   return invoke("test_user_hotkey", { hotkey });
+}
+
+export async function showOnboardingWindow(): Promise<void> {
+  return invoke("show_onboarding_window");
+}
+
+export async function closeOnboardingWindow(): Promise<void> {
+  return invoke("close_onboarding_window");
 }
 
 export async function showHelperWindow(): Promise<void> {

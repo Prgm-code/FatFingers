@@ -10,12 +10,87 @@
   background: var(--bg);
 }
 
+/* Only the section area grows; messages and the footer stay at content height
+   so the Save button is not stretched to fill leftover space. */
+.settings-shell {
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 18px;
+  min-width: 0;
+  align-items: start;
+}
+
+.settings-nav {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.settings-nav-item {
+  justify-content: flex-start;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--muted);
+  background: transparent;
+  text-align: left;
+}
+
+.settings-nav-item:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.settings-nav-item[aria-current="true"] {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+.settings-panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-messages {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-messages:empty {
+  display: none;
+}
+
+.danger-button {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.danger-button:hover:not(:disabled) {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 .settings-section {
   display: grid;
   gap: 10px;
   min-width: 0;
   border-block-start: 1px solid var(--border);
   padding-block-start: 12px;
+}
+
+.settings-panel .settings-section {
+  border-block-start: none;
+  padding-block-start: 0;
 }
 
 .settings-grid {
@@ -64,6 +139,7 @@
   position: sticky;
   bottom: 0;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
   border-block-start: 1px solid var(--border);
@@ -75,6 +151,16 @@
   .settings-shell,
   .onboarding-shell {
     padding: 10px;
+  }
+
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-nav {
+    position: static;
+    grid-auto-flow: column;
+    overflow-x: auto;
   }
 
   .settings-grid {

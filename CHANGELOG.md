@@ -8,6 +8,20 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Flujo de dos fases en el helper: Enter mejora el texto y un segundo Enter lo
+  confirma; `Cmd/Ctrl+Enter` vuelve a mejorar en fase review.
+- Pegado automatico opt-in en la app origen (`pasteBehavior: auto_paste`) con
+  simulacion de `Ctrl/Cmd+V` via `enigo`, deteccion de capacidad por plataforma
+  y fallback a copia al portapapeles (Wayland, macOS sin Accessibility).
+- Nota de capacidad de pegado en Settings segun la plataforma.
+- Rediseño minimalista del helper: ventana sin decoraciones con esquinas
+  redondeadas, superficie unica de texto y linea de estado con hints de
+  teclado en lugar de botones.
+- Navegacion lateral por secciones en Settings, guardado unificado de settings
+  y secrets, y confirmacion en dos pasos para acciones destructivas.
+- El onboarding abre en una ventana dedicada con marco nativo (~860x820) en
+  lugar de la ventana compacta del helper.
+
 - Soporte para provider OpenRouter con modelo default `openrouter/auto`.
 - Selector de idioma de interfaz ingles/español persistido en settings.
 - Helper reducido a ventana compacta, con selector de accion compacto y panel de resultado oculto hasta generar.
@@ -25,6 +39,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Changed
 
+- El tema oscuro usa fondos negros neutros en lugar del tono verdoso,
+  conservando el acento teal de la marca.
 - El build release Linux define `NO_STRIP=true` para que AppImage pueda
   empaquetarse en distros rolling donde `linuxdeploy` falla con librerias
   recientes.

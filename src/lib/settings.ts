@@ -75,6 +75,7 @@ export const FALLBACK_SETTINGS: AppSettings = {
   timeoutSeconds: 30,
   autoCopy: false,
   autoCloseAfterCopy: false,
+  pasteBehavior: "clipboard",
   launchAtLogin: false,
   theme: "system",
   storeHistory: false,

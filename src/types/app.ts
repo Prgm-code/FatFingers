@@ -2,6 +2,12 @@ import type { ProviderType, WritingAction, WritingMode } from "./llm";
 
 export type Theme = "system" | "light" | "dark";
 export type AppLanguage = "en" | "es";
+export type PasteBehavior = "clipboard" | "auto_paste";
+export type PasteCapability = "simulated" | "clipboard_only";
+
+export type PasteBackOutcome = {
+  method: PasteCapability;
+};
 
 export type AppSettings = {
   appName: string;
@@ -19,6 +25,7 @@ export type AppSettings = {
   timeoutSeconds: number;
   autoCopy: boolean;
   autoCloseAfterCopy: boolean;
+  pasteBehavior: PasteBehavior;
   launchAtLogin: boolean;
   theme: Theme;
   storeHistory: boolean;
