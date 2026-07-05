@@ -14,12 +14,12 @@ import {
   deleteSecret,
   hasSecret,
   normalizeError,
-  registerUserHotkey,
   saveSecret,
   saveSettings,
+  testUserHotkey,
   testProviderConnection,
 } from "../lib/tauri";
-import { toNullableText, validateSettings } from "../lib/validators";
+import { toNullableText, validateCustomHeadersJson, validateSettings } from "../lib/validators";
 import type { AppSettings } from "../types/app";
 
 type OnboardingProps = {
@@ -80,21 +80,22 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       return null;
     }
 
+    const headersError = validateCustomHeadersJson(customHeadersDraft, language);
+    if (headersError) {
+      setError(headersError);
+      return null;
+    }
+
     try {
       await saveSettings(normalized);
       const nextHasApiKey = await persistApiKeyDraft();
       if (customHeadersDraft.trim().length > 0) {
-        JSON.parse(customHeadersDraft);
         await saveSecret(SECRET_CUSTOM_HEADERS, customHeadersDraft);
       }
       setDraft(normalized);
       return { settings: normalized, hasApiKey: nextHasApiKey };
     } catch (saveError) {
-      setError(
-        saveError instanceof SyntaxError
-          ? t(language, "customHeadersValidJson")
-          : normalizeError(saveError).message,
-      );
+      setError(normalizeError(saveError).message);
       return null;
     }
   }
@@ -123,18 +124,27 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
   async function saveCustomHeaders() {
     setError(null);
     try {
-      if (customHeadersDraft.trim().length > 0) {
-        JSON.parse(customHeadersDraft);
+      const headersError = validateCustomHeadersJson(customHeadersDraft, language);
+      if (headersError) {
+        setError(headersError);
+        return;
       }
       await saveSecret(SECRET_CUSTOM_HEADERS, customHeadersDraft);
       setCustomHeadersDraft("");
       setStatus(t(language, "customHeadersSaved"));
     } catch (headersError) {
-      setError(
-        headersError instanceof SyntaxError
-          ? t(language, "customHeadersValidJson")
-          : normalizeError(headersError).message,
-      );
+      setError(normalizeError(headersError).message);
+    }
+  }
+
+  async function clearCustomHeaders() {
+    setError(null);
+    try {
+      await deleteSecret(SECRET_CUSTOM_HEADERS);
+      setCustomHeadersDraft("");
+      setStatus(t(language, "customHeadersCleared"));
+    } catch (headersError) {
+      setError(normalizeError(headersError).message);
     }
   }
 
@@ -163,7 +173,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
   async function testShortcut() {
     setError(null);
     try {
-      await registerUserHotkey(draft.hotkey);
+      await testUserHotkey(draft.hotkey);
       setStatus(t(language, "shortcutRegistered"));
     } catch (shortcutError) {
       setError(normalizeError(shortcutError).message);
@@ -222,6 +232,7 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
           isTesting={isTesting}
           onApiKeyDraftChange={setApiKeyDraft}
           onClearApiKey={() => void clearApiKey()}
+          onClearCustomHeaders={() => void clearCustomHeaders()}
           onCustomHeadersDraftChange={setCustomHeadersDraft}
           onSaveApiKey={() => void saveApiKey()}
           onSaveCustomHeaders={() => void saveCustomHeaders()}

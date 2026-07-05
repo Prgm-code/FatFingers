@@ -20,6 +20,7 @@ function renderProviderForm(
     isTesting: false,
     onApiKeyDraftChange: vi.fn(),
     onClearApiKey: vi.fn(),
+    onClearCustomHeaders: vi.fn(),
     onCustomHeadersDraftChange: vi.fn(),
     onSaveApiKey: vi.fn(),
     onSaveCustomHeaders: vi.fn(),
@@ -129,6 +130,15 @@ describe("ProviderForm", () => {
     );
   });
 
+  it("exposes a clear headers action", () => {
+    const onClearCustomHeaders = vi.fn();
+    renderProviderForm({ onClearCustomHeaders });
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear headers" }));
+
+    expect(onClearCustomHeaders).toHaveBeenCalledOnce();
+  });
+
   it("shows the selected MiniMax model after changing provider", () => {
     render(<ControlledProviderForm />);
 
@@ -154,6 +164,7 @@ function ControlledProviderForm() {
       isTesting={false}
       onApiKeyDraftChange={vi.fn()}
       onClearApiKey={vi.fn()}
+      onClearCustomHeaders={vi.fn()}
       onCustomHeadersDraftChange={vi.fn()}
       onSaveApiKey={vi.fn()}
       onSaveCustomHeaders={vi.fn()}

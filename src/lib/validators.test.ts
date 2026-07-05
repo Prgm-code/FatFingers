@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FALLBACK_SETTINGS } from "./settings";
-import { validateInput, validateSettings } from "./validators";
+import { validateCustomHeadersJson, validateInput, validateSettings } from "./validators";
 
 describe("validateInput", () => {
   it("rejects empty input", () => {
@@ -13,6 +13,28 @@ describe("validateInput", () => {
 
   it("accepts text", () => {
     expect(validateInput("hello")).toBeNull();
+  });
+});
+
+describe("validateCustomHeadersJson", () => {
+  it("accepts an empty draft", () => {
+    expect(validateCustomHeadersJson("")).toBeNull();
+  });
+
+  it("accepts a JSON object with string values", () => {
+    expect(validateCustomHeadersJson('{"X-Test":"yes"}')).toBeNull();
+  });
+
+  it("rejects non-object JSON", () => {
+    expect(validateCustomHeadersJson("[1,2]")).toBe(
+      "Custom headers must be a JSON object with string values.",
+    );
+  });
+
+  it("rejects non-string header values in Spanish", () => {
+    expect(validateCustomHeadersJson('{"X-Test":true}', "es")).toBe(
+      "Los headers custom deben ser un objeto JSON con valores string.",
+    );
   });
 });
 

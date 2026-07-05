@@ -29,4 +29,8 @@ export type AppError = {
   message: string;
 };
 
+export type RuntimeStatus = {
+  shortcutRegistered: boolean;
+};
+
 export type View = "onboarding" | "helper" | "settings" | "about";

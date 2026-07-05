@@ -5,9 +5,9 @@ import { Settings } from "./Settings";
 
 const mocks = vi.hoisted(() => ({
   hasSecret: vi.fn(),
-  registerUserHotkey: vi.fn(),
   saveSecret: vi.fn(),
   saveSettings: vi.fn(),
+  testUserHotkey: vi.fn(),
   testProviderConnection: vi.fn(),
 }));
 
@@ -20,9 +20,9 @@ vi.mock("../lib/tauri", () => ({
     typeof error === "object" && error !== null && "message" in error
       ? (error as { message: string })
       : { message: "Unexpected error." },
-  registerUserHotkey: mocks.registerUserHotkey,
   saveSecret: mocks.saveSecret,
   saveSettings: mocks.saveSettings,
+  testUserHotkey: mocks.testUserHotkey,
   testProviderConnection: mocks.testProviderConnection,
 }));
 
@@ -30,7 +30,7 @@ describe("Settings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.hasSecret.mockResolvedValue(true);
-    mocks.registerUserHotkey.mockResolvedValue(undefined);
+    mocks.testUserHotkey.mockResolvedValue(undefined);
     mocks.saveSecret.mockResolvedValue(undefined);
     mocks.saveSettings.mockResolvedValue(undefined);
     mocks.testProviderConnection.mockResolvedValue({
@@ -90,7 +90,7 @@ describe("Settings", () => {
   });
 
   it("shows shortcut registration errors", async () => {
-    mocks.registerUserHotkey.mockRejectedValueOnce({
+    mocks.testUserHotkey.mockRejectedValueOnce({
       message: "This shortcut could not be registered. It may already be used by another app.",
     });
 

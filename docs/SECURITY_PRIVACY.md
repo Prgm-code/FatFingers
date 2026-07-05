@@ -36,13 +36,15 @@ Implementacion actual:
 - Se usa `keyring` desde Rust.
 - Servicio: `FatFingers`.
 - `provider_api_key` y `custom_headers` son los unicos nombres aceptados.
+- `custom_headers` debe ser un objeto JSON con valores string.
 - `save_secret` guarda y luego intenta leer el valor desde una entrada nueva.
 - Si el valor no puede recuperarse, la operacion falla con `SecureStorageUnavailable`.
 - No se usan variables de entorno para guardar API keys.
 
 Backends configurados:
 
-- Linux: `keyring` con `linux-native` (`keyutils`).
+- Linux: `keyring` con `linux-native-sync-persistent` (Secret Service
+  persistente via D-Bus y `keyutils` como cache de sesion).
 - macOS: `apple-native` (Keychain).
 - Windows: `windows-native` (Credential Manager).
 

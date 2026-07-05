@@ -25,6 +25,7 @@ type ProviderFormProps = {
   onSaveApiKey: () => void;
   onClearApiKey: () => void;
   onSaveCustomHeaders: () => void;
+  onClearCustomHeaders: () => void;
   onTestConnection: () => void;
 };
 
@@ -40,6 +41,7 @@ export function ProviderForm({
   onSaveApiKey,
   onClearApiKey,
   onSaveCustomHeaders,
+  onClearCustomHeaders,
   onTestConnection,
 }: ProviderFormProps) {
   const isOpenAiProvider = settings.provider === "openai";
@@ -212,6 +214,9 @@ export function ProviderForm({
           type="button"
         >
           {t(language, "saveHeaders")}
+        </button>
+        <button onClick={onClearCustomHeaders} type="button">
+          {t(language, "clearHeaders")}
         </button>
         <button disabled={isTesting} onClick={onTestConnection} type="button">
           {isTesting ? t(language, "testing") : t(language, "testConnection")}

@@ -12,6 +12,7 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - Changelog inicial.
 - Issue templates.
 - Pull request template.
+- Workflow CI multiplataforma.
 - `.env.example` sin secretos.
 - `.gitignore` cubre entornos locales y build output.
 - Docs principales sincronizados con la implementacion actual.

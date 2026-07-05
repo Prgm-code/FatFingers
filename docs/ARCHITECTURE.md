@@ -240,10 +240,12 @@ Implementacion actual:
 
 - `provider_api_key` y `custom_headers` se guardan con `keyring`.
 - Nombre de servicio: `FatFingers`.
-- Linux usa `keyring` con feature `linux-native`.
+- Linux usa `keyring` con feature `linux-native-sync-persistent`, Secret Service
+  para persistencia y `keyutils` como cache de sesion.
 - macOS usa `apple-native`.
 - Windows usa `windows-native`.
 - `save_secret` verifica que el valor pueda leerse despues de guardarse para evitar falsos positivos.
+- `custom_headers` debe ser un objeto JSON con valores string.
 
 ## 6. Tauri commands
 

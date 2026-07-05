@@ -67,3 +67,29 @@ export function toNullableText(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length === 0 ? null : trimmed;
 }
+
+export function validateCustomHeadersJson(
+  value: string,
+  language: AppLanguage = "en",
+): string | null {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      Array.isArray(parsed) ||
+      !Object.values(parsed).every((headerValue) => typeof headerValue === "string")
+    ) {
+      return t(language, "customHeadersValidJson");
+    }
+  } catch {
+    return t(language, "customHeadersValidJson");
+  }
+
+  return null;
+}

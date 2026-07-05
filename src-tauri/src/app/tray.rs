@@ -37,59 +37,62 @@ pub fn build_tray(app: &mut App) -> tauri::Result<()> {
         ],
     )?;
 
-    TrayIconBuilder::new()
-        .tooltip("FatFingers")
-        .menu(&menu)
-        .on_menu_event(move |app, event| match event.id().as_ref() {
-            "open_helper" => {
-                let _ = windows::show_helper(app);
-            }
-            "settings" => {
-                let _ = windows::show_settings(app);
-            }
-            "enable_shortcut" => {
-                if let Ok(settings) = load_settings(app) {
-                    if let Ok(enabled) = hotkeys::toggle_user_hotkey(app, &settings.hotkey) {
-                        let _ = enable_shortcut.set_text(if enabled {
-                            "Disable shortcut"
-                        } else {
-                            "Enable shortcut"
-                        });
-                    }
-                }
-            }
-            "start_at_login" => {
-                if let Ok(mut settings) = load_settings(app) {
-                    settings.launch_at_login = !settings.launch_at_login;
-                    let autostart = app.autolaunch();
-                    let launch_result = if settings.launch_at_login {
-                        autostart.enable()
-                    } else {
-                        autostart.disable()
-                    };
+    let mut tray = TrayIconBuilder::new().tooltip("FatFingers").menu(&menu);
 
-                    if launch_result.is_ok() {
-                        let _ = save_settings(app, &settings);
-                    }
+    if let Some(icon) = app.default_window_icon().cloned() {
+        tray = tray.icon(icon);
+    }
+
+    tray.on_menu_event(move |app, event| match event.id().as_ref() {
+        "open_helper" => {
+            let _ = windows::show_helper(app);
+        }
+        "settings" => {
+            let _ = windows::show_settings(app);
+        }
+        "enable_shortcut" => {
+            if let Ok(settings) = load_settings(app) {
+                if let Ok(enabled) = hotkeys::toggle_user_hotkey(app, &settings.hotkey) {
+                    let _ = enable_shortcut.set_text(if enabled {
+                        "Disable shortcut"
+                    } else {
+                        "Enable shortcut"
+                    });
                 }
             }
-            "quit" => {
-                lifecycle::request_quit();
-                app.exit(0);
+        }
+        "start_at_login" => {
+            if let Ok(mut settings) = load_settings(app) {
+                settings.launch_at_login = !settings.launch_at_login;
+                let autostart = app.autolaunch();
+                let launch_result = if settings.launch_at_login {
+                    autostart.enable()
+                } else {
+                    autostart.disable()
+                };
+
+                if launch_result.is_ok() {
+                    let _ = save_settings(app, &settings);
+                }
             }
-            _ => {}
-        })
-        .on_tray_icon_event(|tray, event| {
-            if let TrayIconEvent::Click {
-                button: MouseButton::Left,
-                button_state: MouseButtonState::Up,
-                ..
-            } = event
-            {
-                let _ = windows::show_helper(tray.app_handle());
-            }
-        })
-        .build(app)?;
+        }
+        "quit" => {
+            lifecycle::request_quit();
+            app.exit(0);
+        }
+        _ => {}
+    })
+    .on_tray_icon_event(|tray, event| {
+        if let TrayIconEvent::Click {
+            button: MouseButton::Left,
+            button_state: MouseButtonState::Up,
+            ..
+        } = event
+        {
+            let _ = windows::show_helper(tray.app_handle());
+        }
+    })
+    .build(app)?;
 
     Ok(())
 }

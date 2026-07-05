@@ -10,6 +10,7 @@ import {
   copyToClipboard,
   correctText,
   getSettings,
+  getRuntimeStatus,
   hasSecret,
   hideHelperWindow,
   hideSettingsWindow,
@@ -23,13 +24,15 @@ import "./styles/globals.css";
 async function loadSettingsSnapshot(): Promise<{
   settings: AppSettings;
   hasApiKey: boolean;
+  shortcutRegistered: boolean;
 }> {
-  const [settings, hasApiKey] = await Promise.all([
+  const [settings, hasApiKey, runtimeStatus] = await Promise.all([
     getSettings(),
     hasSecret(SECRET_PROVIDER_API_KEY),
+    getRuntimeStatus(),
   ]);
 
-  return { settings, hasApiKey };
+  return { settings, hasApiKey, shortcutRegistered: runtimeStatus.shortcutRegistered };
 }
 
 function App() {
@@ -55,6 +58,11 @@ function App() {
 
         setSettings(snapshot.settings);
         setHasApiKey(snapshot.hasApiKey);
+        setStartupError(
+          snapshot.shortcutRegistered
+            ? null
+            : t(snapshot.settings.language, "shortcutUnavailable"),
+        );
         setView(isSettingsWindow ? "settings" : snapshot.hasApiKey ? "helper" : "onboarding");
       } catch (error) {
         if (!isMounted) {
@@ -152,44 +160,55 @@ function App() {
 
   if (view === "onboarding") {
     return (
-      <Onboarding
-        hasApiKey={hasApiKey}
-        onFinish={(savedSettings, nextHasApiKey) => {
-          setSettings(savedSettings);
-          setHasApiKey(nextHasApiKey);
-          setView("helper");
-        }}
-        settings={settings}
-      />
+      <>
+        {startupError ? <div className="startup-error">{startupError}</div> : null}
+        <Onboarding
+          hasApiKey={hasApiKey}
+          onFinish={(savedSettings, nextHasApiKey) => {
+            setSettings(savedSettings);
+            setHasApiKey(nextHasApiKey);
+            setView("helper");
+          }}
+          settings={settings}
+        />
+      </>
     );
   }
 
   if (view === "settings") {
     return (
-      <Settings
-        hasApiKey={hasApiKey}
-        onApiKeyChanged={setHasApiKey}
-        onBack={() => {
-          if (isSettingsWindow) {
-            void hideSettingsWindow();
-            return;
-          }
+      <>
+        {startupError ? <div className="startup-error">{startupError}</div> : null}
+        <Settings
+          hasApiKey={hasApiKey}
+          onApiKeyChanged={setHasApiKey}
+          onBack={() => {
+            if (isSettingsWindow) {
+              void hideSettingsWindow();
+              return;
+            }
 
-          setView("helper");
-        }}
-        onDataCleared={() => {
-          setSettings(FALLBACK_SETTINGS);
-          setHasApiKey(false);
-          setView("onboarding");
-        }}
-        onSettingsSaved={setSettings}
-        settings={settings}
-      />
+            setView("helper");
+          }}
+          onDataCleared={() => {
+            setSettings(FALLBACK_SETTINGS);
+            setHasApiKey(false);
+            setView("onboarding");
+          }}
+          onSettingsSaved={setSettings}
+          settings={settings}
+        />
+      </>
     );
   }
 
   if (view === "about") {
-    return <About onBack={() => setView("helper")} settings={settings} />;
+    return (
+      <>
+        {startupError ? <div className="startup-error">{startupError}</div> : null}
+        <About onBack={() => setView("helper")} settings={settings} />
+      </>
+    );
   }
 
   return (

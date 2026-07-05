@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { AppError, AppSettings } from "../types/app";
+import type { AppError, AppSettings, RuntimeStatus } from "../types/app";
 import type {
   CorrectTextRequest,
   CorrectTextResponse,
@@ -8,6 +8,10 @@ import type {
 
 export async function getSettings(): Promise<AppSettings> {
   return invoke<AppSettings>("get_settings");
+}
+
+export async function getRuntimeStatus(): Promise<RuntimeStatus> {
+  return invoke<RuntimeStatus>("get_runtime_status");
 }
 
 export async function saveSettings(settings: AppSettings): Promise<void> {
@@ -46,6 +50,10 @@ export async function readClipboardText(): Promise<string> {
 
 export async function registerUserHotkey(hotkey: string): Promise<void> {
   return invoke("register_user_hotkey", { hotkey });
+}
+
+export async function testUserHotkey(hotkey: string): Promise<void> {
+  return invoke("test_user_hotkey", { hotkey });
 }
 
 export async function showHelperWindow(): Promise<void> {

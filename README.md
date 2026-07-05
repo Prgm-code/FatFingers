@@ -34,7 +34,6 @@ Pendiente antes de considerar un release estable:
 - Iconografia final.
 - Validacion amplia con providers reales.
 - Mejoras de accesibilidad y navegacion keyboard-first.
-- Documentar soporte exacto de keyring por plataforma.
 
 Fuera del MVP:
 
@@ -74,7 +73,11 @@ La lista sugerida de modelos OpenAI vive en `src/lib/settings.ts` y permite ingr
 - Rust stable.
 - Dependencias de Tauri v2 para la plataforma local.
 
-En Linux, el almacenamiento seguro usa `keyring` con backend `linux-native` (`keyutils`). El entorno debe permitir kernel keyrings para que las API keys sean recuperables por la app.
+En Linux, el almacenamiento seguro usa `keyring` con backend
+`linux-native-sync-persistent`: Secret Service via D-Bus para persistir
+despues de reinicios y `keyutils` como cache de sesion. El entorno debe tener
+un Secret Service compatible, como GNOME Keyring o KWallet, para persistencia
+de secrets.
 
 El tray de Linux depende del soporte AppIndicator/Ayatana disponible en el
 desktop environment. Algunas versiones de `libayatana-appindicator` imprimen

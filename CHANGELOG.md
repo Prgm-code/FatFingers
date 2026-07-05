@@ -19,12 +19,22 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Nota de QA Linux sobre el warning no bloqueante de `libayatana-appindicator` al inicializar el tray.
 - Soporte para provider MiniMax con modelo default `MiniMax-M3` y wire API `responses`.
 - El helper recarga settings al guardar cambios desde la ventana de configuracion y muestra datos de request LLM en modo dev.
+- Accion explicita para borrar `custom_headers` desde onboarding/settings.
+- Aviso de runtime cuando el shortcut global no queda registrado.
+- Workflow CI multiplataforma para frontend y backend en Linux, macOS y Windows.
 
 ### Changed
 
 - El build release Linux define `NO_STRIP=true` para que AppImage pueda
   empaquetarse en distros rolling donde `linuxdeploy` falla con librerias
   recientes.
+- En Linux, secrets pasa de `linux-native` a `linux-native-sync-persistent`
+  para usar Secret Service persistente con `keyutils` como cache.
+- `Test shortcut` prueba el registro sin guardar settings y restaura el atajo
+  anterior despues de la prueba.
+- `custom_headers` se valida como objeto JSON con valores string antes de
+  guardarse.
+- La configuracion Tauri ahora define una CSP explicita.
 
 ## 0.1.0-alpha
 

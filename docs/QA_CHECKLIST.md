@@ -53,7 +53,11 @@
 - Settings persisten tras reinicio.
 - API key no se muestra tras guardar.
 - API key no aparece en settings planos.
+- API key sigue disponible despues de reiniciar el sistema.
+- Custom headers se guardan solo si son objeto JSON con valores string.
+- Custom headers se pueden borrar desde la UI.
 - Shortcut se puede cambiar.
+- Test shortcut no persiste el atajo si no se guardan settings.
 - Error de shortcut usado se muestra claro.
 - Test provider connection muestra exito/error.
 - App quita limpiamente desde tray.
@@ -71,6 +75,7 @@
 
 - Default shortcut `Ctrl+Shift+Space`.
 - Tray icon aparece.
+- Tray icon es visible y clicable despues de cerrar la ventana.
 - Helper always-on-top funciona.
 - Clipboard copy funciona.
 - App empaqueta para Windows.
@@ -81,6 +86,9 @@
 - Default shortcut `Ctrl+Shift+Space`.
 - Tray funciona en entorno soportado.
 - Warning `libayatana-appindicator is deprecated` no se considera bloqueante si el tray funciona.
+- Shortcut global se valida en X11 y en sesiones Wayland soportadas.
+- Si el shortcut global no se puede registrar en Wayland, la UI muestra aviso claro.
+- Secrets persisten tras logout/reboot cuando Secret Service esta disponible.
 - Helper always-on-top funciona donde el WM lo permita.
 - Clipboard copy funciona.
 - Errores de portal/clipboard son claros.
@@ -94,6 +102,7 @@
 - Telemetria esta off.
 - History esta off.
 - Clear API key funciona.
+- Clear custom headers funciona.
 - Clear all local data funciona.
 
 ## 8. Acceptance smoke test
@@ -117,17 +126,17 @@ Entorno: Linux local.
 
 Comandos ejecutados:
 
-- `pnpm test`: 17 tests frontend pasan.
+- `pnpm test`: tests frontend pasan.
 - `pnpm build`: TypeScript y build Vite pasan.
 - `cargo fmt --check`: pasa.
 - `cargo check`: pasa.
-- `cargo test`: 21 tests backend pasan.
+- `cargo test`: tests backend pasan.
 - `pnpm tauri build --debug --bundles deb`: genera `src-tauri/target/debug/bundle/deb/FatFingers_0.1.0_amd64.deb`.
 - `pnpm tauri build`: genera paquetes release Linux `.deb`, `.rpm` y `.AppImage`.
 
 Notas:
 
-- El build Linux usa `keyring` con backend `linux-native`.
+- El build Linux usa `keyring` con backend `linux-native-sync-persistent`.
 - En Linux, `scripts/run-tauri.mjs` define `NO_STRIP=true` para builds Tauri.
   Esto evita que `linuxdeploy` falle en distros rolling al ejecutar su `strip`
   embebido sobre librerias con seccion ELF `.relr.dyn`.

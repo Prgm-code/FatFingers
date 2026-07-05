@@ -6,9 +6,9 @@ import { Onboarding } from "./Onboarding";
 const mocks = vi.hoisted(() => ({
   deleteSecret: vi.fn(),
   hasSecret: vi.fn(),
-  registerUserHotkey: vi.fn(),
   saveSecret: vi.fn(),
   saveSettings: vi.fn(),
+  testUserHotkey: vi.fn(),
   testProviderConnection: vi.fn(),
 }));
 
@@ -19,9 +19,9 @@ vi.mock("../lib/tauri", () => ({
     typeof error === "object" && error !== null && "message" in error
       ? (error as { message: string })
       : { message: "Unexpected error." },
-  registerUserHotkey: mocks.registerUserHotkey,
   saveSecret: mocks.saveSecret,
   saveSettings: mocks.saveSettings,
+  testUserHotkey: mocks.testUserHotkey,
   testProviderConnection: mocks.testProviderConnection,
 }));
 
@@ -30,7 +30,7 @@ describe("Onboarding", () => {
     vi.clearAllMocks();
     mocks.deleteSecret.mockResolvedValue(undefined);
     mocks.hasSecret.mockResolvedValue(true);
-    mocks.registerUserHotkey.mockResolvedValue(undefined);
+    mocks.testUserHotkey.mockResolvedValue(undefined);
     mocks.saveSecret.mockResolvedValue(undefined);
     mocks.saveSettings.mockResolvedValue(undefined);
     mocks.testProviderConnection.mockResolvedValue({

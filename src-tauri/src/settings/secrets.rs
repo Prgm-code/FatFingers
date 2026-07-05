@@ -1,5 +1,6 @@
 use crate::errors::{AppError, AppErrorKind};
 use keyring::{Entry, Error as KeyringError};
+use serde_json::Value;
 
 pub const PROVIDER_API_KEY: &str = "provider_api_key";
 pub const CUSTOM_HEADERS: &str = "custom_headers";
@@ -11,6 +12,10 @@ pub fn save_secret(name: &str, value: &str) -> Result<(), AppError> {
 
     if value.trim().is_empty() {
         return delete_secret(name);
+    }
+
+    if name == CUSTOM_HEADERS {
+        validate_custom_headers(value)?;
     }
 
     entry(name)?
@@ -66,6 +71,31 @@ fn entry(name: &str) -> Result<Entry, AppError> {
     Entry::new(SERVICE_NAME, name).map_err(map_keyring_error)
 }
 
+fn validate_custom_headers(value: &str) -> Result<(), AppError> {
+    let parsed = serde_json::from_str::<Value>(value).map_err(|_| {
+        AppError::new(
+            AppErrorKind::InvalidSettings,
+            "Custom headers must be a JSON object with string values.",
+        )
+    })?;
+
+    let Some(object) = parsed.as_object() else {
+        return Err(AppError::new(
+            AppErrorKind::InvalidSettings,
+            "Custom headers must be a JSON object with string values.",
+        ));
+    };
+
+    if object.values().any(|value| !value.is_string()) {
+        return Err(AppError::new(
+            AppErrorKind::InvalidSettings,
+            "Custom headers must be a JSON object with string values.",
+        ));
+    }
+
+    Ok(())
+}
+
 fn map_keyring_error(_error: KeyringError) -> AppError {
     AppError::secure_storage()
 }
@@ -79,5 +109,13 @@ mod tests {
         let error = has_secret("unexpected_secret").unwrap_err();
 
         assert_eq!(error.code, AppErrorKind::InvalidSettings);
+    }
+
+    #[test]
+    fn validates_custom_headers_shape_before_keyring_access() {
+        let error = save_secret(CUSTOM_HEADERS, r#"{"X-Test":true}"#).unwrap_err();
+
+        assert_eq!(error.code, AppErrorKind::InvalidSettings);
+        assert!(error.message.contains("Custom headers"));
     }
 }

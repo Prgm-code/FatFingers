@@ -8,15 +8,29 @@ use errors::{AppError, AppErrorKind};
 use llm::types::{
     CorrectTextRequest, CorrectTextResponse, LlmRequest, TestProviderResponse, WritingAction,
 };
+use serde::Serialize;
 use settings::history;
 use settings::secrets::{self, CUSTOM_HEADERS, PROVIDER_API_KEY};
 use settings::store;
 use settings::{validate_settings, AppSettings};
 use tauri::{AppHandle, Emitter};
 
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RuntimeStatus {
+    shortcut_registered: bool,
+}
+
 #[tauri::command]
 fn get_settings(app: AppHandle) -> Result<AppSettings, AppError> {
     store::load_settings(&app)
+}
+
+#[tauri::command]
+fn get_runtime_status() -> RuntimeStatus {
+    RuntimeStatus {
+        shortcut_registered: hotkeys::is_user_hotkey_enabled(),
+    }
 }
 
 #[tauri::command]
@@ -25,7 +39,7 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), AppError> 
     let previous_settings = store::load_settings(&app).unwrap_or_default();
 
     if previous_settings.hotkey != settings.hotkey || !hotkeys::is_user_hotkey_enabled() {
-        hotkeys::register_user_hotkey(&app, &settings.hotkey)?;
+        hotkeys::replace_user_hotkey(&app, &settings.hotkey, Some(&previous_settings.hotkey))?;
     }
 
     if previous_settings.launch_at_login != settings.launch_at_login {
@@ -111,9 +125,15 @@ fn read_clipboard_text(app: AppHandle) -> Result<String, AppError> {
 #[tauri::command]
 fn register_user_hotkey(app: AppHandle, hotkey: String) -> Result<(), AppError> {
     let mut settings = store::load_settings(&app)?;
-    hotkeys::register_user_hotkey(&app, &hotkey)?;
+    hotkeys::replace_user_hotkey(&app, &hotkey, Some(&settings.hotkey))?;
     settings.hotkey = hotkey;
     store::save_settings(&app, &settings)
+}
+
+#[tauri::command]
+fn test_user_hotkey(app: AppHandle, hotkey: String) -> Result<(), AppError> {
+    let settings = store::load_settings(&app).unwrap_or_default();
+    hotkeys::test_user_hotkey(&app, &hotkey, Some(&settings.hotkey))
 }
 
 #[tauri::command]
@@ -240,6 +260,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             get_settings,
+            get_runtime_status,
             save_settings,
             save_secret,
             has_secret,
@@ -249,6 +270,7 @@ pub fn run() {
             copy_to_clipboard,
             read_clipboard_text,
             register_user_hotkey,
+            test_user_hotkey,
             show_helper_window,
             hide_helper_window,
             show_settings_window,

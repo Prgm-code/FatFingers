@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for FatFingers desktop windows",
-  "windows": ["helper", "settings", "onboarding", "main"],
+  "windows": ["helper", "settings"],
   "permissions": [
     "core:default",
     "opener:default"
