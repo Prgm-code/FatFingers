@@ -206,6 +206,16 @@ function App() {
             }
             setView("helper");
           }}
+          onOpenSettings={() => {
+            if (isOnboardingWindow) {
+              showSettingsWindow()
+                .then(() => closeOnboardingWindow())
+                .catch(() => setView("settings"));
+              return;
+            }
+
+            setView("settings");
+          }}
           settings={settings}
         />
       </>

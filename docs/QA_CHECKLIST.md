@@ -59,6 +59,9 @@
 - Shortcut se puede cambiar.
 - Test shortcut no persiste el atajo si no se guardan settings.
 - Error de shortcut usado se muestra claro.
+- Un fallo al registrar el shortcut no bloquea completar onboarding ni guardar
+  otros settings.
+- Onboarding permite abrir Settings directamente como salida de recuperacion.
 - Test provider connection muestra exito/error.
 - App quita limpiamente desde tray.
 

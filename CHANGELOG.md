@@ -39,6 +39,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Workflow de releases desde `main` y tags `v*`, con artefactos Linux
   `.AppImage`/`.deb`/`.rpm`, macOS `.dmg` por arquitectura y Windows
   `.exe`/`.msi`; los pushes a `main` generan prereleases automaticos.
+- Salida directa desde onboarding hacia Settings para recuperar configuraciones
+  problematicas.
 
 ### Changed
 
@@ -47,6 +49,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - El build release Linux define `NO_STRIP=true` para que AppImage pueda
   empaquetarse en distros rolling donde `linuxdeploy` falla con librerias
   recientes.
+- Guardar settings ya no queda bloqueado por fallos de registro del atajo
+  global; el aviso se mantiene para que el usuario elija otro atajo.
 - En Linux, secrets pasa de `linux-native` a `linux-native-sync-persistent`
   para usar Secret Service persistente con `keyutils` como cache.
 - `Test shortcut` prueba el registro sin guardar settings y restaura el atajo

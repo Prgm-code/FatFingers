@@ -45,6 +45,7 @@ describe("Onboarding", () => {
       <Onboarding
         hasApiKey={false}
         onFinish={vi.fn()}
+        onOpenSettings={vi.fn()}
         settings={FALLBACK_SETTINGS}
       />,
     );
@@ -60,6 +61,7 @@ describe("Onboarding", () => {
       <Onboarding
         hasApiKey={false}
         onFinish={vi.fn()}
+        onOpenSettings={vi.fn()}
         settings={FALLBACK_SETTINGS}
       />,
     );
@@ -78,6 +80,7 @@ describe("Onboarding", () => {
       <Onboarding
         hasApiKey={false}
         onFinish={onFinish}
+        onOpenSettings={vi.fn()}
         settings={FALLBACK_SETTINGS}
       />,
     );
@@ -98,6 +101,7 @@ describe("Onboarding", () => {
       <Onboarding
         hasApiKey={false}
         onFinish={vi.fn()}
+        onOpenSettings={vi.fn()}
         settings={FALLBACK_SETTINGS}
       />,
     );
@@ -110,5 +114,21 @@ describe("Onboarding", () => {
     expect(await screen.findByText("Provider connection succeeded.")).toBeTruthy();
     expect(mocks.saveSecret).toHaveBeenCalledWith(SECRET_PROVIDER_API_KEY, "test-api-key");
     expect(mocks.testProviderConnection).toHaveBeenCalledOnce();
+  });
+
+  it("exposes a direct settings escape hatch", () => {
+    const onOpenSettings = vi.fn();
+    render(
+      <Onboarding
+        hasApiKey={false}
+        onFinish={vi.fn()}
+        onOpenSettings={onOpenSettings}
+        settings={FALLBACK_SETTINGS}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Open settings" }));
+
+    expect(onOpenSettings).toHaveBeenCalledOnce();
   });
 });

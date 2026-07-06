@@ -163,6 +163,8 @@ Defaults:
 - Windows/Linux: `Ctrl+Shift+Space`
 
 Si el shortcut falla, la app debe mostrar un error claro y permitir elegir otro.
+Un fallo de registro del atajo no debe bloquear completar onboarding ni guardar
+otros settings; el usuario debe poder entrar a Settings y corregirlo despues.
 
 ### 7.3 AI Provider
 
@@ -255,6 +257,8 @@ Onboarding:
 - Finalizar.
 
 Si el test de provider falla, el usuario debe poder continuar y arreglarlo despues desde settings.
+Onboarding debe incluir una salida directa a Settings para que el usuario no
+quede bloqueado si falla un ajuste no critico como el atajo global.
 
 El onboarding abre en su propia ventana dedicada, con marco nativo, opaca y
 amplia (~860x820, minimo 680x680). Al finalizar, la ventana de onboarding se

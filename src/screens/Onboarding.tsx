@@ -26,9 +26,15 @@ type OnboardingProps = {
   settings: AppSettings;
   hasApiKey: boolean;
   onFinish: (settings: AppSettings, hasApiKey: boolean) => void;
+  onOpenSettings: () => void;
 };
 
-export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
+export function Onboarding({
+  settings,
+  hasApiKey,
+  onFinish,
+  onOpenSettings,
+}: OnboardingProps) {
   const [draft, setDraft] = useState(settings);
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [hasSavedApiKey, setHasSavedApiKey] = useState(hasApiKey);
@@ -228,6 +234,9 @@ export function Onboarding({ settings, hasApiKey, onFinish }: OnboardingProps) {
       <footer className="settings-footer">
         <button disabled={isTesting} onClick={() => void testConnection()} type="button">
           {isTesting ? t(language, "testing") : t(language, "testConnection")}
+        </button>
+        <button onClick={onOpenSettings} type="button">
+          {t(language, "openSettings")}
         </button>
         <button onClick={() => void finish()} type="button">
           {t(language, "finish")}

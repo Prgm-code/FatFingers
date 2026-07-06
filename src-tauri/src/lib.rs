@@ -39,15 +39,15 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), AppError> 
     validate_settings(&settings)?;
     let previous_settings = store::load_settings(&app).unwrap_or_default();
 
-    if previous_settings.hotkey != settings.hotkey || !hotkeys::is_user_hotkey_enabled() {
-        hotkeys::replace_user_hotkey(&app, &settings.hotkey, Some(&previous_settings.hotkey))?;
-    }
-
     if previous_settings.launch_at_login != settings.launch_at_login {
         sync_launch_at_login(&app, settings.launch_at_login)?;
     }
 
     store::save_settings(&app, &settings)?;
+    if previous_settings.hotkey != settings.hotkey || !hotkeys::is_user_hotkey_enabled() {
+        let _ =
+            hotkeys::replace_user_hotkey(&app, &settings.hotkey, Some(&previous_settings.hotkey));
+    }
     let _ = app.emit("fatfingers://settings-updated", &settings);
     Ok(())
 }
