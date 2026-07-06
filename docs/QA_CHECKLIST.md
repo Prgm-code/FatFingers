@@ -134,6 +134,9 @@ GitHub Actions:
 - Un tag `v0.1.0-alpha` es valido si la version base del proyecto es `0.1.0`.
 - El release marca `prerelease` cuando viene de `main` o cuando el tag contiene
   sufijo prerelease (`-alpha`, `-beta`, etc.).
+- Los assets usan el formato
+  `FatFingers-v<version>-<platform>-<arch>[setup].<ext>` y no duplican el tipo
+  de bundle en el nombre (`.deb.deb`, `.msi.msi`, etc.).
 
 Linux:
 
@@ -150,6 +153,8 @@ macOS:
 
 - El draft contiene un `.dmg` para Apple Silicon.
 - El draft contiene un `.dmg` para Intel.
+- El workflow alpha usa firma ad-hoc (`APPLE_SIGNING_IDENTITY=-`) y no importa
+  certificados Apple.
 - Smoke test minimo: abrir DMG, mover app a Applications y lanzar.
 - Si el build no esta firmado/notarizado, documentar el aviso de Gatekeeper
   esperado para release alpha.

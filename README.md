@@ -156,9 +156,14 @@ Cada release sube artefactos para:
 - macOS: `.dmg` para Apple Silicon y `.dmg` para Intel.
 - Windows: instalador NSIS `.exe` y paquete `.msi`.
 
-Los artefactos automaticos y alpha pueden estar sin firmar. En macOS y Windows
-esto puede mostrar avisos de seguridad hasta configurar certificados, firmado y
-notarizacion finales.
+Los assets usan el formato `FatFingers-v<version>-<platform>-<arch>[setup].<ext>`,
+por ejemplo `FatFingers-v0.1.0-linux-amd64.AppImage` y
+`FatFingers-v0.1.0-windows-x64-setup.exe`.
+
+Los artefactos automaticos y alpha pueden estar sin firma de distribucion. En
+macOS el workflow usa firma ad-hoc para poder generar el `.dmg` sin importar un
+certificado Apple; en Windows no hay firma de codigo. Esto puede mostrar avisos
+de seguridad hasta configurar certificados, firmado y notarizacion finales.
 
 Checks backend:
 

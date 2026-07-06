@@ -129,7 +129,7 @@ jobs:
     needs: validate
     runs-on: ${{ matrix.platform }}
     env:
-      APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+      APPLE_SIGNING_IDENTITY: "-"
     strategy:
       fail-fast: false
       matrix:
@@ -193,19 +193,10 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Use ad-hoc macOS signing when no identity secret is configured
-        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY == ''
-        run: echo "APPLE_SIGNING_IDENTITY=-" >> "$GITHUB_ENV"
-
       - name: Build and upload Tauri bundles
         uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref == 'refs/heads/main' && format('main-{0}', github.run_number) || github.ref_name }}
           releaseName: ${{ github.ref == 'refs/heads/main' && format('FatFingers main build {0}', github.run_number) || format('FatFingers {0}', github.ref_name) }}
@@ -222,4 +213,4 @@ jobs:
           tauriScript: pnpm tauri
           args: ${{ matrix.args }}
           retryAttempts: 2
-          releaseAssetNamePattern: FatFingers_[version]_[platform]_[arch]_[bundle][ext]
+          releaseAssetNamePattern: FatFingers-v[version]-[platform]-[arch][setup][ext]
