@@ -26,11 +26,12 @@ Implementado:
 - Controles de modo de escritura, formalidad, creatividad, temperatura, timeout y max output tokens.
 - Tests frontend y backend basicos.
 - Build debug Linux `.deb`.
+- Workflow de GitHub Actions para crear draft releases multiplataforma desde tags.
 
 Pendiente antes de considerar un release estable:
 
 - QA manual completa en macOS y Windows.
-- Firmado/notarizacion e instaladores finales por plataforma.
+- Firmado/notarizacion final por plataforma.
 - Iconografia final.
 - Validacion amplia con providers reales.
 - Mejoras de accesibilidad y navegacion keyboard-first.
@@ -128,6 +129,32 @@ pnpm tauri build --debug --bundles deb
 En Linux, `pnpm tauri build` genera paquetes `.deb`, `.rpm` y `.AppImage`. En
 distros rolling como Arch, el wrapper de Tauri define `NO_STRIP=true` para evitar
 fallos de `linuxdeploy` al procesar librerias del sistema recientes.
+
+## Releases
+
+Los releases se generan con GitHub Actions al pushear un tag `v*`.
+
+Formato recomendado:
+
+```bash
+git tag v0.1.0-alpha
+git push origin v0.1.0-alpha
+```
+
+El workflow valida que `package.json`, `src-tauri/tauri.conf.json` y
+`src-tauri/Cargo.toml` tengan la misma version. El tag debe ser exactamente esa
+version con prefijo `v` (`v0.1.0`) o un prerelease basado en ella
+(`v0.1.0-alpha`).
+
+El release se crea como draft para revision manual y sube artefactos para:
+
+- Linux: `.AppImage`, `.deb` y `.rpm`.
+- macOS: `.dmg` para Apple Silicon y `.dmg` para Intel.
+- Windows: instalador NSIS `.exe` y paquete `.msi`.
+
+Los artefactos alpha pueden estar sin firmar. En macOS y Windows esto puede
+mostrar avisos de seguridad hasta configurar certificados, firmado y
+notarizacion finales.
 
 Checks backend:
 

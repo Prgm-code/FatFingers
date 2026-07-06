@@ -13,6 +13,9 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - Issue templates.
 - Pull request template.
 - Workflow CI multiplataforma.
+- Workflow de draft releases multiplataforma desde tags `v*`.
+- Politica inicial de releases: tags SemVer `v<version>`, drafts revisables,
+  prerelease automatico para tags con sufijo (`-alpha`, `-beta`, etc.).
 - `.env.example` sin secretos.
 - `.gitignore` cubre entornos locales y build output.
 - Docs principales sincronizados con la implementacion actual.
@@ -31,7 +34,7 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - QA manual macOS.
 - QA manual Windows.
 - Revisar empaquetado final por plataforma.
+- Ejecutar y revisar un draft release generado por GitHub Actions.
 - Definir iconos finales.
-- Definir politica de releases y versionado.
 - Validar provider real con API key del maintainer.
 - Revisar soporte real de keyring por plataforma.

@@ -1,0 +1,214 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate release
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@11.9.0 --activate
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux Tauri dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            wget
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate release tag version
+        run: |
+          node <<'NODE'
+          const { readFileSync } = require("node:fs");
+
+          const tagName = process.env.GITHUB_REF_NAME ?? "";
+          const tagVersion = tagName.replace(/^v/, "");
+          const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
+          const tauriVersion = JSON.parse(readFileSync("src-tauri/tauri.conf.json", "utf8")).version;
+          const cargoToml = readFileSync("src-tauri/Cargo.toml", "utf8");
+          const cargoVersion = cargoToml.match(/^version\s*=\s*"([^"]+)"/m)?.[1];
+
+          if (!tagName.startsWith("v")) {
+            throw new Error(`Release tag must start with "v"; got ${tagName}`);
+          }
+
+          if (!cargoVersion) {
+            throw new Error("Could not read package version from src-tauri/Cargo.toml");
+          }
+
+          const versions = {
+            "package.json": packageVersion,
+            "src-tauri/tauri.conf.json": tauriVersion,
+            "src-tauri/Cargo.toml": cargoVersion,
+          };
+
+          const mismatches = Object.entries(versions)
+            .filter(([, version]) => version !== packageVersion)
+            .map(([file, version]) => `${file}=${version}`);
+
+          if (mismatches.length > 0) {
+            throw new Error(
+              `Project versions must match package.json=${packageVersion}; mismatches: ${mismatches.join(", ")}`
+            );
+          }
+
+          const validTag =
+            tagVersion === packageVersion || tagVersion.startsWith(`${packageVersion}-`);
+
+          if (!validTag) {
+            throw new Error(
+              `Tag ${tagName} must be v${packageVersion} or a prerelease based on it, like v${packageVersion}-alpha`
+            );
+          }
+
+          console.log(`Release tag ${tagName} matches app version ${packageVersion}`);
+          NODE
+
+      - name: Build frontend
+        run: pnpm build
+
+      - name: Test frontend
+        run: pnpm test
+
+      - name: Check Rust formatting
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      - name: Check Rust
+        working-directory: src-tauri
+        run: cargo check
+
+      - name: Test Rust
+        working-directory: src-tauri
+        run: cargo test
+
+  publish-tauri:
+    name: Build release (${{ matrix.name }})
+    needs: validate
+    runs-on: ${{ matrix.platform }}
+    env:
+      APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            platform: ubuntu-22.04
+            rust-targets: ""
+            args: "--bundles appimage,deb,rpm"
+
+          - name: macos-arm64
+            platform: macos-latest
+            rust-targets: "aarch64-apple-darwin"
+            args: "--target aarch64-apple-darwin --bundles dmg"
+
+          - name: macos-x64
+            platform: macos-latest
+            rust-targets: "x86_64-apple-darwin"
+            args: "--target x86_64-apple-darwin --bundles dmg"
+
+          - name: windows-x64
+            platform: windows-latest
+            rust-targets: ""
+            args: "--bundles nsis,msi"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        run: corepack enable && corepack prepare pnpm@11.9.0 --activate
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Install Linux Tauri dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            file \
+            libayatana-appindicator3-dev \
+            libfuse2 \
+            librsvg2-dev \
+            libssl-dev \
+            libwebkit2gtk-4.1-dev \
+            libxdo-dev \
+            patchelf \
+            rpm \
+            wget \
+            xdg-utils
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Use ad-hoc macOS signing when no identity secret is configured
+        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY == ''
+        run: echo "APPLE_SIGNING_IDENTITY=-" >> "$GITHUB_ENV"
+
+      - name: Build and upload Tauri bundles
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: FatFingers ${{ github.ref_name }}
+          releaseBody: |
+            Automated FatFingers desktop build.
+
+            Linux assets cover most distributions through AppImage, Debian/Ubuntu packages and RPM packages. Alpha assets may be unsigned; macOS and Windows users can see platform security warnings until final signing and notarization are configured.
+          releaseDraft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generateReleaseNotes: true
+          uploadUpdaterJson: false
+          tauriScript: pnpm tauri
+          args: ${{ matrix.args }}
+          retryAttempts: 2
+          releaseAssetNamePattern: FatFingers_[version]_[platform]_[arch]_[bundle][ext]

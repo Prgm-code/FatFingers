@@ -21,11 +21,12 @@ Implementado en el MVP alpha:
 - Providers `openai`, `minimax`, `openrouter`, `openai_compatible` y `custom_http`.
 - Test de conexion de provider.
 - Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
+- Workflow de GitHub Actions para draft releases multiplataforma desde tags.
 
 Pendiente:
 
 - QA manual completa en macOS y Windows.
-- Packaging final firmado/notarizado por plataforma.
+- Revision de draft release real y packaging final firmado/notarizado por plataforma.
 
 En progreso (roadmap v1.2 adelantado):
 

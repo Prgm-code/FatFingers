@@ -122,6 +122,45 @@ Por plataforma:
 - macOS: el primer intento dispara el prompt de Accessibility; con permiso
   denegado el fallback funciona, con permiso concedido el pegado funciona.
 
+## 6.2 Artefactos de release
+
+GitHub Actions:
+
+- Pushear un tag `v*` crea un draft release.
+- El job `Validate release` falla si `package.json`,
+  `src-tauri/tauri.conf.json` y `src-tauri/Cargo.toml` tienen versiones
+  distintas.
+- Un tag `v0.1.0-alpha` es valido si la version base del proyecto es `0.1.0`.
+- El draft release marca `prerelease` cuando el tag contiene sufijo prerelease
+  (`-alpha`, `-beta`, etc.).
+
+Linux:
+
+- El draft contiene `.AppImage`.
+- El draft contiene `.deb`.
+- El draft contiene `.rpm`.
+- Smoke test minimo: descargar AppImage, marcar ejecutable y lanzar en una
+  distro Linux con WebKitGTK/Secret Service disponibles.
+- Smoke test minimo `.deb`: instalar en Debian/Ubuntu compatible y lanzar app.
+- Smoke test minimo `.rpm`: instalar en Fedora/RHEL/openSUSE compatible y
+  lanzar app.
+
+macOS:
+
+- El draft contiene un `.dmg` para Apple Silicon.
+- El draft contiene un `.dmg` para Intel.
+- Smoke test minimo: abrir DMG, mover app a Applications y lanzar.
+- Si el build no esta firmado/notarizado, documentar el aviso de Gatekeeper
+  esperado para release alpha.
+
+Windows:
+
+- El draft contiene instalador NSIS `.exe`.
+- El draft contiene paquete `.msi`.
+- Smoke test minimo: instalar, lanzar, verificar tray y desinstalar.
+- Si el build no esta firmado, documentar el aviso de SmartScreen esperado para
+  release alpha.
+
 ## 7. Privacy QA
 
 - No hay logs de input text.

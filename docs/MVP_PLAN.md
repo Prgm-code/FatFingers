@@ -15,11 +15,12 @@ La implementacion actual prioriza:
 - Provider OpenAI funcional.
 - Copia al portapapeles.
 - Tests basicos.
+- Workflow de draft releases multiplataforma en GitHub Actions.
 
 Pendientes principales para cerrar el MVP como release publico:
 
 - QA manual en macOS y Windows.
-- Empaquetado final por plataforma.
+- Revision de draft release real y empaquetado firmado/notarizado final por plataforma.
 - Validacion con providers reales fuera del entorno local.
 - Icono final y revision visual de instaladores.
 
@@ -31,7 +32,7 @@ Pendientes principales para cerrar el MVP como release publico:
 - Fase 3 Settings y Secrets: implementada, secrets mediante `keyring`.
 - Fase 4 LLM Integration: implementada para OpenAI, MiniMax, OpenRouter, OpenAI-compatible y Custom HTTP.
 - Fase 5 Clipboard: implementada para copy/read mediante plugin Tauri.
-- Fase 6 Tests, Packaging y QA: tests y build debug Linux listos; QA macOS/Windows pendiente.
+- Fase 6 Tests, Packaging y QA: tests, build debug Linux y workflow de draft releases listos; QA macOS/Windows pendiente.
 
 ## 2. Fase 0: Bootstrap
 
