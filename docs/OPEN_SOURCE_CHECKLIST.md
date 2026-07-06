@@ -13,9 +13,10 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - Issue templates.
 - Pull request template.
 - Workflow CI multiplataforma.
-- Workflow de draft releases multiplataforma desde tags `v*`.
-- Politica inicial de releases: tags SemVer `v<version>`, drafts revisables,
-  prerelease automatico para tags con sufijo (`-alpha`, `-beta`, etc.).
+- Workflow de releases multiplataforma desde `main` y tags `v*`.
+- Politica inicial de releases: prereleases automaticos para `main`, tags
+  SemVer `v<version>` para drafts revisables y prerelease automatico para tags
+  con sufijo (`-alpha`, `-beta`, etc.).
 - `.env.example` sin secretos.
 - `.gitignore` cubre entornos locales y build output.
 - Docs principales sincronizados con la implementacion actual.

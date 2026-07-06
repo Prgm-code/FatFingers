@@ -132,9 +132,12 @@ fallos de `linuxdeploy` al procesar librerias del sistema recientes.
 
 ## Releases
 
-Los releases se generan con GitHub Actions al pushear un tag `v*`.
+Los builds de release se generan con GitHub Actions en dos casos:
 
-Formato recomendado:
+- Cada push a `main` crea un prerelease automatico para probar el ultimo commit.
+- Cada tag `v*` crea un draft release versionado para revision manual.
+
+Formato recomendado para releases versionados:
 
 ```bash
 git tag v0.1.0-alpha
@@ -144,16 +147,17 @@ git push origin v0.1.0-alpha
 El workflow valida que `package.json`, `src-tauri/tauri.conf.json` y
 `src-tauri/Cargo.toml` tengan la misma version. El tag debe ser exactamente esa
 version con prefijo `v` (`v0.1.0`) o un prerelease basado en ella
-(`v0.1.0-alpha`).
+(`v0.1.0-alpha`). Los builds automaticos desde `main` usan tags generados por
+GitHub Actions con formato `main-<run_number>`.
 
-El release se crea como draft para revision manual y sube artefactos para:
+Cada release sube artefactos para:
 
 - Linux: `.AppImage`, `.deb` y `.rpm`.
 - macOS: `.dmg` para Apple Silicon y `.dmg` para Intel.
 - Windows: instalador NSIS `.exe` y paquete `.msi`.
 
-Los artefactos alpha pueden estar sin firmar. En macOS y Windows esto puede
-mostrar avisos de seguridad hasta configurar certificados, firmado y
+Los artefactos automaticos y alpha pueden estar sin firmar. En macOS y Windows
+esto puede mostrar avisos de seguridad hasta configurar certificados, firmado y
 notarizacion finales.
 
 Checks backend:

@@ -36,9 +36,9 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Accion explicita para borrar `custom_headers` desde onboarding/settings.
 - Aviso de runtime cuando el shortcut global no queda registrado.
 - Workflow CI multiplataforma para frontend y backend en Linux, macOS y Windows.
-- Workflow de draft releases desde tags `v*`, con artefactos Linux
-  `.AppImage`/`.deb`/`.rpm`, macOS `.dmg` universal por arquitectura y Windows
-  `.exe`/`.msi`.
+- Workflow de releases desde `main` y tags `v*`, con artefactos Linux
+  `.AppImage`/`.deb`/`.rpm`, macOS `.dmg` por arquitectura y Windows
+  `.exe`/`.msi`; los pushes a `main` generan prereleases automaticos.
 
 ### Changed
 

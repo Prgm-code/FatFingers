@@ -126,13 +126,14 @@ Por plataforma:
 
 GitHub Actions:
 
-- Pushear un tag `v*` crea un draft release.
+- Pushear a `main` crea un prerelease automatico con tag `main-<run_number>`.
+- Pushear un tag `v*` crea un draft release versionado.
 - El job `Validate release` falla si `package.json`,
   `src-tauri/tauri.conf.json` y `src-tauri/Cargo.toml` tienen versiones
   distintas.
 - Un tag `v0.1.0-alpha` es valido si la version base del proyecto es `0.1.0`.
-- El draft release marca `prerelease` cuando el tag contiene sufijo prerelease
-  (`-alpha`, `-beta`, etc.).
+- El release marca `prerelease` cuando viene de `main` o cuando el tag contiene
+  sufijo prerelease (`-alpha`, `-beta`, etc.).
 
 Linux:
 
