@@ -8,6 +8,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Icono multiplataforma de FatFingers generado para Linux, macOS y Windows a
+  partir del asset de marca.
 - Dialogo para capturar el atajo global directamente desde el teclado, con
   confirmacion explicita y cancelacion mediante `Esc`.
 - Flujo de dos fases en el helper: Enter mejora el texto y un segundo Enter lo

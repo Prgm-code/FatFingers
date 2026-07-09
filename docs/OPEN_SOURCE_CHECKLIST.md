@@ -38,6 +38,6 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - QA manual Windows.
 - Revisar empaquetado final por plataforma.
 - Ejecutar y revisar un draft release generado por GitHub Actions.
-- Definir iconos finales.
+- [x] Definir y generar los iconos de la aplicacion para cada plataforma.
 - Validar provider real con API key del maintainer.
 - Revisar soporte real de keyring por plataforma.

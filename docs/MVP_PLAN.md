@@ -172,7 +172,8 @@ Entregables:
 - Tests backend de prompts, settings, secrets y provider body generation.
 - Tests frontend de onboarding, settings, empty input, action selector, result copy, error banner y keyboard submit.
 - Tests frontend de selector de idioma y labels basicos en ingles/español.
-- Icono placeholder.
+- Icono de aplicacion generado desde `src/assets/fatfingers-logo.png` para los
+  formatos y tamaños requeridos por Tauri.
 - Configuracion de empaquetado.
 - QA checklist ejecutada al menos en Linux local y documentada para macOS/Windows.
 
