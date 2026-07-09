@@ -21,15 +21,15 @@ Implementado en el MVP alpha:
 - Providers `openai`, `minimax`, `openrouter`, `openai_compatible` y `custom_http`.
 - Test de conexion de provider.
 - Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
-- Workflow de GitHub Actions para prereleases automaticos desde `main` y draft
-  releases versionados desde tags.
+- Workflow de GitHub Actions para prereleases automaticos exclusivamente desde
+  pushes a `main`.
 - Cada build de `main` recibe una version SemVer unica con formato
   `<version-base>-main.<run_number>` antes de empaquetar.
 
 Pendiente:
 
 - QA manual completa en macOS y Windows.
-- Revision de draft release real y packaging final firmado/notarizado por plataforma.
+- Revision de prerelease real y packaging final firmado/notarizado por plataforma.
 
 En progreso (roadmap v1.2 adelantado):
 

@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*"
 
 permissions:
   contents: read
@@ -17,14 +15,13 @@ concurrency:
 jobs:
   validate:
     name: Validate release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     outputs:
       version: ${{ steps.version.outputs.version }}
       tag_name: ${{ steps.version.outputs.tag_name }}
       release_name: ${{ steps.version.outputs.release_name }}
-      release_draft: ${{ steps.version.outputs.release_draft }}
-      prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
       - name: Checkout
@@ -68,9 +65,10 @@ jobs:
           const { appendFileSync, readFileSync } = require("node:fs");
 
           const ref = process.env.GITHUB_REF ?? "";
-          const tagName = process.env.GITHUB_REF_NAME ?? "";
-          const isMainBuild = ref === "refs/heads/main";
-          const tagVersion = tagName.replace(/^v/, "");
+          if (ref !== "refs/heads/main") {
+            throw new Error(`Release builds are restricted to main; received ${ref}`);
+          }
+
           const baseVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
           const tauriVersion = JSON.parse(readFileSync("src-tauri/tauri.conf.json", "utf8")).version;
           const cargoToml = readFileSync("src-tauri/Cargo.toml", "utf8");
@@ -96,45 +94,14 @@ jobs:
             );
           }
 
-          let buildVersion;
-          let releaseTag;
-          let releaseName;
-          let releaseDraft;
-          let prerelease;
-
-          if (isMainBuild) {
-            buildVersion = `${baseVersion}-main.${process.env.GITHUB_RUN_NUMBER}`;
-            releaseTag = `v${buildVersion}`;
-            releaseName = `FatFingers ${buildVersion} (${process.env.GITHUB_SHA.slice(0, 7)})`;
-            releaseDraft = false;
-            prerelease = true;
-          } else {
-            if (!tagName.startsWith("v")) {
-              throw new Error(`Release tag must start with "v"; got ${tagName}`);
-            }
-
-            const validTag =
-              tagVersion === baseVersion || tagVersion.startsWith(`${baseVersion}-`);
-
-            if (!validTag) {
-              throw new Error(
-                `Tag ${tagName} must be v${baseVersion} or a prerelease based on it, like v${baseVersion}-alpha`
-              );
-            }
-
-            buildVersion = tagVersion;
-            releaseTag = tagName;
-            releaseName = `FatFingers ${tagName}`;
-            releaseDraft = true;
-            prerelease = tagVersion.includes("-");
-          }
+          const buildVersion = `${baseVersion}-main.${process.env.GITHUB_RUN_NUMBER}`;
+          const releaseTag = `v${buildVersion}`;
+          const releaseName = `FatFingers ${buildVersion} (${process.env.GITHUB_SHA.slice(0, 7)})`;
 
           const outputs = {
             version: buildVersion,
             tag_name: releaseTag,
             release_name: releaseName,
-            release_draft: String(releaseDraft),
-            prerelease: String(prerelease),
           };
 
           for (const [name, value] of Object.entries(outputs)) {
@@ -167,6 +134,7 @@ jobs:
 
   publish-tauri:
     name: Build release (${{ matrix.name }})
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: validate
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 90
@@ -196,7 +164,7 @@ jobs:
           - name: windows-x64
             platform: windows-latest
             rust-targets: ""
-            args: "--bundles nsis,msi"
+            args: "--bundles nsis"
 
     steps:
       - name: Checkout
@@ -254,14 +222,13 @@ jobs:
           releaseBody: |
             Automated FatFingers desktop build.
 
-            Main branch builds are automatic prereleases for testing the latest commit. Versioned tags (`v*`) remain the path for reviewed release drafts.
+            Main branch builds are automatic prereleases for testing the latest commit. Distribution builds are restricted to pushes on `main`.
 
-            Linux assets cover most distributions through AppImage, Debian/Ubuntu packages and RPM packages. Alpha assets may be unsigned; macOS and Windows users can see platform security warnings until final signing and notarization are configured.
-          releaseDraft: ${{ needs.validate.outputs.release_draft }}
-          prerelease: ${{ needs.validate.outputs.prerelease }}
+            Linux assets cover most distributions through AppImage, Debian/Ubuntu packages and RPM packages. Windows prereleases use the NSIS `.exe` installer because MSI does not accept the textual `main` prerelease identifier. Alpha assets may be unsigned; macOS and Windows users can see platform security warnings until final signing and notarization are configured.
+          releaseDraft: false
+          prerelease: true
           generateReleaseNotes: true
           uploadUpdaterJson: false
           tauriScript: pnpm tauri
           args: ${{ matrix.args }}
-          retryAttempts: 2
           releaseAssetNamePattern: FatFingers-v[version]-[platform]-[arch][setup][ext]
