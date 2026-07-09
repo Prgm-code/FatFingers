@@ -4,6 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    reviewers:
+      - Prgm-code
+    labels:
+      - dependencies
+      - github-actions
+    open-pull-requests-limit: 5
     groups:
       github-actions:
         patterns:
@@ -13,6 +19,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    reviewers:
+      - Prgm-code
+    labels:
+      - dependencies
+      - npm
+    open-pull-requests-limit: 5
     groups:
       frontend:
         patterns:
@@ -22,6 +34,12 @@ updates:
     directory: /src-tauri
     schedule:
       interval: weekly
+    reviewers:
+      - Prgm-code
+    labels:
+      - dependencies
+      - rust
+    open-pull-requests-limit: 5
     groups:
       rust:
         patterns:
