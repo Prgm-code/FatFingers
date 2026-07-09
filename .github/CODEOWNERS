@@ -1,0 +1,15 @@
+# Default owner for the repository.
+* @Prgm-code
+
+# Security-sensitive backend and desktop permissions.
+/src-tauri/ @Prgm-code
+
+# Frontend and Tauri IPC boundary.
+/src/ @Prgm-code
+
+# CI/CD and dependency manifests.
+/.github/workflows/ @Prgm-code
+/package.json @Prgm-code
+/pnpm-lock.yaml @Prgm-code
+/src-tauri/Cargo.toml @Prgm-code
+/src-tauri/Cargo.lock @Prgm-code

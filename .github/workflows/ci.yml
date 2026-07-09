@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -11,6 +12,8 @@ permissions:
 jobs:
   test:
     name: Test (${{ matrix.os }})
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
