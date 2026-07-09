@@ -28,7 +28,8 @@ Implementado:
 - Controles de modo de escritura, formalidad, creatividad, temperatura, timeout y max output tokens.
 - Tests frontend y backend basicos.
 - Build debug Linux `.deb`.
-- Workflow de GitHub Actions para crear draft releases multiplataforma desde tags.
+- Workflow de GitHub Actions para crear prereleases multiplataforma desde
+  `main`.
 
 Pendiente antes de considerar un release estable:
 
@@ -134,23 +135,14 @@ fallos de `linuxdeploy` al procesar librerias del sistema recientes.
 
 ## Releases
 
-Los builds de release se generan con GitHub Actions en dos casos:
-
-- Cada push a `main` crea un prerelease automatico para probar el ultimo commit.
-- Cada tag `v*` crea un draft release versionado para revision manual.
-
-Formato recomendado para releases versionados:
-
-```bash
-git tag v0.1.0-alpha
-git push origin v0.1.0-alpha
-```
+Los builds de release se generan con GitHub Actions exclusivamente cuando hay
+un push a `main`. Otras ramas, pull requests y tags no generan paquetes de
+distribucion.
 
 El workflow valida que `package.json`, `src-tauri/tauri.conf.json` y
-`src-tauri/Cargo.toml` tengan la misma version. El tag debe ser exactamente esa
-version con prefijo `v` (`v0.1.0`) o un prerelease basado en ella
-(`v0.1.0-alpha`). Los builds automaticos desde `main` reciben una version unica
-con formato `<version-base>-main.<run_number>` y usan el tag
+`src-tauri/Cargo.toml` tengan la misma version. Los builds automaticos desde
+`main` reciben una version unica con formato `<version-base>-main.<run_number>`
+y usan el tag
 `v<version-base>-main.<run_number>`. El cambio de version ocurre solo dentro de
 GitHub Actions; el workflow no crea commits automaticos en `main`.
 
@@ -158,7 +150,8 @@ Cada release sube artefactos para:
 
 - Linux: `.AppImage`, `.deb` y `.rpm`.
 - macOS: `.dmg` para Apple Silicon y `.dmg` para Intel.
-- Windows: instalador NSIS `.exe` y paquete `.msi`.
+- Windows: instalador NSIS `.exe`. Los prereleases no generan MSI porque WiX
+  no admite el identificador textual `main` en la version del paquete.
 
 Los assets usan el formato `FatFingers-v<version>-<platform>-<arch>[setup].<ext>`,
 por ejemplo `FatFingers-v0.1.0-linux-amd64.AppImage` y

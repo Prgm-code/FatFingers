@@ -15,15 +15,15 @@ La implementacion actual prioriza:
 - Provider OpenAI funcional.
 - Copia al portapapeles.
 - Tests basicos.
-- Workflow de prereleases automaticos y draft releases multiplataforma en
-  GitHub Actions.
+- Workflow de prereleases automaticos multiplataforma, limitado a pushes sobre
+  `main` en GitHub Actions.
 - Version SemVer unica por cada ejecucion de `main`, sincronizada en los
   manifests antes de compilar y usada como tag del prerelease.
 
 Pendientes principales para cerrar el MVP como release publico:
 
 - QA manual en macOS y Windows.
-- Revision de draft release real y empaquetado firmado/notarizado final por plataforma.
+- Revision de prerelease real y empaquetado firmado/notarizado final por plataforma.
 - Validacion con providers reales fuera del entorno local.
 - Icono final y revision visual de instaladores.
 
@@ -172,7 +172,8 @@ Entregables:
 - Tests backend de prompts, settings, secrets y provider body generation.
 - Tests frontend de onboarding, settings, empty input, action selector, result copy, error banner y keyboard submit.
 - Tests frontend de selector de idioma y labels basicos en ingles/español.
-- Icono placeholder.
+- Icono de aplicacion generado desde `src/assets/fatfingers-logo.png` para los
+  formatos y tamaños requeridos por Tauri.
 - Configuracion de empaquetado.
 - QA checklist ejecutada al menos en Linux local y documentada para macOS/Windows.
 

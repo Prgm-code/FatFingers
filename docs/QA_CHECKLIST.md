@@ -136,22 +136,20 @@ GitHub Actions:
 - Pushear a `main` crea un prerelease automatico con tag
   `v<version-base>-main.<run_number>` y los binarios contienen esa misma
   version.
-- Pushear un tag `v*` crea un draft release versionado.
+- Pushear otra rama o un tag no ejecuta el workflow de release.
 - El job `Validate release` falla si `package.json`,
   `src-tauri/tauri.conf.json` y `src-tauri/Cargo.toml` tienen versiones
   distintas.
-- Un tag `v0.1.0-alpha` es valido si la version base del proyecto es `0.1.0`.
-- El release marca `prerelease` cuando viene de `main` o cuando el tag contiene
-  sufijo prerelease (`-alpha`, `-beta`, etc.).
+- El release generado desde `main` queda marcado como prerelease.
 - Los assets usan el formato
   `FatFingers-v<version>-<platform>-<arch>[setup].<ext>` y no duplican el tipo
-  de bundle en el nombre (`.deb.deb`, `.msi.msi`, etc.).
+  de bundle en el nombre (`.deb.deb`, `.exe.exe`, etc.).
 
 Linux:
 
-- El draft contiene `.AppImage`.
-- El draft contiene `.deb`.
-- El draft contiene `.rpm`.
+- El prerelease contiene `.AppImage`.
+- El prerelease contiene `.deb`.
+- El prerelease contiene `.rpm`.
 - Smoke test minimo: descargar AppImage, marcar ejecutable y lanzar en una
   distro Linux con WebKitGTK/Secret Service disponibles.
 - Smoke test minimo `.deb`: instalar en Debian/Ubuntu compatible y lanzar app.
@@ -160,8 +158,8 @@ Linux:
 
 macOS:
 
-- El draft contiene un `.dmg` para Apple Silicon.
-- El draft contiene un `.dmg` para Intel.
+- El prerelease contiene un `.dmg` para Apple Silicon.
+- El prerelease contiene un `.dmg` para Intel.
 - El workflow alpha usa firma ad-hoc (`APPLE_SIGNING_IDENTITY=-`) y no importa
   certificados Apple.
 - Smoke test minimo: abrir DMG, mover app a Applications y lanzar.
@@ -170,8 +168,8 @@ macOS:
 
 Windows:
 
-- El draft contiene instalador NSIS `.exe`.
-- El draft contiene paquete `.msi`.
+- El prerelease contiene instalador NSIS `.exe`.
+- El prerelease no intenta generar MSI con una version `*-main.<run_number>`.
 - Smoke test minimo: instalar, lanzar, verificar tray y desinstalar.
 - Si el build no esta firmado, documentar el aviso de SmartScreen esperado para
   release alpha.

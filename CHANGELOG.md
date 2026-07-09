@@ -8,6 +8,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Icono multiplataforma de FatFingers generado para Linux, macOS y Windows a
+  partir del asset de marca.
 - Dialogo para capturar el atajo global directamente desde el teclado, con
   confirmacion explicita y cancelacion mediante `Esc`.
 - Flujo de dos fases en el helper: Enter mejora el texto y un segundo Enter lo
@@ -38,9 +40,9 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Accion explicita para borrar `custom_headers` desde onboarding/settings.
 - Aviso de runtime cuando el shortcut global no queda registrado.
 - Workflow CI multiplataforma para frontend y backend en Linux, macOS y Windows.
-- Workflow de releases desde `main` y tags `v*`, con artefactos Linux
+- Workflow de releases desde `main`, con artefactos Linux
   `.AppImage`/`.deb`/`.rpm`, macOS `.dmg` por arquitectura y Windows
-  `.exe`/`.msi`; los pushes a `main` generan prereleases automaticos.
+  `.exe`; los pushes a `main` generan prereleases automaticos.
 - Salida directa desde onboarding hacia Settings para recuperar configuraciones
   problematicas.
 
@@ -49,6 +51,9 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Cada push a `main` genera un prerelease con version SemVer unica en todos los
   manifests y binarios. Los workflows usan permisos minimos, acciones fijadas
   por SHA y Dependabot para mantener esas referencias actualizadas.
+- El workflow de distribucion solo responde a pushes en `main`; Windows genera
+  NSIS `.exe` para evitar que la restriccion de versiones prerelease de MSI
+  bloquee la publicacion del instalador.
 - El arranque ahora lo decide Rust antes de mostrar ventanas: una instalacion
   nueva abre Settings, las ventanas esperan a terminar de cargar antes de
   mostrarse y la API key ya no controla el flujo inicial. Esto evita el helper

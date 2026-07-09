@@ -13,12 +13,12 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - Issue templates.
 - Pull request template.
 - Workflow CI multiplataforma.
-- Workflow de releases multiplataforma desde `main` y tags `v*`.
+- Workflow de releases multiplataforma activado exclusivamente por pushes a
+  `main`.
 - Acciones externas fijadas por SHA, permisos de escritura limitados al job de
   publicacion y actualizaciones automatizadas mediante Dependabot.
-- Politica inicial de releases: prereleases automaticos para `main`, tags
-  SemVer `v<version>` para drafts revisables y prerelease automatico para tags
-  con sufijo (`-alpha`, `-beta`, etc.).
+- Politica inicial de releases: prereleases automaticos y versionados para
+  `main`; otras ramas y tags no ejecutan builds de distribucion.
 - `.env.example` sin secretos.
 - `.gitignore` cubre entornos locales y build output.
 - Docs principales sincronizados con la implementacion actual.
@@ -37,7 +37,7 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - QA manual macOS.
 - QA manual Windows.
 - Revisar empaquetado final por plataforma.
-- Ejecutar y revisar un draft release generado por GitHub Actions.
-- Definir iconos finales.
+- Ejecutar y revisar un prerelease generado por GitHub Actions.
+- [x] Definir y generar los iconos de la aplicacion para cada plataforma.
 - Validar provider real con API key del maintainer.
 - Revisar soporte real de keyring por plataforma.
