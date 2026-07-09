@@ -37,3 +37,12 @@ Areas especialmente sensibles:
 - Settings planos no deben contener secrets.
 - No debe haber telemetria por defecto.
 - No se debe loggear input/output del usuario por defecto.
+
+## Auditoria de dependencias
+
+CI ejecuta semanalmente `pnpm audit` y `cargo audit`, y tambien cuando cambian
+los manifests o lockfiles. Las advisories `RUSTSEC-2026-0194` y
+`RUSTSEC-2026-0195` estan temporalmente exceptuadas para `quick-xml 0.39.x`
+porque llegan mediante `wayland-scanner 0.31.10`, la ultima version disponible,
+y solo procesan definiciones Wayland confiables durante compilacion. La
+excepcion debe eliminarse cuando `wayland-scanner` adopte `quick-xml >= 0.41.0`.
