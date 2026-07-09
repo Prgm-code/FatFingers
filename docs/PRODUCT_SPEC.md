@@ -23,6 +23,8 @@ Implementado en el MVP alpha:
 - Tests frontend/backend basicos y empaquetado debug Linux `.deb`.
 - Workflow de GitHub Actions para prereleases automaticos desde `main` y draft
   releases versionados desde tags.
+- Cada build de `main` recibe una version SemVer unica con formato
+  `<version-base>-main.<run_number>` antes de empaquetar.
 
 Pendiente:
 
@@ -153,9 +155,14 @@ configurado.
 Campos y acciones:
 
 - Current shortcut
-- Change shortcut
+- Change shortcut: abre un dialogo de captura; el usuario presiona la
+  combinacion en el teclado y la confirma sin escribir el accelerator a mano.
 - Test shortcut
 - Reset shortcut
+
+El dialogo muestra la combinacion detectada, exige al menos un modificador y
+una tecla principal, permite cancelar con `Esc` y no modifica el atajo actual
+hasta que el usuario confirma.
 
 Defaults:
 

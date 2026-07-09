@@ -8,7 +8,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref_name }}
@@ -18,21 +18,31 @@ jobs:
   validate:
     name: Validate release
     runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag_name: ${{ steps.version.outputs.tag_name }}
+      release_name: ${{ steps.version.outputs.release_name }}
+      release_draft: ${{ steps.version.outputs.release_draft }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 24
+          package-manager-cache: false
 
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@11.9.0 --activate
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
 
       - name: Install Linux Tauri dependencies
         run: |
@@ -51,16 +61,17 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate release tag version
+      - name: Resolve build version
+        id: version
         run: |
           node <<'NODE'
-          const { readFileSync } = require("node:fs");
+          const { appendFileSync, readFileSync } = require("node:fs");
 
           const ref = process.env.GITHUB_REF ?? "";
           const tagName = process.env.GITHUB_REF_NAME ?? "";
           const isMainBuild = ref === "refs/heads/main";
           const tagVersion = tagName.replace(/^v/, "");
-          const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
+          const baseVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
           const tauriVersion = JSON.parse(readFileSync("src-tauri/tauri.conf.json", "utf8")).version;
           const cargoToml = readFileSync("src-tauri/Cargo.toml", "utf8");
           const cargoVersion = cargoToml.match(/^version\s*=\s*"([^"]+)"/m)?.[1];
@@ -70,41 +81,71 @@ jobs:
           }
 
           const versions = {
-            "package.json": packageVersion,
+            "package.json": baseVersion,
             "src-tauri/tauri.conf.json": tauriVersion,
             "src-tauri/Cargo.toml": cargoVersion,
           };
 
           const mismatches = Object.entries(versions)
-            .filter(([, version]) => version !== packageVersion)
+            .filter(([, version]) => version !== baseVersion)
             .map(([file, version]) => `${file}=${version}`);
 
           if (mismatches.length > 0) {
             throw new Error(
-              `Project versions must match package.json=${packageVersion}; mismatches: ${mismatches.join(", ")}`
+              `Project versions must match package.json=${baseVersion}; mismatches: ${mismatches.join(", ")}`
             );
           }
+
+          let buildVersion;
+          let releaseTag;
+          let releaseName;
+          let releaseDraft;
+          let prerelease;
 
           if (isMainBuild) {
-            console.log(`Main build uses app version ${packageVersion}`);
-            process.exit(0);
+            buildVersion = `${baseVersion}-main.${process.env.GITHUB_RUN_NUMBER}`;
+            releaseTag = `v${buildVersion}`;
+            releaseName = `FatFingers ${buildVersion} (${process.env.GITHUB_SHA.slice(0, 7)})`;
+            releaseDraft = false;
+            prerelease = true;
+          } else {
+            if (!tagName.startsWith("v")) {
+              throw new Error(`Release tag must start with "v"; got ${tagName}`);
+            }
+
+            const validTag =
+              tagVersion === baseVersion || tagVersion.startsWith(`${baseVersion}-`);
+
+            if (!validTag) {
+              throw new Error(
+                `Tag ${tagName} must be v${baseVersion} or a prerelease based on it, like v${baseVersion}-alpha`
+              );
+            }
+
+            buildVersion = tagVersion;
+            releaseTag = tagName;
+            releaseName = `FatFingers ${tagName}`;
+            releaseDraft = true;
+            prerelease = tagVersion.includes("-");
           }
 
-          if (!tagName.startsWith("v")) {
-            throw new Error(`Release tag must start with "v"; got ${tagName}`);
+          const outputs = {
+            version: buildVersion,
+            tag_name: releaseTag,
+            release_name: releaseName,
+            release_draft: String(releaseDraft),
+            prerelease: String(prerelease),
+          };
+
+          for (const [name, value] of Object.entries(outputs)) {
+            appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
           }
 
-          const validTag =
-            tagVersion === packageVersion || tagVersion.startsWith(`${packageVersion}-`);
-
-          if (!validTag) {
-            throw new Error(
-              `Tag ${tagName} must be v${packageVersion} or a prerelease based on it, like v${packageVersion}-alpha`
-            );
-          }
-
-          console.log(`Release tag ${tagName} matches app version ${packageVersion}`);
+          console.log(`Resolved ${releaseTag} with app version ${buildVersion}`);
           NODE
+
+      - name: Apply build version
+        run: node scripts/set-version.mjs "${{ steps.version.outputs.version }}"
 
       - name: Build frontend
         run: pnpm build
@@ -128,6 +169,9 @@ jobs:
     name: Build release (${{ matrix.name }})
     needs: validate
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 90
+    permissions:
+      contents: write
     env:
       APPLE_SIGNING_IDENTITY: "-"
     strategy:
@@ -156,18 +200,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 24
+          package-manager-cache: false
 
       - name: Setup pnpm
         run: corepack enable && corepack prepare pnpm@11.9.0 --activate
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
         with:
           targets: ${{ matrix.rust-targets }}
 
@@ -193,21 +240,25 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply build version
+        run: node scripts/set-version.mjs "${{ needs.validate.outputs.version }}"
+
       - name: Build and upload Tauri bundles
-        uses: tauri-apps/tauri-action@v1
+        uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref == 'refs/heads/main' && format('main-{0}', github.run_number) || github.ref_name }}
-          releaseName: ${{ github.ref == 'refs/heads/main' && format('FatFingers main build {0}', github.run_number) || format('FatFingers {0}', github.ref_name) }}
+          tagName: ${{ needs.validate.outputs.tag_name }}
+          releaseName: ${{ needs.validate.outputs.release_name }}
+          releaseCommitish: ${{ github.sha }}
           releaseBody: |
             Automated FatFingers desktop build.
 
             Main branch builds are automatic prereleases for testing the latest commit. Versioned tags (`v*`) remain the path for reviewed release drafts.
 
             Linux assets cover most distributions through AppImage, Debian/Ubuntu packages and RPM packages. Alpha assets may be unsigned; macOS and Windows users can see platform security warnings until final signing and notarization are configured.
-          releaseDraft: ${{ github.ref != 'refs/heads/main' }}
-          prerelease: ${{ github.ref == 'refs/heads/main' || contains(github.ref_name, '-') }}
+          releaseDraft: ${{ needs.validate.outputs.release_draft }}
+          prerelease: ${{ needs.validate.outputs.prerelease }}
           generateReleaseNotes: true
           uploadUpdaterJson: false
           tauriScript: pnpm tauri

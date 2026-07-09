@@ -14,6 +14,8 @@ Estado: preparado para publicacion inicial del repositorio, pendiente antes de r
 - Pull request template.
 - Workflow CI multiplataforma.
 - Workflow de releases multiplataforma desde `main` y tags `v*`.
+- Acciones externas fijadas por SHA, permisos de escritura limitados al job de
+  publicacion y actualizaciones automatizadas mediante Dependabot.
 - Politica inicial de releases: prereleases automaticos para `main`, tags
   SemVer `v<version>` para drafts revisables y prerelease automatico para tags
   con sufijo (`-alpha`, `-beta`, etc.).

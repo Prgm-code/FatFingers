@@ -8,6 +8,8 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Dialogo para capturar el atajo global directamente desde el teclado, con
+  confirmacion explicita y cancelacion mediante `Esc`.
 - Flujo de dos fases en el helper: Enter mejora el texto y un segundo Enter lo
   confirma; `Cmd/Ctrl+Enter` vuelve a mejorar en fase review.
 - Pegado automatico opt-in en la app origen (`pasteBehavior: auto_paste`) con
@@ -44,6 +46,9 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Changed
 
+- Cada push a `main` genera un prerelease con version SemVer unica en todos los
+  manifests y binarios. Los workflows usan permisos minimos, acciones fijadas
+  por SHA y Dependabot para mantener esas referencias actualizadas.
 - El arranque ahora lo decide Rust antes de mostrar ventanas: una instalacion
   nueva abre Settings, las ventanas esperan a terminar de cargar antes de
   mostrarse y la API key ya no controla el flujo inicial. Esto evita el helper

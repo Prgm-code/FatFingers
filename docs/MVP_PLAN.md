@@ -17,6 +17,8 @@ La implementacion actual prioriza:
 - Tests basicos.
 - Workflow de prereleases automaticos y draft releases multiplataforma en
   GitHub Actions.
+- Version SemVer unica por cada ejecucion de `main`, sincronizada en los
+  manifests antes de compilar y usada como tag del prerelease.
 
 Pendientes principales para cerrar el MVP como release publico:
 
@@ -87,6 +89,8 @@ Entregables:
 - Tray/menu bar.
 - Menu: Open helper, Settings, Enable/disable shortcut, Start at login, Quit.
 - Comandos `show_helper_window`, `hide_helper_window`, `register_user_hotkey`.
+- Dialogo de captura del shortcut para elegir la combinacion desde el teclado
+  sin escribir el accelerator manualmente.
 
 Validacion:
 

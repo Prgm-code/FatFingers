@@ -133,7 +133,9 @@ Por plataforma:
 
 GitHub Actions:
 
-- Pushear a `main` crea un prerelease automatico con tag `main-<run_number>`.
+- Pushear a `main` crea un prerelease automatico con tag
+  `v<version-base>-main.<run_number>` y los binarios contienen esa misma
+  version.
 - Pushear un tag `v*` crea un draft release versionado.
 - El job `Validate release` falla si `package.json`,
   `src-tauri/tauri.conf.json` y `src-tauri/Cargo.toml` tienen versiones

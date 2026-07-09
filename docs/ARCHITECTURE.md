@@ -8,6 +8,12 @@ El frontend renderiza onboarding, helper flotante y settings. El backend control
 
 React no debe llamar proveedores LLM directamente.
 
+`ShortcutRecorder` mantiene el accelerator como un valor de solo lectura y
+abre un dialogo frontend para capturar eventos de teclado. La conversion desde
+`KeyboardEvent.code` a los nombres aceptados por `global-hotkey` vive en
+`src/lib/hotkeys.ts`; Rust conserva la validacion y el registro definitivo del
+atajo.
+
 ## 1.1 Estado implementado
 
 La arquitectura base ya esta implementada en el repo.
@@ -27,6 +33,12 @@ Componentes principales actuales:
 
 Los comandos Tauri usan Rust como unico punto de salida hacia proveedores LLM.
 El frontend solo invoca comandos Tauri mediante `src/lib/tauri.ts`.
+
+El workflow de release deriva una version unica para cada build de `main`
+(`<version-base>-main.<run_number>`) y la sincroniza temporalmente en
+`package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` y
+`src-tauri/Cargo.lock` mediante `scripts/set-version.mjs`. Estos cambios solo
+existen dentro del runner: no se empujan commits automaticos a `main`.
 
 ## 2. Estructura frontend
 

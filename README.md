@@ -149,8 +149,10 @@ git push origin v0.1.0-alpha
 El workflow valida que `package.json`, `src-tauri/tauri.conf.json` y
 `src-tauri/Cargo.toml` tengan la misma version. El tag debe ser exactamente esa
 version con prefijo `v` (`v0.1.0`) o un prerelease basado en ella
-(`v0.1.0-alpha`). Los builds automaticos desde `main` usan tags generados por
-GitHub Actions con formato `main-<run_number>`.
+(`v0.1.0-alpha`). Los builds automaticos desde `main` reciben una version unica
+con formato `<version-base>-main.<run_number>` y usan el tag
+`v<version-base>-main.<run_number>`. El cambio de version ocurre solo dentro de
+GitHub Actions; el workflow no crea commits automaticos en `main`.
 
 Cada release sube artefactos para:
 

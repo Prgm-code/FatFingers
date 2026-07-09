@@ -123,6 +123,83 @@
   gap: 10px;
 }
 
+.shortcut-dialog-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, #050706 58%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.shortcut-dialog {
+  display: grid;
+  width: min(440px, 100%);
+  gap: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.shortcut-dialog-heading {
+  display: grid;
+  gap: 6px;
+}
+
+.shortcut-dialog-heading h2 {
+  font-size: 16px;
+}
+
+.shortcut-capture-area {
+  display: grid;
+  min-height: 92px;
+  place-items: center;
+  border: 1px dashed var(--accent);
+  border-radius: 10px;
+  padding: 16px;
+  color: var(--muted);
+  background: var(--accent-soft);
+  text-align: center;
+  outline: none;
+}
+
+.shortcut-capture-area:focus-visible {
+  border-style: solid;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent), transparent 68%);
+}
+
+.shortcut-keys {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.shortcut-keys kbd {
+  min-width: 38px;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: 7px;
+  padding: 7px 10px 6px;
+  color: var(--text);
+  background: var(--surface);
+  font: 600 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.shortcut-requirement {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.shortcut-dialog-actions {
+  justify-content: flex-end;
+}
+
 .form-actions {
   align-content: end;
   align-items: end;
