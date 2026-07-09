@@ -44,6 +44,12 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Changed
 
+- El arranque ahora lo decide Rust antes de mostrar ventanas: una instalacion
+  nueva abre Settings, las ventanas esperan a terminar de cargar antes de
+  mostrarse y la API key ya no controla el flujo inicial. Esto evita el helper
+  blanco/transparente que podia bloquear Settings en Windows.
+- Las operaciones de Credential Manager/Keychain/Secret Service se ejecutan
+  fuera del hilo de UI y su consulta inicial ya no retrasa el render.
 - El tema oscuro usa fondos negros neutros en lugar del tono verdoso,
   conservando el acento teal de la marca.
 - El build release Linux define `NO_STRIP=true` para que AppImage pueda

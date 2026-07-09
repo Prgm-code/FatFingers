@@ -31,6 +31,10 @@ pub fn load_settings(app: &AppHandle) -> Result<AppSettings, AppError> {
     Ok(settings)
 }
 
+pub fn has_saved_settings(app: &AppHandle) -> Result<bool, AppError> {
+    settings_path(app).map(|path| path.is_file())
+}
+
 pub fn save_settings(app: &AppHandle, settings: &AppSettings) -> Result<(), AppError> {
     validate_settings(settings)?;
 

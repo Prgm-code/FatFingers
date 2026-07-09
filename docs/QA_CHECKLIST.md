@@ -76,6 +76,10 @@
 
 ## 5. Windows
 
+- En una instalacion limpia, la primera ventana visible es Settings.
+- El helper transparente no aparece durante el bootstrap ni tapa Settings.
+- Cerrar Settings deja la app operativa y accesible desde el tray.
+- La ausencia o fallo de Credential Manager no bloquea el render de Settings.
 - Default shortcut `Ctrl+Shift+Space`.
 - Tray icon aparece.
 - Tray icon es visible y clicable despues de cerrar la ventana.

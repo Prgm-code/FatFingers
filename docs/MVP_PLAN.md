@@ -116,6 +116,8 @@ Entregables:
 Validacion:
 
 - Settings persisten tras reinicio.
+- Una instalacion nueva abre Settings antes de mostrar el helper.
+- Cerrar Settings mantiene la app accesible desde el tray.
 - API key no aparece en archivos planos.
 - UI indica si existe API key guardada sin mostrarla.
 - Modo de escritura persiste y se envia al backend.
@@ -181,6 +183,7 @@ Validacion:
 MVP completo cuando:
 
 - App instala y lanza.
+- Primera ejecucion abre Settings sin mostrar un WebView blanco/transparente.
 - Tray/menu bar funciona.
 - Shortcut global abre helper.
 - Textarea enfoca.

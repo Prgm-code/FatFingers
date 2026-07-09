@@ -246,25 +246,25 @@ Texto obligatorio:
 
 ## 8. Primer lanzamiento
 
-Onboarding:
+Una instalacion nueva debe abrir directamente la ventana opaca y con marco
+nativo de Settings. El helper transparente no debe hacerse visible antes de
+resolver el estado de configuracion, especialmente en Windows.
 
-- Welcome screen.
-- Elegir provider: OpenAI, MiniMax, OpenRouter, OpenAI-compatible endpoint o local/custom endpoint.
-- Ingresar API key.
-- Ingresar modelo default.
-- Elegir shortcut default.
-- Probar conexion.
-- Finalizar.
+Reglas:
 
-Si el test de provider falla, el usuario debe poder continuar y arreglarlo despues desde settings.
-Onboarding debe incluir una salida directa a Settings para que el usuario no
-quede bloqueado si falla un ajuste no critico como el atajo global.
+- La existencia de un `settings.json` valido determina si la configuracion
+  inicial ya fue completada; la presencia o ausencia de una API key no controla
+  la ventana de arranque.
+- Sin settings validos se muestra Settings y el helper permanece oculto.
+- Cerrar Settings oculta la ventana, pero mantiene la aplicacion disponible en
+  el tray para volver a abrir Settings o invocar el helper.
+- Un fallo de secure storage, provider o shortcut nunca debe dejar una ventana
+  blanca ni bloquear el acceso a Settings.
+- Las ventanas se crean ocultas y solo se muestran al terminar de cargar su
+  documento, evitando exponer el WebView vacio durante el arranque.
 
-El onboarding abre en su propia ventana dedicada, con marco nativo, opaca y
-amplia (~860x820, minimo 680x680). Al finalizar, la ventana de onboarding se
-cierra y se muestra el helper compacto. Cerrar la ventana de onboarding con el
-boton nativo no bloquea la app: sigue disponible desde el tray y el usuario
-puede completar la configuracion despues desde settings.
+El flujo de onboarding se conserva como asistente opcional, pero no participa
+en la decision critica de arranque.
 
 ## 9. Helper flotante
 

@@ -53,18 +53,24 @@ fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), AppError> 
 }
 
 #[tauri::command]
-fn save_secret(name: String, value: String) -> Result<(), AppError> {
-    secrets::save_secret(&name, &value)
+async fn save_secret(name: String, value: String) -> Result<(), AppError> {
+    tauri::async_runtime::spawn_blocking(move || secrets::save_secret(&name, &value))
+        .await
+        .map_err(|_| AppError::secure_storage())?
 }
 
 #[tauri::command]
-fn has_secret(name: String) -> Result<bool, AppError> {
-    secrets::has_secret(&name)
+async fn has_secret(name: String) -> Result<bool, AppError> {
+    tauri::async_runtime::spawn_blocking(move || secrets::has_secret(&name))
+        .await
+        .map_err(|_| AppError::secure_storage())?
 }
 
 #[tauri::command]
-fn delete_secret(name: String) -> Result<(), AppError> {
-    secrets::delete_secret(&name)
+async fn delete_secret(name: String) -> Result<(), AppError> {
+    tauri::async_runtime::spawn_blocking(move || secrets::delete_secret(&name))
+        .await
+        .map_err(|_| AppError::secure_storage())?
 }
 
 #[tauri::command]
@@ -183,10 +189,12 @@ fn clear_local_history(app: AppHandle) -> Result<(), AppError> {
 }
 
 #[tauri::command]
-fn clear_all_local_data(app: AppHandle) -> Result<(), AppError> {
+async fn clear_all_local_data(app: AppHandle) -> Result<(), AppError> {
     store::clear_settings(&app)?;
     history::clear_history(&app)?;
-    secrets::clear_all_secrets()
+    tauri::async_runtime::spawn_blocking(secrets::clear_all_secrets)
+        .await
+        .map_err(|_| AppError::secure_storage())?
 }
 
 #[tauri::command]
@@ -244,7 +252,7 @@ fn sync_launch_at_login(app: &AppHandle, enabled: bool) -> Result<(), AppError> 
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            let _ = windows::show_helper(app);
+            let _ = windows::show_startup(app);
         }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -276,6 +284,8 @@ pub fn run() {
                 let _ = hotkeys::register_user_hotkey(&handle, &settings.hotkey);
                 let _ = sync_launch_at_login(&handle, settings.launch_at_login);
             }
+
+            windows::show_startup(&handle)?;
 
             Ok(())
         })

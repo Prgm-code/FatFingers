@@ -108,9 +108,8 @@ Ventanas Tauri actuales:
   Sin decoraciones nativas (`decorations: false`), fondo transparente con
   contenedor redondeado dibujado por CSS y fuera de la taskbar
   (`skipTaskbar: true`). Tamaño por defecto `600x220`, minimo `460x160`.
-  La configuracion de esta ventana vive en `tauri.conf.json` y tambien en el
-  `WebviewWindowBuilder` de `src-tauri/src/app/windows.rs`; ambos deben
-  mantenerse sincronizados.
+  Se crea bajo demanda desde `src-tauri/src/app/windows.rs` y permanece oculta
+  durante una instalacion nueva.
 - `settings`: dashboard de configuracion en ventana separada con navegacion
   lateral. Tamaño por defecto `920x720`, minimo `760x560`.
 - `onboarding`: primer flujo de configuracion en ventana propia, con marco
@@ -119,6 +118,13 @@ Ventanas Tauri actuales:
   onboarding. No se reutiliza la ventana del helper: alternar decoraciones
   nativas sobre una ventana transparente rompe el hit-testing de la barra de
   titulo en algunos entornos.
+
+El backend Rust decide la ventana inicial antes de mostrar un WebView. Si no
+existe un archivo de settings valido abre `settings`; en caso contrario abre
+`helper`. Todas las ventanas se construyen inicialmente con `visible: false` y
+se muestran al recibir `PageLoadEvent::Finished`. React no decide el primer
+lanzamiento ni usa el estado de Credential Manager/Keychain/Secret Service para
+elegir la ventana.
 
 `app/paste.rs` implementa el pegado automatico en la app origen: escribe el
 resultado al clipboard, oculta el helper (el sistema devuelve el foco a la app
@@ -444,10 +450,11 @@ Ventanas actuales:
 
 - `helper`: flotante, compacta, always-on-top, ocultable.
 - `settings`: dashboard de configuracion.
-- `onboarding`: primer lanzamiento, ventana dedicada que se cierra al
-  finalizar.
+- `onboarding`: asistente opcional en una ventana dedicada.
 
 El helper debe ocultarse en vez de destruirse al presionar `Esc`.
+En una instalacion nueva, Settings es la primera ventana visible; al cerrarla la
+app sigue disponible desde el tray.
 
 ## 11. Errores
 

@@ -105,7 +105,7 @@ pub fn is_user_hotkey_enabled() -> bool {
 
 pub fn handle_shortcut(app: &AppHandle, event: ShortcutState) {
     if is_user_hotkey_enabled() && event == ShortcutState::Pressed {
-        let _ = windows::show_helper(app);
+        let _ = windows::show_startup(app);
     }
 }
 

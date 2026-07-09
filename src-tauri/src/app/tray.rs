@@ -89,7 +89,7 @@ pub fn build_tray(app: &mut App) -> tauri::Result<()> {
             ..
         } = event
         {
-            let _ = windows::show_helper(tray.app_handle());
+            let _ = windows::show_startup(tray.app_handle());
         }
     })
     .build(app)?;

@@ -18,7 +18,6 @@ import {
   normalizeError,
   pasteBack,
   showHelperWindow,
-  showOnboardingWindow,
   showSettingsWindow,
 } from "./lib/tauri";
 import type { AppSettings, PasteBackOutcome, View } from "./types/app";
@@ -27,16 +26,14 @@ import "./styles/globals.css";
 
 async function loadSettingsSnapshot(): Promise<{
   settings: AppSettings;
-  hasApiKey: boolean;
   shortcutRegistered: boolean;
 }> {
-  const [settings, hasApiKey, runtimeStatus] = await Promise.all([
+  const [settings, runtimeStatus] = await Promise.all([
     getSettings(),
-    hasSecret(SECRET_PROVIDER_API_KEY),
     getRuntimeStatus(),
   ]);
 
-  return { settings, hasApiKey, shortcutRegistered: runtimeStatus.shortcutRegistered };
+  return { settings, shortcutRegistered: runtimeStatus.shortcutRegistered };
 }
 
 function App() {
@@ -64,18 +61,11 @@ function App() {
         }
 
         setSettings(snapshot.settings);
-        setHasApiKey(snapshot.hasApiKey);
         setStartupError(
           snapshot.shortcutRegistered
             ? null
             : t(snapshot.settings.language, "shortcutUnavailable"),
         );
-        if (!isSettingsWindow && !isOnboardingWindow && !snapshot.hasApiKey) {
-          // First launch: onboarding lives in its own framed window instead of
-          // the compact frameless helper.
-          void showOnboardingWindow();
-          void hideHelperWindow();
-        }
       } catch (error) {
         if (!isMounted) {
           return;
@@ -89,6 +79,26 @@ function App() {
     }
 
     void load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    // Secure storage can be slower or unavailable on some Windows systems.
+    // It must not delay the first render or decide which window is visible.
+    hasSecret(SECRET_PROVIDER_API_KEY)
+      .then((stored) => {
+        if (isMounted) {
+          setHasApiKey(stored);
+        }
+      })
+      .catch(() => {
+        // Saving or testing a key will surface an actionable storage error.
+      });
 
     return () => {
       isMounted = false;
@@ -132,7 +142,6 @@ function App() {
       try {
         const snapshot = await loadSettingsSnapshot();
         setSettings(snapshot.settings);
-        setHasApiKey(snapshot.hasApiKey);
       } catch {
         // The helper can still open with the last loaded settings.
       }
@@ -240,10 +249,7 @@ function App() {
           onDataCleared={() => {
             setSettings(FALLBACK_SETTINGS);
             setHasApiKey(false);
-            void showOnboardingWindow();
-            if (isSettingsWindow) {
-              void hideSettingsWindow();
-            }
+            setView("settings");
           }}
           onSettingsSaved={setSettings}
           settings={settings}

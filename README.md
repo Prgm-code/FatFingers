@@ -13,6 +13,8 @@ Implementado:
 - App Tauri v2 con frontend React/TypeScript/Vite y backend Rust.
 - Helper flotante con input, selector de accion, contador, resultado y copia al portapapeles.
 - Onboarding y pantalla de settings.
+- Primera ejecucion segura: una instalacion nueva abre Settings antes de crear
+  el helper y, al cerrar la ventana, la app sigue disponible desde el tray.
 - Atajo global configurable.
 - Tray/menu bar con acciones basicas.
 - Persistencia local de settings no secretos.

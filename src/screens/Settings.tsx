@@ -71,6 +71,10 @@ export function Settings({
   const confirmTimerRef = useRef<number | null>(null);
   const language = draft.language;
 
+  useEffect(() => {
+    setDraft(settings);
+  }, [settings]);
+
   // Apply the theme live so the dropdown previews instantly; restore the saved
   // theme if the user leaves without saving the draft.
   useEffect(() => {

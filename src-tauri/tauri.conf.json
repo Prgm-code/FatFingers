@@ -11,23 +11,7 @@
   },
   "app": {
     "macOSPrivateApi": true,
-    "windows": [
-      {
-        "label": "helper",
-        "title": "FatFingers",
-        "width": 600,
-        "height": 220,
-        "minWidth": 460,
-        "minHeight": 160,
-        "center": true,
-        "resizable": true,
-        "alwaysOnTop": true,
-        "decorations": false,
-        "transparent": true,
-        "skipTaskbar": true,
-        "shadow": false
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'",
       "capabilities": ["default"]
