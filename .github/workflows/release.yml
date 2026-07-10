@@ -132,10 +132,42 @@ jobs:
         working-directory: src-tauri
         run: cargo test
 
+  create-release:
+    name: Create GitHub release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create release if missing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NAME: ${{ needs.validate.outputs.release_name }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; reusing it."
+            exit 0
+          fi
+
+          release_args=(
+            "$RELEASE_TAG"
+            --repo "$GITHUB_REPOSITORY"
+            --target "$GITHUB_SHA"
+            --title "$RELEASE_NAME"
+            --generate-notes
+            --notes "Automated FatFingers desktop build."
+            --prerelease
+          )
+
+          gh release create "${release_args[@]}"
+
   publish-tauri:
     name: Build release (${{ matrix.name }})
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
+    needs: [validate, create-release]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 90
     permissions:
