@@ -40,6 +40,11 @@ El workflow de release deriva una version unica para cada build de `main`
 `src-tauri/Cargo.lock` mediante `scripts/set-version.mjs`. Estos cambios solo
 existen dentro del runner: no se empujan commits automaticos a `main`.
 
+Antes de iniciar la matriz de packaging, un job unico crea o reutiliza el
+GitHub Release correspondiente. Los jobs Linux, macOS y Windows dependen de ese
+job y solo compilan y adjuntan artefactos; ninguno compite por crear el mismo
+tag o release.
+
 ## 2. Estructura frontend
 
 ```text
