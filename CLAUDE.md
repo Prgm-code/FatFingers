@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FatFingers is a cross-platform desktop writing helper (Spotlight/Raycast-style floating window) built with Tauri v2: React/TypeScript/Vite frontend, Rust backend, pnpm as package manager. Status: MVP alpha. Do not re-initialize Tauri or replace the existing structure.
 
+Public site: `https://fatfingers.lakebed.app/`.
+
+The repository has two independent frontends: `src/` is the React UI embedded
+in Tauri; `frontend/FatFingers/` is the public Preact/Lakebed landing page. Read
+`frontend/FatFingers/AGENTS.md` before changing the landing.
+
 `AGENTS.md` contains the canonical agent rules. Before changes that alter public behavior, read the relevant docs in `docs/` (`PRODUCT_SPEC.md`, `ARCHITECTURE.md`, `MVP_PLAN.md`, `SECURITY_PRIVACY.md`) and update them first. Docs/specs are written in Spanish; type, command, API, and module names stay in English. Keep `README.md` and `CHANGELOG.md` in sync with public-facing changes.
 
 ## Commands
@@ -35,6 +41,13 @@ CI runs `pnpm build`, `pnpm test`, `cargo check`, and `cargo test` on Linux/macO
 
 `pnpm tauri` goes through `scripts/run-tauri.mjs`, which prepends `~/.cargo/bin` to PATH and sets `NO_STRIP=true` for Linux builds (works around linuxdeploy failures on rolling distros).
 
+Landing page (run from `frontend/FatFingers/`):
+
+```bash
+vp dlx lakebed dev
+vp dlx lakebed deploy
+```
+
 ## Architecture
 
 ### Hard boundary: all LLM and OS access lives in Rust
@@ -58,6 +71,17 @@ Providers: `openai` and `minimax` use the Responses API; `openrouter` and `opena
 
 Frontend tests are Vitest + Testing Library (jsdom, globals enabled, setup in `src/test/setup.ts`), colocated as `*.test.tsx` / `*.test.ts`.
 
+### Public landing layout (`frontend/FatFingers/`)
+
+- `client/index.tsx` — bilingual Preact landing, animated helper demo, OS
+  detection, and latest-release download links.
+- `server/index.ts` — Lakebed capsule definition.
+- `shared/release.ts` — release metadata shared types.
+- `lakebed.json` — portable binding to the owned Lakebed deployment.
+
+The landing is a separate public web surface. It must not receive provider API
+keys, access desktop settings, or call LLM providers.
+
 ### Secrets
 
 `provider_api_key` and `custom_headers` are secrets, stored via `keyring` under service name `FatFingers` — never in plain settings, env vars, or logs. `custom_headers` must be a JSON object with string values. `save_secret` verifies read-back after saving.
@@ -69,4 +93,5 @@ Frontend tests are Vitest + Testing Library (jsdom, globals enabled, setup in `s
 - Keep the UI minimal, fast, and keyboard-first; no heavy UI frameworks for the MVP.
 - App name `FatFingers` stays configurable from central config (`appName` setting).
 - Prompts must return only the transformed text — no explanations.
-- Automatic text replacement in the source app is out of scope (roadmap v1.2); the MVP copies results to the clipboard.
+- Automatic paste into the source app is implemented as an opt-in
+  `pasteBehavior`; clipboard copy remains the default and required fallback.

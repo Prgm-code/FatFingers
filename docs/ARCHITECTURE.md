@@ -3,6 +3,8 @@
 ## 1. Resumen
 
 FatFingers es una app Tauri v2 con frontend React/TypeScript y backend Rust.
+El repositorio incluye ademas una landing publica independiente construida como
+capsula Lakebed y desplegada en `https://fatfingers.lakebed.app/`.
 
 El frontend renderiza onboarding, helper flotante y settings. El backend controla ventanas, tray, shortcuts globales, clipboard, settings, secrets y llamadas LLM.
 
@@ -45,7 +47,7 @@ GitHub Release correspondiente. Los jobs Linux, macOS y Windows dependen de ese
 job y solo compilan y adjuntan artefactos; ninguno compite por crear el mismo
 tag o release.
 
-## 2. Estructura frontend
+## 2. Estructura frontend desktop
 
 ```text
 src/
@@ -79,6 +81,27 @@ src/
   types/
     app.ts
     llm.ts
+```
+
+## 2.1 Landing publica
+
+La landing vive aislada de la aplicacion Tauri en `frontend/FatFingers/`. Usa
+Preact y Lakebed, detecta idioma y sistema operativo en el navegador, y enlaza
+los instaladores de la release mas reciente. No comparte runtime, secrets ni
+llamadas LLM con el frontend desktop.
+
+```text
+frontend/FatFingers/
+  client/
+    index.tsx        UI, deteccion de plataforma/idioma y descargas
+  server/
+    index.ts         Definicion de la capsula Lakebed
+  shared/
+    release.ts       Tipos compartidos de metadata de releases
+  AGENTS.md          Reglas especificas de Lakebed
+  CLAUDE.md          Contexto del subproyecto
+  lakebed.json       Binding del deploy propio
+  README.md          Desarrollo y despliegue de la landing
 ```
 
 ## 3. Estructura backend

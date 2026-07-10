@@ -4,6 +4,8 @@ FatFingers es una aplicacion desktop multiplataforma para corregir, pulir, reesc
 
 La app funciona como un helper flotante tipo Spotlight/Raycast: corre en segundo plano, se abre con un atajo global, permite escribir o pegar texto, ejecuta una accion de escritura y deja el resultado listo para copiar.
 
+Sitio oficial: [fatfingers.lakebed.app](https://fatfingers.lakebed.app/)
+
 ## Estado actual
 
 Estado: MVP alpha funcional.
@@ -30,6 +32,8 @@ Implementado:
 - Build debug Linux `.deb`.
 - Workflow de GitHub Actions para crear prereleases multiplataforma desde
   `main`.
+- Landing publica bilingue en Lakebed con deteccion de sistema operativo,
+  recomendacion de descarga y enlaces a la release mas reciente.
 
 Pendiente antes de considerar un release estable:
 
@@ -79,7 +83,7 @@ La lista sugerida de modelos OpenAI vive en `src/lib/settings.ts` y permite ingr
 
 ## Requisitos de desarrollo
 
-- Node.js compatible con Vite 7.
+- Node.js compatible con Vite 8.
 - `pnpm`.
 - Rust stable.
 - Dependencias de Tauri v2 para la plataforma local.
@@ -118,6 +122,13 @@ Ejecutar app Tauri:
 
 ```bash
 pnpm tauri dev
+```
+
+Ejecutar la landing publica:
+
+```bash
+cd frontend/FatFingers
+vp dlx lakebed dev
 ```
 
 Tests y builds:
@@ -175,19 +186,30 @@ cargo test
 
 ```text
 src/
-  components/       Componentes React reutilizables
-  screens/          Helper, settings, onboarding y about
-  lib/              Wrappers Tauri, settings y validadores
-  styles/           CSS plano
-  types/            Tipos compartidos frontend
+  components/               Componentes React reutilizables
+  screens/                  Helper, settings, onboarding y about
+  lib/                      Wrappers Tauri, settings, i18n y validadores
+  styles/                   CSS plano
+  types/                    Tipos compartidos del frontend desktop
 
 src-tauri/src/
-  app/              Ventanas, tray, shortcuts y clipboard
-  settings/         Settings, history y secrets
-  llm/              Providers, prompts y tipos LLM
-  errors/           Errores serializables para IPC
+  app/                      Ventanas, tray, shortcuts, clipboard y pegado
+  settings/                 Settings, history y secrets
+  llm/                      Providers, prompts y tipos LLM
+  errors/                   Errores serializables para IPC
 
-docs/               Specs, arquitectura, QA, roadmap y privacidad
+frontend/FatFingers/
+  client/                   Landing Preact, i18n y descargas
+  server/                   Definicion de la capsula Lakebed
+  shared/                   Tipos de metadata de releases
+  AGENTS.md                 Reglas especificas del subproyecto
+  CLAUDE.md                 Contexto para Claude Code
+  lakebed.json              Binding del deploy en Lakebed
+  README.md                 Desarrollo y despliegue de la landing
+
+docs/                       Specs, arquitectura, QA, roadmap y privacidad
+scripts/                    Versionado y wrapper de Tauri
+.github/                    Workflows, CODEOWNERS y configuracion GitHub
 ```
 
 ## Documentacion
