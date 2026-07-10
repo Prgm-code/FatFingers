@@ -9,14 +9,42 @@ if (!version || !semverPattern.test(version)) {
 
 async function updateJson(path) {
   const source = await readFile(path, "utf8");
-  const pattern = /("version"\s*:\s*")[^"]+("\s*,)/;
-  const matches = source.match(new RegExp(pattern.source, "g"));
+  let document;
 
-  if (matches?.length !== 1) {
-    throw new Error(`Expected exactly one top-level version in ${path}`);
+  try {
+    document = JSON.parse(source);
+  } catch (error) {
+    throw new Error(`Expected valid JSON in ${path}`, { cause: error });
   }
 
-  await writeFile(path, source.replace(pattern, `$1${version}$2`));
+  if (
+    !document ||
+    typeof document !== "object" ||
+    Array.isArray(document) ||
+    typeof document.version !== "string"
+  ) {
+    throw new Error(`Expected one top-level string version in ${path}`);
+  }
+
+  const versionProperties = [
+    ...source.matchAll(/^([ \t]*)"version"(\s*:\s*)"([^"\r\n]*)"/gm),
+  ];
+  const minimumIndent = Math.min(...versionProperties.map((match) => match[1].length));
+  const topLevelMatches = versionProperties.filter(
+    (match) => match[1].length === minimumIndent,
+  );
+
+  if (topLevelMatches.length !== 1 || topLevelMatches[0][3] !== document.version) {
+    throw new Error(`Could not locate the top-level version in ${path}`);
+  }
+
+  const match = topLevelMatches[0];
+  const start = match.index;
+  const replacement = `${match[1]}"version"${match[2]}"${version}"`;
+  await writeFile(
+    path,
+    `${source.slice(0, start)}${replacement}${source.slice(start + match[0].length)}`,
+  );
 }
 
 async function replaceVersion(path, pattern, label) {
