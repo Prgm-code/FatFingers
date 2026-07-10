@@ -8,6 +8,14 @@ El proyecto ya tiene una primera implementacion Tauri/React/Rust. No reinicialic
 
 Estado publico: MVP alpha. El repo esta preparado para publicarse como open source, pero todavia requiere QA macOS/Windows y packaging final antes de un release estable.
 
+Sitio publico: `https://fatfingers.lakebed.app/`.
+
+El repositorio contiene dos frontends independientes:
+
+- `src/`: interfaz React/TypeScript de la aplicacion desktop Tauri.
+- `frontend/FatFingers/`: landing publica Preact/Lakebed. Antes de modificarla,
+  leer tambien `frontend/FatFingers/AGENTS.md`.
+
 Antes de implementar, lee:
 
 - `docs/PRODUCT_SPEC.md`
@@ -27,6 +35,23 @@ Antes de implementar, lee:
 - No agregar frameworks UI pesados para el MVP.
 - Preferir modulos pequeños y tipos explicitos.
 - Agregar comentarios solo donde ayuden a entender decisiones no obvias.
+
+## Distribucion del repositorio
+
+```text
+src/                         Frontend desktop React/TypeScript
+src-tauri/                   Backend y packaging Tauri/Rust
+frontend/FatFingers/         Landing publica Lakebed/Preact
+  client/                    UI, i18n, deteccion de SO y descargas
+  server/                    Capsula Lakebed
+  shared/                    Tipos compartidos de la landing
+docs/                        Specs, arquitectura, QA y privacidad
+scripts/                     Scripts de versionado y ejecucion Tauri
+.github/                     Workflows y configuracion de GitHub
+```
+
+La landing se desarrolla y despliega desde `frontend/FatFingers/`; no mover el
+frontend Tauri de `src/` ni mezclar llamadas LLM o secrets con la landing.
 
 ## Seguridad obligatoria
 
