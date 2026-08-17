@@ -251,8 +251,10 @@ fn sync_launch_at_login(app: &AppHandle, enabled: bool) -> Result<(), AppError> 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            let _ = windows::show_startup(app);
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            if !lifecycle::requests_background(argv) {
+                let _ = windows::show_startup(app);
+            }
         }))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -265,7 +267,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
+            Some(vec![lifecycle::BACKGROUND_ARG]),
         ))
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -285,7 +287,9 @@ pub fn run() {
                 let _ = sync_launch_at_login(&handle, settings.launch_at_login);
             }
 
-            windows::show_startup(&handle)?;
+            if !lifecycle::requests_background(std::env::args_os()) {
+                windows::show_startup(&handle)?;
+            }
 
             Ok(())
         })

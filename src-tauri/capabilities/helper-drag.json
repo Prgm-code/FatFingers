@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "helper-drag",
+  "description": "Allow the frameless helper window to be moved",
+  "windows": ["helper"],
+  "permissions": ["core:window:allow-start-dragging"]
+}

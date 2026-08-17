@@ -70,9 +70,10 @@ body[data-view="helper"] {
 
 .helper-drag {
   flex: 0 0 auto;
-  height: 12px;
+  height: 20px;
   margin: 0 -14px;
   cursor: grab;
+  user-select: none;
 }
 
 .helper-card .error-banner {

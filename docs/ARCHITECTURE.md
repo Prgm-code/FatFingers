@@ -148,8 +148,10 @@ Ventanas Tauri actuales:
   Sin decoraciones nativas (`decorations: false`), fondo transparente con
   contenedor redondeado dibujado por CSS y fuera de la taskbar
   (`skipTaskbar: true`). Tamaño por defecto `600x220`, minimo `460x160`.
-  Se crea bajo demanda desde `src-tauri/src/app/windows.rs` y permanece oculta
-  durante una instalacion nueva.
+  Se crea bajo demanda desde `src-tauri/src/app/windows.rs`, puede moverse desde
+  una franja de arrastre propia y permanece oculta durante una instalacion
+  nueva. Mientras el proceso sigue activo, ocultarla y volverla a abrir no
+  restablece el tamaño ni la posicion elegidos.
 - `settings`: dashboard de configuracion en ventana separada con navegacion
   lateral. Tamaño por defecto `920x720`, minimo `760x560`.
 - `onboarding`: primer flujo de configuracion en ventana propia, con marco
@@ -165,6 +167,11 @@ existe un archivo de settings valido abre `settings`; en caso contrario abre
 se muestran al recibir `PageLoadEvent::Finished`. React no decide el primer
 lanzamiento ni usa el estado de Credential Manager/Keychain/Secret Service para
 elegir la ventana.
+
+El inicio automatico usa el argumento interno `--background`. En ese modo el
+backend construye el tray y registra el shortcut, pero omite la seleccion de
+ventana inicial. El callback de segunda instancia tambien ignora invocaciones
+con ese argumento para que un inicio automatico tardio no muestre el helper.
 
 `app/paste.rs` implementa el pegado automatico en la app origen: escribe el
 resultado al clipboard, oculta el helper (el sistema devuelve el foco a la app

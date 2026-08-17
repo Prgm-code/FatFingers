@@ -156,6 +156,12 @@ Reglas:
 - `read_clipboard_text` solo debe usarse por accion explicita o flujo documentado.
 - No guardar contenido de clipboard por defecto.
 
+## 8.1 Permisos de ventana
+
+La ventana `helper` puede solicitar `core:window:allow-start-dragging` para
+moverse desde su franja superior. Este permiso debe declararse en una capability
+separada y limitada al label `helper`; Settings y Onboarding no lo necesitan.
+
 ## 9. Reemplazo en app origen
 
 Implementado como pegado automatico opt-in (roadmap v1.2 adelantado).

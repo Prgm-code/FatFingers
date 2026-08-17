@@ -87,6 +87,7 @@ Entregables:
   - macOS: `Command+Shift+Space`
   - Windows/Linux: `Ctrl+Shift+Space`
 - Tray/menu bar.
+- Inicio de sesion silencioso: cargar tray y shortcut sin mostrar ventanas.
 - Menu: Open helper, Settings, Enable/disable shortcut, Start at login, Quit.
 - Comandos `show_helper_window`, `hide_helper_window`, `register_user_hotkey`.
 - Dialogo de captura del shortcut para elegir la combinacion desde el teclado
@@ -97,6 +98,9 @@ Validacion:
 - Shortcut abre helper.
 - Si el shortcut falla, la app muestra error accionable.
 - Tray permite abrir settings y salir.
+- Start at login mantiene Helper y Settings ocultos hasta una accion explicita.
+- La franja superior permite mover el helper y, dentro del mismo proceso,
+  conserva el tamaño y la posicion tras ocultarlo.
 
 ## 5. Fase 3: Settings y Secrets
 
