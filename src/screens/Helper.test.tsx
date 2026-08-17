@@ -5,6 +5,12 @@ import { FALLBACK_SETTINGS } from "../lib/settings";
 import { Helper } from "./Helper";
 
 describe("Helper", () => {
+  it("marks the top strip as a Tauri drag region", () => {
+    const { container } = renderHelper();
+
+    expect(container.querySelector("[data-tauri-drag-region]")).not.toBeNull();
+  });
+
   it("shows a local error for empty input", () => {
     renderHelper();
 

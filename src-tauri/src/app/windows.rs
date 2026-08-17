@@ -1,8 +1,7 @@
 use crate::errors::{AppError, AppErrorKind};
 use crate::settings::store;
 use tauri::{
-    webview::PageLoadEvent, AppHandle, Emitter, LogicalSize, Manager, Size, WebviewUrl,
-    WebviewWindowBuilder,
+    webview::PageLoadEvent, AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder,
 };
 
 pub const HELPER_LABEL: &str = "helper";
@@ -25,14 +24,6 @@ const SETTINGS_MIN_HEIGHT: f64 = 560.0;
 
 pub fn show_helper(app: &AppHandle) -> Result<(), AppError> {
     if let Some(window) = app.get_webview_window(HELPER_LABEL) {
-        let _ = window.set_min_size(Some(Size::Logical(LogicalSize {
-            width: HELPER_MIN_WIDTH,
-            height: HELPER_MIN_HEIGHT,
-        })));
-        let _ = window.set_size(Size::Logical(LogicalSize {
-            width: HELPER_WIDTH,
-            height: HELPER_HEIGHT,
-        }));
         window
             .show()
             .map_err(|_| window_error("FatFingers window could not be shown."))?;

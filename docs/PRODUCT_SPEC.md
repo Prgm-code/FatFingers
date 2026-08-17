@@ -145,6 +145,11 @@ Campos:
 - Close window after copy
 - Theme: `system`, `light`, `dark`
 
+`Launch at login` inicia FatFingers en segundo plano: crea el tray, registra el
+shortcut y carga los servicios necesarios, pero no muestra Helper, Settings ni
+Onboarding. Una apertura manual del ejecutable sigue mostrando la ventana
+correspondiente al estado de configuracion.
+
 `Interface language` controla solo el idioma visible de la aplicacion
 FatFingers. No fuerza el idioma de salida del proveedor LLM; la salida sigue
 determinada por la accion, el texto de entrada y el comportamiento de escritura
@@ -279,6 +284,8 @@ Cuando se presiona el shortcut global:
 
 - Abrir ventana pequeña centrada, sin marco (frameless) y con esquinas
   redondeadas dibujadas por la app.
+- Permitir moverla arrastrando la franja superior del helper en macOS, Windows
+  y Linux.
 - Mantener always-on-top y fuera de la taskbar.
 - Fondo crema u oscuro segun el tema (`system` sigue al sistema operativo),
   manteniendo el acento teal de la marca.
@@ -294,6 +301,10 @@ Dimensiones sugeridas:
 - Height: 220px
 - Resizable: si
 - Compacta por defecto
+
+El tamaño y la posicion elegidos por el usuario se conservan al ocultar y
+volver a mostrar el helper mientras FatFingers siga ejecutandose. Al iniciar un
+nuevo proceso, la ventana vuelve al tamaño compacto y centrado por defecto.
 
 El helper opera en un flujo de dos fases:
 
