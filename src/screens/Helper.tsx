@@ -36,7 +36,7 @@ const NOTICE_CLOSE_DELAY_MS = 1200;
 const isMac = navigator.platform.toLowerCase().includes("mac");
 const MOD_LABEL = isMac ? "⌘" : "Ctrl";
 const PASTE_SHORTCUT_LABEL = isMac ? "⌘V" : "Ctrl+V";
-const LANGUAGE_SHORTCUT_LABEL = isMac ? "⌘L" : "Ctrl+L";
+const LANGUAGE_SHORTCUT_LABEL = isMac ? "⌘⇧L" : "Ctrl+Shift+L";
 
 export function Helper({
   settings,
@@ -294,7 +294,7 @@ export function Helper({
       return;
     }
 
-    if (command && !event.shiftKey && event.key.toLowerCase() === "l") {
+    if (command && event.shiftKey && event.key.toLowerCase() === "l") {
       event.preventDefault();
       if (phase !== "improving") {
         cycleTargetLanguage();

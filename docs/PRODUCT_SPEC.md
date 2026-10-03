@@ -356,7 +356,7 @@ Fase `review` (resultado generado):
   texto original y vuelve a `compose`.
 - Mostrar latencia de la ultima generacion en la linea de estado.
 - Junto al selector de accion hay un chip de idioma de salida (`Aa`, `→ EN`,
-  `→ ES`). Se cicla con click o `Cmd/Ctrl + L`, se resalta con el color de
+  `→ ES`). Se cicla con click o `Cmd/Ctrl + Shift + L`, se resalta con el color de
   acento cuando no es `original` y vuelve a `defaultTargetLanguage` en cada
   sesion. Con `Correct` y un idioma destino, el hint de Enter dice "Translate".
 
@@ -371,7 +371,7 @@ Fase `review` (resultado generado):
 - `Cmd/Ctrl + N`: nuevo input (vuelve a `compose`).
 - `Cmd/Ctrl + ,`: abrir settings.
 - `Tab`: ciclar la accion de escritura.
-- `Cmd/Ctrl + L`: ciclar el idioma de salida (`original` → `en` → `es`).
+- `Cmd/Ctrl + Shift + L`: ciclar el idioma de salida (`original` → `en` → `es`).
 - `Cmd/Ctrl + 1..5`: seleccionar accion directamente.
 
 ## 11. Tray/menu bar

@@ -11,7 +11,7 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 - Idioma de salida independiente de la accion (`targetLanguage`: `original`,
   `en`, `es`). "Corregir → EN" traduce conservando el tono del mensaje y
   "Profesional → EN" reescribe y traduce en un paso. Chip en el helper
-  (`Ctrl/Cmd+L`) y "Default output language" en Settings.
+  (`Ctrl/Cmd+Shift+L`) y "Default output language" en Settings.
 - Icono multiplataforma de FatFingers generado para Linux, macOS y Windows a
   partir del asset de marca.
 - Dialogo para capturar el atajo global directamente desde el teclado, con
