@@ -2,23 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { ActionSelector } from "../components/ActionSelector";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { SettingsButton } from "../components/SettingsButton";
+import { TargetLanguageChip } from "../components/TargetLanguageChip";
 import {
   MINIMAX_BASE_URL,
   OPENAI_RESPONSES_URL,
   OPENROUTER_CHAT_COMPLETIONS_URL,
+  TARGET_LANGUAGES,
   WRITING_ACTIONS,
 } from "../lib/settings";
 import { formatMessage, t } from "../lib/i18n";
 import { validateInput } from "../lib/validators";
 import type { AppSettings, PasteBackOutcome } from "../types/app";
-import type { CorrectTextResponse, WritingAction } from "../types/llm";
+import type { CorrectTextResponse, TargetLanguage, WritingAction } from "../types/llm";
 
 type HelperPhase = "compose" | "improving" | "review";
 
 type HelperProps = {
   settings: AppSettings;
   sessionId: number;
-  onRun: (input: string, action: WritingAction) => Promise<CorrectTextResponse>;
+  onRun: (
+    input: string,
+    action: WritingAction,
+    targetLanguage: TargetLanguage,
+  ) => Promise<CorrectTextResponse>;
   onCopy: (text: string) => Promise<void>;
   onPaste: (text: string) => Promise<PasteBackOutcome>;
   onClose: () => void;
@@ -30,6 +36,7 @@ const NOTICE_CLOSE_DELAY_MS = 1200;
 const isMac = navigator.platform.toLowerCase().includes("mac");
 const MOD_LABEL = isMac ? "⌘" : "Ctrl";
 const PASTE_SHORTCUT_LABEL = isMac ? "⌘V" : "Ctrl+V";
+const LANGUAGE_SHORTCUT_LABEL = isMac ? "⌘L" : "Ctrl+L";
 
 export function Helper({
   settings,
@@ -42,6 +49,9 @@ export function Helper({
 }: HelperProps) {
   const [input, setInput] = useState("");
   const [action, setAction] = useState<WritingAction>(settings.defaultAction);
+  const [targetLanguage, setTargetLanguage] = useState<TargetLanguage>(
+    settings.defaultTargetLanguage,
+  );
   const [phase, setPhase] = useState<HelperPhase>("compose");
   const [previousInput, setPreviousInput] = useState<string | null>(null);
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
@@ -71,6 +81,7 @@ export function Helper({
     clearCloseTimer();
     setInput("");
     setPhase("compose");
+    setTargetLanguage(settings.defaultTargetLanguage);
     setPreviousInput(null);
     setLatencyMs(null);
     setLastResponse(null);
@@ -82,6 +93,10 @@ export function Helper({
   useEffect(() => {
     setAction(settings.defaultAction);
   }, [settings.defaultAction]);
+
+  useEffect(() => {
+    setTargetLanguage(settings.defaultTargetLanguage);
+  }, [settings.defaultTargetLanguage]);
 
   useEffect(() => {
     setLastResponse(null);
@@ -116,13 +131,14 @@ export function Helper({
       if (showDevDebug) {
         console.debug("[FatFingers] LLM request", {
           action,
+          targetLanguage,
           provider: settings.provider,
           model: settings.model,
           baseUrl: effectiveBaseUrl,
         });
       }
 
-      const response = await onRun(input, action);
+      const response = await onRun(input, action, targetLanguage);
       if (showDevDebug) {
         console.debug("[FatFingers] LLM response", {
           provider: response.provider,
@@ -237,6 +253,11 @@ export function Helper({
     setAction(WRITING_ACTIONS[nextIndex].value);
   }
 
+  function cycleTargetLanguage() {
+    const index = TARGET_LANGUAGES.indexOf(targetLanguage);
+    setTargetLanguage(TARGET_LANGUAGES[(index + 1) % TARGET_LANGUAGES.length]);
+  }
+
   function handleKeyDown(event: React.KeyboardEvent) {
     const command = event.metaKey || event.ctrlKey;
 
@@ -273,6 +294,14 @@ export function Helper({
       return;
     }
 
+    if (command && !event.shiftKey && event.key.toLowerCase() === "l") {
+      event.preventDefault();
+      if (phase !== "improving") {
+        cycleTargetLanguage();
+      }
+      return;
+    }
+
     if (command && event.shiftKey && event.key.toLowerCase() === "c") {
       event.preventDefault();
       void copyInput();
@@ -301,6 +330,10 @@ export function Helper({
     settings.pasteBehavior === "auto_paste"
       ? t(language, "hintPaste")
       : t(language, "hintCopyClose");
+  const runHint =
+    action === "correct" && targetLanguage !== "original"
+      ? t(language, "hintTranslate")
+      : t(language, "hintImprove");
 
   return (
     <main className="helper-shell" onKeyDown={handleKeyDown}>
@@ -334,12 +367,21 @@ export function Helper({
           value={input}
         />
         <footer className="status-line">
-          <ActionSelector
-            disabled={phase === "improving"}
-            language={language}
-            onChange={setAction}
-            value={action}
-          />
+          <div className="status-controls">
+            <ActionSelector
+              disabled={phase === "improving"}
+              language={language}
+              onChange={setAction}
+              value={action}
+            />
+            <TargetLanguageChip
+              disabled={phase === "improving"}
+              language={language}
+              onCycle={cycleTargetLanguage}
+              shortcutLabel={LANGUAGE_SHORTCUT_LABEL}
+              value={targetLanguage}
+            />
+          </div>
           <div className="status-hints">
             {phase === "improving" ? (
               <span className="loading-state">
@@ -367,7 +409,7 @@ export function Helper({
                   </span>
                 ) : null}
                 <span className="hint">
-                  <kbd>↵</kbd> {t(language, "hintImprove")}
+                  <kbd>↵</kbd> {runHint}
                 </span>
                 <span className="hint">
                   <kbd>Esc</kbd> {t(language, "close")}

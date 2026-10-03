@@ -215,13 +215,14 @@ pub(crate) fn map_openai_status(status: reqwest::StatusCode) -> AppError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::llm::types::{WritingAction, WritingMode};
+    use crate::llm::types::{TargetLanguage, WritingAction, WritingMode};
 
     fn request() -> LlmRequest {
         LlmRequest {
             action: WritingAction::Correct,
             input_text: "helo".to_string(),
             custom_instruction: None,
+            target_language: TargetLanguage::Original,
             model: "gpt-test".to_string(),
             temperature: Some(0.2),
             max_output_tokens: Some(200),

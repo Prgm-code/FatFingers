@@ -8,6 +8,10 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Added
 
+- Idioma de salida independiente de la accion (`targetLanguage`: `original`,
+  `en`, `es`). "Corregir → EN" traduce conservando el tono del mensaje y
+  "Profesional → EN" reescribe y traduce en un paso. Chip en el helper
+  (`Ctrl/Cmd+L`) y "Default output language" en Settings.
 - Icono multiplataforma de FatFingers generado para Linux, macOS y Windows a
   partir del asset de marca.
 - Dialogo para capturar el atajo global directamente desde el teclado, con
@@ -48,6 +52,10 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
 
 ### Changed
 
+- `TranslateEnglish`/`TranslateSpanish` pasan a ser legacy y se normalizan a
+  `Correct` + idioma de salida.
+- El selector de accion del helper muestra la accion por defecto aunque no
+  este en la lista rapida; antes mostraba "Correct" mientras ejecutaba otra.
 - Cada push a `main` genera un prerelease con version SemVer unica en todos los
   manifests y binarios. Los workflows usan permisos minimos, acciones fijadas
   por SHA y Dependabot para mantener esas referencias actualizadas.

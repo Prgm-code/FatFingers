@@ -20,7 +20,7 @@ pub fn load_settings(app: &AppHandle) -> Result<AppSettings, AppError> {
         )
     })?;
 
-    let settings = serde_json::from_str::<AppSettings>(&contents).map_err(|_| {
+    let mut settings = serde_json::from_str::<AppSettings>(&contents).map_err(|_| {
         AppError::new(
             AppErrorKind::InvalidSettings,
             "Settings file is invalid. Reset settings from Privacy.",
@@ -28,6 +28,7 @@ pub fn load_settings(app: &AppHandle) -> Result<AppSettings, AppError> {
     })?;
 
     validate_settings(&settings)?;
+    settings.normalize_legacy_actions();
     Ok(settings)
 }
 

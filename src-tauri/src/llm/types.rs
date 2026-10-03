@@ -14,6 +14,27 @@ pub enum WritingAction {
     Custom,
 }
 
+/// Language of the final text, independent from the writing action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TargetLanguage {
+    #[default]
+    Original,
+    En,
+    Es,
+}
+
+impl WritingAction {
+    /// Maps legacy translate actions to `Correct` plus a target language.
+    pub fn normalize(self, target_language: TargetLanguage) -> (Self, TargetLanguage) {
+        match self {
+            Self::TranslateEnglish => (Self::Correct, TargetLanguage::En),
+            Self::TranslateSpanish => (Self::Correct, TargetLanguage::Es),
+            action => (action, target_language),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum WritingMode {
@@ -43,6 +64,8 @@ pub struct LlmRequest {
     pub action: WritingAction,
     pub input_text: String,
     pub custom_instruction: Option<String>,
+    #[serde(default)]
+    pub target_language: TargetLanguage,
     pub model: String,
     pub temperature: Option<f32>,
     pub max_output_tokens: Option<u32>,
@@ -66,6 +89,8 @@ pub struct CorrectTextRequest {
     pub action: WritingAction,
     pub input_text: String,
     pub custom_instruction: Option<String>,
+    #[serde(default)]
+    pub target_language: TargetLanguage,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,5 +1,5 @@
 use crate::errors::{AppError, AppErrorKind};
-use crate::llm::types::{CorrectTextRequest, LlmResponse, WritingAction};
+use crate::llm::types::{CorrectTextRequest, LlmResponse, TargetLanguage, WritingAction};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -13,6 +13,7 @@ const HISTORY_FILE: &str = "history.jsonl";
 struct HistoryEntry<'a> {
     created_at_ms: u128,
     action: WritingAction,
+    target_language: TargetLanguage,
     input_text: &'a str,
     output_text: &'a str,
     provider: &'a str,
@@ -48,6 +49,7 @@ fn append_history_to_path(
             .map(|duration| duration.as_millis())
             .unwrap_or_default(),
         action: request.action,
+        target_language: request.target_language,
         input_text: &request.input_text,
         output_text: &response.output_text,
         provider: &response.provider,
@@ -87,7 +89,7 @@ fn history_error(message: &'static str) -> AppError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::llm::types::WritingAction;
+    use crate::llm::types::{TargetLanguage, WritingAction};
 
     #[test]
     fn appends_and_clears_history_file() {
@@ -103,6 +105,7 @@ mod tests {
             action: WritingAction::Correct,
             input_text: "helo".to_string(),
             custom_instruction: None,
+            target_language: TargetLanguage::Original,
         };
         let response = LlmResponse {
             output_text: "hello".to_string(),

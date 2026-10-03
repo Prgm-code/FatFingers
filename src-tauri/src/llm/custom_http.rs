@@ -152,7 +152,7 @@ fn headers(config: &ProviderConfig) -> Result<HeaderMap, LlmError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::llm::types::{WritingAction, WritingMode};
+    use crate::llm::types::{TargetLanguage, WritingAction, WritingMode};
 
     #[test]
     fn custom_body_matches_spec() {
@@ -160,6 +160,7 @@ mod tests {
             action: WritingAction::Shorten,
             input_text: "Please make this shorter".to_string(),
             custom_instruction: None,
+            target_language: TargetLanguage::Original,
             model: "local-model".to_string(),
             temperature: Some(0.2),
             max_output_tokens: Some(300),

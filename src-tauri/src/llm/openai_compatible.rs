@@ -189,13 +189,14 @@ fn headers(api_key: &str, config: &ProviderConfig) -> Result<HeaderMap, LlmError
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::llm::types::{WritingAction, WritingMode};
+    use crate::llm::types::{TargetLanguage, WritingAction, WritingMode};
 
     fn request() -> LlmRequest {
         LlmRequest {
             action: WritingAction::Professional,
             input_text: "hey can you check this".to_string(),
             custom_instruction: None,
+            target_language: TargetLanguage::Original,
             model: "model".to_string(),
             temperature: Some(0.3),
             max_output_tokens: Some(500),
