@@ -115,6 +115,37 @@ body[data-view="helper"] {
   min-height: 26px;
 }
 
+.status-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.target-language-chip {
+  flex: 0 0 auto;
+  min-height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 9px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.target-language-chip:hover:not(:disabled),
+.target-language-chip:focus-visible {
+  color: var(--text);
+}
+
+.target-language-chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
 .status-hints {
   display: flex;
   align-items: center;

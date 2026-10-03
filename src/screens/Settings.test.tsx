@@ -96,6 +96,21 @@ describe("Settings", () => {
     });
   });
 
+  it("saves the default output language", async () => {
+    renderSettings();
+
+    fireEvent.change(screen.getByLabelText("Default output language"), {
+      target: { value: "en" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save settings" }));
+
+    expect(await screen.findByText("Settings saved.")).toBeTruthy();
+    expect(mocks.saveSettings).toHaveBeenCalledWith({
+      ...FALLBACK_SETTINGS,
+      defaultTargetLanguage: "en",
+    });
+  });
+
   it("shows shortcut registration errors", async () => {
     mocks.testUserHotkey.mockRejectedValueOnce({
       message: "This shortcut could not be registered. It may already be used by another app.",

@@ -33,7 +33,7 @@ describe("Helper", () => {
     fireEvent.keyDown(input, { key: "Enter" });
 
     await waitFor(() => {
-      expect(onRun).toHaveBeenCalledWith("helo", "correct");
+      expect(onRun).toHaveBeenCalledWith("helo", "correct", "original");
     });
     expect(await screen.findByDisplayValue("Fixed text")).toBeTruthy();
     expect(screen.getByText("Copy & close")).toBeTruthy();
@@ -159,11 +159,77 @@ describe("Helper", () => {
     });
   });
 
+  it("cycles the output language with Cmd/Ctrl+L and sends it with the request", async () => {
+    const onRun = vi.fn(async () => ({
+      outputText: "Hey, I'll send it tomorrow",
+      provider: "openai",
+      model: "model",
+      latencyMs: 10,
+    }));
+    renderHelper({ onRun });
+
+    const input = screen.getByLabelText("Write or paste text");
+    const chip = screen.getByRole("button", { name: "Output language: Same as input" });
+    expect(chip.getAttribute("aria-pressed")).toBe("false");
+    expect(screen.getByText("Improve")).toBeTruthy();
+
+    fireEvent.keyDown(input, { key: "l", ctrlKey: true });
+
+    const englishChip = screen.getByRole("button", { name: "Output language: English" });
+    expect(englishChip.getAttribute("aria-pressed")).toBe("true");
+    expect(englishChip.textContent).toBe("→ EN");
+    expect(screen.getByText("Translate")).toBeTruthy();
+
+    fireEvent.change(input, { target: { value: "te lo mando mañana" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(onRun).toHaveBeenCalledWith("te lo mando mañana", "correct", "en");
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Output language: English" }));
+    expect(screen.getByRole("button", { name: "Output language: Spanish" })).toBeTruthy();
+    fireEvent.keyDown(input, { key: "l", metaKey: true });
+    expect(screen.getByRole("button", { name: "Output language: Same as input" })).toBeTruthy();
+  });
+
+  it("resets the output language to the default on a new session", async () => {
+    const settings = { ...FALLBACK_SETTINGS, defaultTargetLanguage: "en" as const };
+    const { rerender } = renderHelper({ settings, sessionId: 0 });
+
+    fireEvent.keyDown(screen.getByLabelText("Write or paste text"), { key: "l", ctrlKey: true });
+    expect(screen.getByRole("button", { name: "Output language: Spanish" })).toBeTruthy();
+
+    rerender(
+      <Helper
+        onClose={vi.fn()}
+        onCopy={vi.fn(async () => undefined)}
+        onOpenSettings={vi.fn()}
+        onPaste={vi.fn(async () => ({ method: "simulated" as const }))}
+        onRun={vi.fn()}
+        sessionId={1}
+        settings={settings}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Output language: English" })).toBeTruthy();
+    });
+  });
+
+  it("shows a default action that is not in the quick action list", () => {
+    renderHelper({ settings: { ...FALLBACK_SETTINGS, defaultAction: "custom" } });
+
+    const select = screen.getByLabelText("Writing action") as HTMLSelectElement;
+    expect(select.value).toBe("custom");
+  });
+
   it("renders helper labels and validation in Spanish", async () => {
     renderHelper({ settings: { ...FALLBACK_SETTINGS, language: "es" } });
 
     const input = screen.getByLabelText("Escribe o pega texto");
     expect(screen.getByText("Mejorar")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Idioma de salida: Igual que la entrada" })).toBeTruthy();
 
     fireEvent.keyDown(input, { key: "Enter" });
     expect(screen.getByRole("alert").textContent).toContain("Ingresa texto");

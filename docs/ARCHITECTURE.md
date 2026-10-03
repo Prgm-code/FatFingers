@@ -197,7 +197,25 @@ pub enum WritingAction {
 }
 ```
 
-### 4.2 WritingMode
+`TranslateEnglish` y `TranslateSpanish` son legacy: `WritingAction::normalize`
+los convierte en `Correct` + `TargetLanguage::En`/`Es`.
+
+### 4.2 TargetLanguage
+
+```rust
+pub enum TargetLanguage {
+    Original, // default
+    En,
+    Es,
+}
+```
+
+Idioma de la salida, independiente de la accion. `CorrectTextRequest` y
+`LlmRequest` lo reciben como `target_language` con `#[serde(default)]`.
+`prompts.rs` agrega una instruccion de idioma que conserva tono y formato, y
+deja de pedir "preservar el idioma" cuando hay traduccion.
+
+### 4.3 WritingMode
 
 ```rust
 pub enum WritingMode {
@@ -208,13 +226,14 @@ pub enum WritingMode {
 }
 ```
 
-### 4.3 LlmRequest
+### 4.4 LlmRequest
 
 ```rust
 pub struct LlmRequest {
     pub action: WritingAction,
     pub input_text: String,
     pub custom_instruction: Option<String>,
+    pub target_language: TargetLanguage,
     pub model: String,
     pub temperature: Option<f32>,
     pub max_output_tokens: Option<u32>,
@@ -224,7 +243,7 @@ pub struct LlmRequest {
 }
 ```
 
-### 4.4 LlmResponse
+### 4.5 LlmResponse
 
 ```rust
 pub struct LlmResponse {
@@ -235,7 +254,7 @@ pub struct LlmResponse {
 }
 ```
 
-### 4.5 LlmProvider
+### 4.6 LlmProvider
 
 ```rust
 pub trait LlmProvider {
@@ -258,6 +277,7 @@ type WritingAction =
   | "quick_reply"
   | "custom";
 
+type TargetLanguage = "original" | "en" | "es";
 type WritingMode = "plain_text" | "balanced" | "formal" | "creative";
 type AppLanguage = "en" | "es";
 
@@ -269,6 +289,7 @@ type AppSettings = {
   baseUrl?: string;
   model: string;
   defaultAction: WritingAction;
+  defaultTargetLanguage: TargetLanguage;
   correctionMode: WritingMode;
   formalityLevel: number;
   creativityLevel: number;
@@ -288,6 +309,10 @@ type AppSettings = {
 copia al portapapeles; `auto_paste` pega en la app origen. En Rust el campo usa
 `#[serde(default)]` para que settings antiguos sin el campo carguen con
 `clipboard`.
+
+`defaultTargetLanguage` tambien usa `#[serde(default)]` (`original`). Al cargar
+settings, un `defaultAction` legacy de traduccion se normaliza a `correct` +
+idioma de salida.
 
 Rust:
 

@@ -7,7 +7,8 @@ use app::paste::{PasteBackOutcome, PasteCapability};
 use app::{clipboard, hotkeys, lifecycle, paste, tray, windows};
 use errors::{AppError, AppErrorKind};
 use llm::types::{
-    CorrectTextRequest, CorrectTextResponse, LlmRequest, TestProviderResponse, WritingAction,
+    CorrectTextRequest, CorrectTextResponse, LlmRequest, TargetLanguage, TestProviderResponse,
+    WritingAction,
 };
 use serde::Serialize;
 use settings::history;
@@ -108,6 +109,7 @@ async fn test_provider_connection(app: AppHandle) -> Result<TestProviderResponse
         action: WritingAction::Custom,
         input_text: "Reply with OK.".to_string(),
         custom_instruction: Some("Return only OK.".to_string()),
+        target_language: TargetLanguage::Original,
     };
 
     let response = run_llm_request(&settings, test_request).await?;
@@ -216,6 +218,7 @@ async fn run_llm_request(
         action: request.action,
         input_text: request.input_text,
         custom_instruction: request.custom_instruction,
+        target_language: TargetLanguage::Original,
         model: settings.model.clone(),
         temperature: Some(settings.temperature),
         max_output_tokens: Some(settings.max_output_tokens),

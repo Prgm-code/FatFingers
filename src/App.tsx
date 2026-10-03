@@ -21,7 +21,7 @@ import {
   showSettingsWindow,
 } from "./lib/tauri";
 import type { AppSettings, PasteBackOutcome, View } from "./types/app";
-import type { CorrectTextResponse, WritingAction } from "./types/llm";
+import type { CorrectTextResponse, TargetLanguage, WritingAction } from "./types/llm";
 import "./styles/globals.css";
 
 async function loadSettingsSnapshot(): Promise<{
@@ -157,9 +157,10 @@ function App() {
   async function runAction(
     inputText: string,
     action: WritingAction,
+    targetLanguage: TargetLanguage,
   ): Promise<CorrectTextResponse> {
     try {
-      return await correctText({ action, inputText, customInstruction: null });
+      return await correctText({ action, inputText, customInstruction: null, targetLanguage });
     } catch (error) {
       throw new Error(normalizeError(error).message);
     }

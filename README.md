@@ -26,7 +26,10 @@ Implementado:
 - Provider OpenRouter usando Chat Completions desde Rust.
 - Provider OpenAI-compatible usando Chat Completions.
 - Provider Custom HTTP.
-- Acciones `Correct`, `Professional`, `Shorten`, `Friendly`, `QuickReply`, `TranslateEnglish`, `TranslateSpanish` y `Custom`.
+- Acciones `Correct`, `Professional`, `Shorten`, `Friendly`, `QuickReply` y `Custom`.
+- Idioma de salida combinable con cualquier accion (igual que la entrada,
+  ingles o español): traduce conservando el tono del mensaje. Se cambia con el
+  chip del helper o `Ctrl/Cmd+L`.
 - Controles de modo de escritura, formalidad, creatividad, temperatura, timeout y max output tokens.
 - Tests frontend y backend basicos.
 - Build debug Linux `.deb`.

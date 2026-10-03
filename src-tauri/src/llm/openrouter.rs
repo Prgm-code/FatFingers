@@ -151,7 +151,7 @@ fn headers(api_key: &str, config: &ProviderConfig) -> Result<HeaderMap, LlmError
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::llm::types::{WritingAction, WritingMode};
+    use crate::llm::types::{TargetLanguage, WritingAction, WritingMode};
     use std::collections::HashMap;
     use std::time::Duration;
 
@@ -160,6 +160,7 @@ mod tests {
             action: WritingAction::Correct,
             input_text: "helo".to_string(),
             custom_instruction: None,
+            target_language: TargetLanguage::Original,
             model: DEFAULT_OPENROUTER_MODEL.to_string(),
             temperature: Some(0.2),
             max_output_tokens: Some(200),

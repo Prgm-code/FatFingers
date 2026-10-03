@@ -3,7 +3,7 @@ pub mod secrets;
 pub mod store;
 
 use crate::errors::{AppError, AppErrorKind};
-use crate::llm::types::{ProviderType, WritingAction, WritingMode};
+use crate::llm::types::{ProviderType, TargetLanguage, WritingAction, WritingMode};
 use serde::{Deserialize, Serialize};
 
 pub const APP_NAME: &str = "FatFingers";
@@ -20,6 +20,8 @@ pub struct AppSettings {
     pub base_url: Option<String>,
     pub model: String,
     pub default_action: WritingAction,
+    #[serde(default)]
+    pub default_target_language: TargetLanguage,
     pub correction_mode: WritingMode,
     pub formality_level: u8,
     pub creativity_level: u8,
@@ -74,6 +76,7 @@ impl Default for AppSettings {
             base_url: None,
             model: DEFAULT_OPENAI_MODEL.to_string(),
             default_action: WritingAction::Correct,
+            default_target_language: TargetLanguage::Original,
             correction_mode: WritingMode::PlainText,
             formality_level: 50,
             creativity_level: 20,
@@ -87,6 +90,15 @@ impl Default for AppSettings {
             theme: Theme::System,
             store_history: false,
         }
+    }
+}
+
+impl AppSettings {
+    /// Rewrites a legacy translate default action as `Correct` + target language.
+    pub fn normalize_legacy_actions(&mut self) {
+        let (action, target_language) = self.default_action.normalize(self.default_target_language);
+        self.default_action = action;
+        self.default_target_language = target_language;
     }
 }
 
@@ -239,6 +251,20 @@ mod tests {
 
         assert_eq!(settings.language, AppLanguage::En);
         assert_eq!(settings.paste_behavior, PasteBehavior::Clipboard);
+        assert_eq!(settings.default_target_language, TargetLanguage::Original);
+    }
+
+    #[test]
+    fn normalizes_legacy_translate_default_action() {
+        let mut settings = AppSettings {
+            default_action: WritingAction::TranslateEnglish,
+            ..AppSettings::default()
+        };
+
+        settings.normalize_legacy_actions();
+
+        assert_eq!(settings.default_action, WritingAction::Correct);
+        assert_eq!(settings.default_target_language, TargetLanguage::En);
     }
 
     #[test]

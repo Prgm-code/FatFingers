@@ -8,6 +8,8 @@ export type WritingAction =
   | "quick_reply"
   | "custom";
 
+export type TargetLanguage = "original" | "en" | "es";
+
 export type WritingMode = "plain_text" | "balanced" | "formal" | "creative";
 
 export type ProviderType =
@@ -21,6 +23,7 @@ export type CorrectTextRequest = {
   action: WritingAction;
   inputText: string;
   customInstruction?: string | null;
+  targetLanguage: TargetLanguage;
 };
 
 export type CorrectTextResponse = {

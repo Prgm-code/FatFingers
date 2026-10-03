@@ -9,9 +9,16 @@ import {
   MINIMAX_BASE_URL,
   SECRET_CUSTOM_HEADERS,
   SECRET_PROVIDER_API_KEY,
+  TARGET_LANGUAGES,
   WRITING_MODES,
 } from "../lib/settings";
-import { t, writingActionLabel, writingModeLabel, type TranslationKey } from "../lib/i18n";
+import {
+  t,
+  targetLanguageLabel,
+  writingActionLabel,
+  writingModeLabel,
+  type TranslationKey,
+} from "../lib/i18n";
 import {
   clearAllLocalData,
   clearLocalHistory,
@@ -369,6 +376,25 @@ export function Settings({
                     {EXTENDED_WRITING_ACTIONS.map((action) => (
                       <option key={action.value} value={action.value}>
                         {writingActionLabel(language, action.value)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  {t(language, "defaultTargetLanguage")}
+                  <select
+                    onChange={(event) =>
+                      setDraft({
+                        ...draft,
+                        defaultTargetLanguage: event.currentTarget
+                          .value as AppSettings["defaultTargetLanguage"],
+                      })
+                    }
+                    value={draft.defaultTargetLanguage}
+                  >
+                    {TARGET_LANGUAGES.map((targetLanguage) => (
+                      <option key={targetLanguage} value={targetLanguage}>
+                        {targetLanguageLabel(language, targetLanguage)}
                       </option>
                     ))}
                   </select>

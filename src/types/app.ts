@@ -1,4 +1,4 @@
-import type { ProviderType, WritingAction, WritingMode } from "./llm";
+import type { ProviderType, TargetLanguage, WritingAction, WritingMode } from "./llm";
 
 export type Theme = "system" | "light" | "dark";
 export type AppLanguage = "en" | "es";
@@ -17,6 +17,7 @@ export type AppSettings = {
   baseUrl?: string | null;
   model: string;
   defaultAction: WritingAction;
+  defaultTargetLanguage: TargetLanguage;
   correctionMode: WritingMode;
   formalityLevel: number;
   creativityLevel: number;

@@ -106,9 +106,27 @@ Acciones obligatorias:
 
 Acciones planificadas tambien en la arquitectura:
 
-- `TranslateEnglish`
-- `TranslateSpanish`
 - `Custom`
+
+### 6.1 Idioma de salida
+
+El idioma de salida (`TargetLanguage`: `original`, `en`, `es`) es un eje
+independiente de la accion. Cualquier accion puede combinarse con un idioma de
+salida:
+
+- `Correct` + `en`: traduce al ingles conservando tono, registro y formato del
+  mensaje, y corrige errores del original en el camino. Es el caso principal.
+- `Professional` + `en`: reescribe con tono profesional y entrega en ingles.
+- `QuickReply` + `en`: redacta la respuesta en ingles.
+- `original`: la salida queda en el idioma del texto de entrada.
+
+El prompt indica conservar nombres propios, URLs, codigo, emojis, saltos de
+linea y formato. Si el texto ya esta en el idioma destino, solo se aplica la
+accion.
+
+`TranslateEnglish` y `TranslateSpanish` quedan como valores legacy: se aceptan
+al leer settings o requests y se normalizan a `Correct` + `en`/`es`. No se
+muestran en la UI.
 
 ## 7. Dashboard de configuracion
 
@@ -137,6 +155,8 @@ Campos:
 - Launch at login
 - Interface language: `en`, `es`
 - Default action
+- Default output language: `original` (default), `en`, `es`. Es el idioma con
+  el que arranca el chip del helper en cada sesion.
 - After improving, Enter will: `clipboard` (copiar al portapapeles, default) o
   `auto_paste` (pegar en la app origen). Si la plataforma no soporta pegado
   simulado (por ejemplo Wayland o macOS sin permiso de Accessibility), la UI
@@ -335,6 +355,10 @@ Fase `review` (resultado generado):
 - `Cmd/Ctrl + Z` sobre el estado de la app (boton/atajo Undo) restaura el
   texto original y vuelve a `compose`.
 - Mostrar latencia de la ultima generacion en la linea de estado.
+- Junto al selector de accion hay un chip de idioma de salida (`Aa`, `→ EN`,
+  `→ ES`). Se cicla con click o `Cmd/Ctrl + L`, se resalta con el color de
+  acento cuando no es `original` y vuelve a `defaultTargetLanguage` en cada
+  sesion. Con `Correct` y un idioma destino, el hint de Enter dice "Translate".
 
 ## 10. Shortcuts internos
 
@@ -347,6 +371,7 @@ Fase `review` (resultado generado):
 - `Cmd/Ctrl + N`: nuevo input (vuelve a `compose`).
 - `Cmd/Ctrl + ,`: abrir settings.
 - `Tab`: ciclar la accion de escritura.
+- `Cmd/Ctrl + L`: ciclar el idioma de salida (`original` → `en` → `es`).
 - `Cmd/Ctrl + 1..5`: seleccionar accion directamente.
 
 ## 11. Tray/menu bar

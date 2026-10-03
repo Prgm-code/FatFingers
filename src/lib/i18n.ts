@@ -1,5 +1,5 @@
 import type { AppLanguage } from "../types/app";
-import type { WritingAction, WritingMode } from "../types/llm";
+import type { TargetLanguage, WritingAction, WritingMode } from "../types/llm";
 
 export const translations = {
   en: {
@@ -39,6 +39,7 @@ export const translations = {
     customModel: "Custom model...",
     customModelId: "Custom model ID",
     defaultAction: "Default action",
+    defaultTargetLanguage: "Default output language",
     enterTextBeforeRunning: "Enter text before running an action.",
     finish: "Finish",
     floatingEditor: "Floating editor",
@@ -47,7 +48,9 @@ export const translations = {
     hintAgain: "Again",
     hintCopyClose: "Copy & close",
     hintImprove: "Improve",
+    hintLanguage: "Language",
     hintPaste: "Paste",
+    hintTranslate: "Translate",
     copiedPressPaste: "Copied — press {shortcut} to paste",
     confirmClear: "Confirm clear?",
     pasteBehavior: "After improving, Enter will",
@@ -90,6 +93,10 @@ export const translations = {
     shortcutUnavailable: "This shortcut could not be registered. It may already be used by another app or unsupported on this desktop session.",
     shortcutRegistered: "Shortcut registered.",
     storeHistoryLocally: "Store history locally",
+    targetEnglish: "English",
+    targetLanguageLabel: "Output language: {language}",
+    targetOriginal: "Same as input",
+    targetSpanish: "Spanish",
     temperature: "Temperature",
     testConnection: "Test connection",
     testShortcut: "Test shortcut",
@@ -154,6 +161,7 @@ export const translations = {
     customModel: "Modelo custom...",
     customModelId: "ID de modelo custom",
     defaultAction: "Acción por defecto",
+    defaultTargetLanguage: "Idioma de salida por defecto",
     enterTextBeforeRunning: "Ingresa texto antes de ejecutar una acción.",
     finish: "Finalizar",
     floatingEditor: "Editor flotante",
@@ -162,7 +170,9 @@ export const translations = {
     hintAgain: "Otra vez",
     hintCopyClose: "Copiar y cerrar",
     hintImprove: "Mejorar",
+    hintLanguage: "Idioma",
     hintPaste: "Pegar",
+    hintTranslate: "Traducir",
     copiedPressPaste: "Copiado — pulsa {shortcut} para pegar",
     confirmClear: "¿Confirmar borrado?",
     pasteBehavior: "Después de mejorar, Enter hará",
@@ -205,6 +215,10 @@ export const translations = {
     shortcutUnavailable: "Este atajo no se pudo registrar. Puede estar usado por otra app o no estar soportado en esta sesión de escritorio.",
     shortcutRegistered: "Atajo registrado.",
     storeHistoryLocally: "Guardar historial localmente",
+    targetEnglish: "Inglés",
+    targetLanguageLabel: "Idioma de salida: {language}",
+    targetOriginal: "Igual que la entrada",
+    targetSpanish: "Español",
     temperature: "Temperatura",
     testConnection: "Probar conexión",
     testShortcut: "Probar atajo",
@@ -253,6 +267,12 @@ const modeKeys: Record<WritingMode, TranslationKey> = {
   creative: "modeCreative",
 };
 
+const targetLanguageKeys: Record<TargetLanguage, TranslationKey> = {
+  original: "targetOriginal",
+  en: "targetEnglish",
+  es: "targetSpanish",
+};
+
 export function t(language: AppLanguage, key: TranslationKey): string {
   return translations[language][key];
 }
@@ -263,6 +283,13 @@ export function writingActionLabel(language: AppLanguage, action: WritingAction)
 
 export function writingModeLabel(language: AppLanguage, mode: WritingMode): string {
   return t(language, modeKeys[mode]);
+}
+
+export function targetLanguageLabel(
+  language: AppLanguage,
+  targetLanguage: TargetLanguage,
+): string {
+  return t(language, targetLanguageKeys[targetLanguage]);
 }
 
 export function formatMessage(

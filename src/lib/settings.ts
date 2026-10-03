@@ -1,6 +1,6 @@
 import type { AppSettings } from "../types/app";
 import type { AppLanguage } from "../types/app";
-import type { ProviderType, WritingAction, WritingMode } from "../types/llm";
+import type { ProviderType, TargetLanguage, WritingAction, WritingMode } from "../types/llm";
 
 export const SECRET_PROVIDER_API_KEY = "provider_api_key";
 export const SECRET_CUSTOM_HEADERS = "custom_headers";
@@ -32,10 +32,11 @@ export const WRITING_ACTIONS: Array<{ value: WritingAction; label: string }> = [
 
 export const EXTENDED_WRITING_ACTIONS: Array<{ value: WritingAction; label: string }> = [
   ...WRITING_ACTIONS,
-  { value: "translate_english", label: "Translate EN" },
-  { value: "translate_spanish", label: "Translate ES" },
   { value: "custom", label: "Custom" },
 ];
+
+// Cycle order for the helper's output-language chip.
+export const TARGET_LANGUAGES: TargetLanguage[] = ["original", "en", "es"];
 
 export const WRITING_MODES: Array<{ value: WritingMode; label: string }> = [
   { value: "plain_text", label: "Plain text" },
@@ -67,6 +68,7 @@ export const FALLBACK_SETTINGS: AppSettings = {
   baseUrl: null,
   model: DEFAULT_OPENAI_MODEL,
   defaultAction: "correct",
+  defaultTargetLanguage: "original",
   correctionMode: "plain_text",
   formalityLevel: 50,
   creativityLevel: 20,
