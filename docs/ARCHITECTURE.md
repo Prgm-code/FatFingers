@@ -87,13 +87,26 @@ src/
 
 La landing vive aislada de la aplicacion Tauri en `frontend/FatFingers/`. Usa
 Preact y Lakebed, detecta idioma y sistema operativo en el navegador, y enlaza
-los instaladores de la release mas reciente. No comparte runtime, secrets ni
-llamadas LLM con el frontend desktop.
+los instaladores de la release mas reciente. Incluye una demo animada del flujo
+de teclado y una prueba interactiva de accion + idioma de salida; ambas usan
+textos escritos de antemano en `client/copy.ts`, sin llamadas LLM. No comparte
+runtime, secrets ni llamadas LLM con el frontend desktop.
 
 ```text
 frontend/FatFingers/
   client/
-    index.tsx        UI, deteccion de plataforma/idioma y descargas
+    index.tsx        Composicion de la pagina, navegacion, CTAs y footer
+    copy.ts          Textos es/en, ejemplos de la demo y resultados pregrabados
+    Headline.tsx     Titular que corrige sus propios errores al cargar
+    HeroScene.tsx    Demo animada: chat, helper flotante y teclas pulsadas
+    How.tsx          Flujo de tres pasos y atajos que reaccionan al teclado
+    Playground.tsx   Prueba interactiva de accion + idioma de salida
+    sections.tsx     Proveedor, configuracion y privacidad
+    Keycap.tsx       Teclas reutilizables
+    hooks.ts         Fuentes, reveal al hacer scroll, movimiento y teclado
+    release.ts       Deteccion de plataforma y enlaces de descarga
+    styles.ts        CSS de la landing
+    icons.tsx        Iconos SVG
   server/
     index.ts         Definicion de la capsula Lakebed
   shared/

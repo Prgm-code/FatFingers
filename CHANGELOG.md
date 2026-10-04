@@ -12,6 +12,13 @@ El formato sigue una version simple de Keep a Changelog y el proyecto usa SemVer
   `en`, `es`). "Corregir → EN" traduce conservando el tono del mensaje y
   "Profesional → EN" reescribe y traduce en un paso. Chip en el helper
   (`Ctrl/Cmd+Shift+L`) y "Default output language" en Settings.
+- Rediseño de la landing publica con la misma paleta y tipografia: titular que
+  corrige sus propios errores, demo animada del flujo completo (atajo global,
+  Tab, idioma de salida con `Ctrl/Cmd+Shift+L`, Enter y pegado en un chat),
+  seccion de atajos que reacciona a las teclas pulsadas, prueba interactiva de
+  accion + idioma de salida con ejemplos pregrabados, ventana de configuracion
+  de muestra y descargas para todas las plataformas. Respeta
+  `prefers-reduced-motion`.
 - Icono multiplataforma de FatFingers generado para Linux, macOS y Windows a
   partir del asset de marca.
 - Dialogo para capturar el atajo global directamente desde el teclado, con
