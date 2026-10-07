@@ -159,7 +159,7 @@ describe("Helper", () => {
     });
   });
 
-  it("cycles the output language with Cmd/Ctrl+L and sends it with the request", async () => {
+  it("cycles the output language with Cmd/Ctrl+Shift+L and sends it with the request", async () => {
     const onRun = vi.fn(async () => ({
       outputText: "Hey, I'll send it tomorrow",
       provider: "openai",
@@ -173,7 +173,7 @@ describe("Helper", () => {
     expect(chip.getAttribute("aria-pressed")).toBe("false");
     expect(screen.getByText("Improve")).toBeTruthy();
 
-    fireEvent.keyDown(input, { key: "l", ctrlKey: true });
+    fireEvent.keyDown(input, { key: "L", ctrlKey: true, shiftKey: true });
 
     const englishChip = screen.getByRole("button", { name: "Output language: English" });
     expect(englishChip.getAttribute("aria-pressed")).toBe("true");
@@ -189,7 +189,7 @@ describe("Helper", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Output language: English" }));
     expect(screen.getByRole("button", { name: "Output language: Spanish" })).toBeTruthy();
-    fireEvent.keyDown(input, { key: "l", metaKey: true });
+    fireEvent.keyDown(input, { key: "L", metaKey: true, shiftKey: true });
     expect(screen.getByRole("button", { name: "Output language: Same as input" })).toBeTruthy();
   });
 
@@ -197,7 +197,7 @@ describe("Helper", () => {
     const settings = { ...FALLBACK_SETTINGS, defaultTargetLanguage: "en" as const };
     const { rerender } = renderHelper({ settings, sessionId: 0 });
 
-    fireEvent.keyDown(screen.getByLabelText("Write or paste text"), { key: "l", ctrlKey: true });
+    fireEvent.keyDown(screen.getByLabelText("Write or paste text"), { key: "L", ctrlKey: true, shiftKey: true });
     expect(screen.getByRole("button", { name: "Output language: Spanish" })).toBeTruthy();
 
     rerender(

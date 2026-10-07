@@ -73,8 +73,16 @@ Frontend tests are Vitest + Testing Library (jsdom, globals enabled, setup in `s
 
 ### Public landing layout (`frontend/FatFingers/`)
 
-- `client/index.tsx` — bilingual Preact landing, animated helper demo, OS
-  detection, and latest-release download links.
+- `client/index.tsx` — page composition: nav, hero, download CTAs, footer, and
+  document metadata.
+- `client/copy.ts` — all bilingual (`es`/`en`) copy, hero demo examples, and
+  the pre-written playground outputs. Add new strings to both locales.
+- `client/Headline.tsx`, `client/HeroScene.tsx`, `client/How.tsx`,
+  `client/Playground.tsx`, `client/sections.tsx` — self-correcting headline,
+  animated helper demo, keyboard-reactive how-it-works, output-language
+  playground, and the provider/settings/privacy sections.
+- `client/release.ts` — OS detection and latest-release download links.
+- `client/styles.ts` — the landing's raw CSS (no build pipeline).
 - `server/index.ts` — Lakebed capsule definition.
 - `shared/release.ts` — release metadata shared types.
 - `lakebed.json` — portable binding to the owned Lakebed deployment.

@@ -29,14 +29,16 @@ Implementado:
 - Acciones `Correct`, `Professional`, `Shorten`, `Friendly`, `QuickReply` y `Custom`.
 - Idioma de salida combinable con cualquier accion (igual que la entrada,
   ingles o español): traduce conservando el tono del mensaje. Se cambia con el
-  chip del helper o `Ctrl/Cmd+L`.
+  chip del helper o `Ctrl/Cmd+Shift+L`.
 - Controles de modo de escritura, formalidad, creatividad, temperatura, timeout y max output tokens.
 - Tests frontend y backend basicos.
 - Build debug Linux `.deb`.
 - Workflow de GitHub Actions para crear prereleases multiplataforma desde
   `main`.
-- Landing publica bilingue en Lakebed con deteccion de sistema operativo,
-  recomendacion de descarga y enlaces a la release mas reciente.
+- Landing publica bilingue en Lakebed con demo animada del flujo de teclado,
+  prueba interactiva del idioma de salida con ejemplos pregrabados, deteccion
+  de sistema operativo, recomendacion de descarga y enlaces a la release mas
+  reciente.
 
 Pendiente antes de considerar un release estable:
 
